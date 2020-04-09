@@ -15,6 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -124,9 +125,9 @@ public class SnakeApp extends Application
                 food.setAlive(false);
                 root.getChildren().removeAll(food.getView());
 
-                Tail newTail = new Tail(((Player)player).getLastTail(), player);
-                ((Player) player).setLastTail(newTail);
-                addGameObject(newTail , player.getView().getTranslateX(), player.getView().getTranslateY());
+                SnakePart newSnakePart = new SnakePart(null, player);
+                ((Player) player).addPart(newSnakePart);
+                addGameObject(newSnakePart , player.getView().getTranslateX(), player.getView().getTranslateY());
 
             }
         }
@@ -174,41 +175,37 @@ public class SnakeApp extends Application
     private class Player extends GameObject
     {
         int timer = 0;
-        Stack<GameObject> tails;
+        LinkedList<GameObject> bodyParts;
+        GameObject head;
 
         Player()
         {
             super(new Rectangle(30, 30, Color.BLUE));
-            tails = new Stack<>();
+            bodyParts = new LinkedList<>();
 
-            Rectangle rectangle = new Rectangle(30,30);
-            rectangle.setFill(new ImagePattern(new Image("test.jpg")));
-            this.view = rectangle;
-            this.previousX = view.getTranslateX();
-            this.previousY = view.getTranslateY();
-            this.previousAngle = view.getRotate();
+            bodyParts.add(new SnakePart(null, this));
         }
 
-        void setLastTail(GameObject lastTail)
+        void addPart(GameObject lastTail)
         {
-            System.out.println(this.tails.size());
-            if (lastTail instanceof Tail)
-                ((Tail) lastTail).tailNumber = this.tails.size();
+            ((Rectangle)lastTail.view).setFill(new ImagePattern(new Image("test.jpg")));
 
-            this.tails.add(lastTail);
-        }
+            if (this.bodyParts.size() > 0)
+            {
+                ((SnakePart)this.bodyParts.getFirst()).parent = lastTail;
 
-        GameObject getLastTail()
-        {
-            if (tails.empty())
-                return this;
+                if (this.bodyParts.size() == 2 || this.bodyParts.size() == 1 || this.bodyParts.size() == 3 )
+                    ((Rectangle) ((SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
+                else
+                    ((Rectangle) ((SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
+            }
 
-            return tails.lastElement();
+            this.bodyParts.addFirst(lastTail);
         }
 
         void stackForEach(Consumer<? super GameObject> action)
         {
-            this.tails.forEach(action);
+            this.bodyParts.forEach(action);
         }
 
         boolean checkForTail()
@@ -224,14 +221,19 @@ public class SnakeApp extends Application
                 super.update();
                 timer++;
 
+                /*
                 int i = 0;
-                for (GameObject tail : tails)
+                for (GameObject tail : bodyParts)
                 {
-                    if (i++ != tails.size()- 1)
-                    ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeBody.png")));
+                    if (i++ == bodyParts.size() - 2)
+                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeTail.png")));
+                    else if (((SnakePart) tail).parent == null)
+                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("test.jpg")));
+                    else
+                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeBody.png")));
                 }
-
-                if (timer == 10)
+*/
+                if (timer == 11)
                 {
                     this.updatePreviousView();
                     this.timer = 0;
@@ -240,7 +242,7 @@ public class SnakeApp extends Application
             else
             {
                 view.setOpacity(.3);
-                for(GameObject tail : tails)
+                for(GameObject tail : bodyParts)
                     tail.view.setOpacity(.3);
 
                 view.setTranslateX(view.getTranslateX());
@@ -250,8 +252,8 @@ public class SnakeApp extends Application
 
                 if (timer > 5)
                 {
-                    if (!this.tails.empty())
-                        root.getChildren().removeAll(this.tails.pop().getView());
+                    if (this.bodyParts.size() != 0)
+                        root.getChildren().removeAll(this.bodyParts.pop().getView());
                     else
                         root.getChildren().removeAll(this.view);
 
@@ -261,25 +263,17 @@ public class SnakeApp extends Application
         }
     }
 
-    private class Tail extends GameObject
+    private class SnakePart extends GameObject
     {
         int tailNumber;
         int timer = 0;
         GameObject parent;
         GameObject head;
 
-        Tail(GameObject parent, GameObject head)
+        SnakePart(GameObject parent, GameObject head)
         {
             super(new Rectangle(30, 30, Color.BLUE));
-
-            Rectangle rectangle = new Rectangle(30,30);
-            rectangle.setFill(new ImagePattern(new Image("snakeTail.png")));
-            this.view = rectangle;
-            this.previousX = view.getTranslateX();
-            this.previousY = view.getTranslateY();
-            this.previousAngle = view.getRotate();
-
-
+            ((Rectangle)this.view).setFill(new ImagePattern(new Image("snakeTail.png")));
             this.parent = parent;
             this.head = head;
             this.tailNumber = 0;
@@ -291,16 +285,31 @@ public class SnakeApp extends Application
         {
             if (head.isAlive())
             {
-                view.setTranslateX(parent.previousX);
-                view.setTranslateY(parent.previousY);
-                view.setRotate(parent.previousAngle);
-
-                timer++;
-
-                if (timer == 10)
+                if (parent == null)
                 {
-                    this.updatePreviousView();
-                    this.timer = 0;
+                    view.setTranslateX(head.view.getTranslateX());
+                    view.setTranslateY(head.view.getTranslateY());
+                    view.setRotate(head.view.getRotate());
+
+                    timer++;
+
+                    if (timer == 10) {
+                        this.updatePreviousView();
+                        this.timer = 0;
+                    }
+                }
+                else
+                {
+                    view.setTranslateX(parent.previousX);
+                    view.setTranslateY(parent.previousY);
+                    view.setRotate(parent.previousAngle);
+
+                    timer++;
+
+                    if (timer == 10) {
+                        this.updatePreviousView();
+                        this.timer = 0;
+                    }
                 }
             }
         }

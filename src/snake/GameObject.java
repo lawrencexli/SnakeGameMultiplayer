@@ -87,7 +87,7 @@ public class GameObject
         if (alive)
         {
             view.setRotate(view.getRotate() + 3);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
         }
     }
 
@@ -96,7 +96,7 @@ public class GameObject
         if (alive)
         {
             view.setRotate(view.getRotate() - 3);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
         }
     }
 
