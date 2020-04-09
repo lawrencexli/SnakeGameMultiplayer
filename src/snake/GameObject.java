@@ -13,6 +13,10 @@ public class GameObject
     double previousY = 0;
     double previousAngle = 0;
 
+
+    boolean turnRight = false;
+    boolean turnLeft = false;
+
     private boolean alive = true;
 
     public GameObject(Node view)
@@ -56,6 +60,11 @@ public class GameObject
 
     public void update()
     {
+        if (turnRight)
+            this.rotateRight();
+        else if(turnLeft)
+            this.rotateLeft();
+
         view.setTranslateX(view.getTranslateX() + velocity.getX());
         view.setTranslateY(view.getTranslateY() + velocity.getY());
     }
@@ -77,7 +86,7 @@ public class GameObject
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() + 15);
+            view.setRotate(view.getRotate() + 3);
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
         }
     }
@@ -86,7 +95,7 @@ public class GameObject
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() - 15);
+            view.setRotate(view.getRotate() - 3);
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
         }
     }

@@ -35,9 +35,17 @@ public class SnakeApp extends Application
         stage.getScene().setOnKeyPressed(e ->
         {
             if (e.getCode() == KeyCode.RIGHT)
-                player.rotateLeft();
+                player.turnLeft = true;
             else if (e.getCode() == KeyCode.LEFT)
-                player.rotateRight();
+                player.turnRight = true;
+        });
+
+        stage.getScene().setOnKeyReleased(e ->
+        {
+            if (e.getCode() == KeyCode.RIGHT)
+                player.turnLeft = false;
+            else if (e.getCode() == KeyCode.LEFT)
+                player.turnRight = false;
         });
         stage.show();
     }
