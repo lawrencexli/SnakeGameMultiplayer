@@ -3,16 +3,12 @@ package snake;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 
+import java.util.Random;
+
 public class GameObject
 {
     Node view;
     Point2D velocity = new Point2D(0,0);
-
-    //protected Node previousView;
-    double previousX = 0;
-    double previousY = 0;
-    double previousAngle = 0;
-
 
     boolean turnRight = false;
     boolean turnLeft = false;
@@ -22,9 +18,6 @@ public class GameObject
     public GameObject(Node view)
     {
         this.view = view;
-        this.previousX = view.getTranslateX();
-        this.previousY = view.getTranslateY();
-        this.previousAngle = view.getRotate();
         //this.previousView = this.view;
     }
 
@@ -36,11 +29,6 @@ public class GameObject
     public Node getView()
     {
         return view;
-    }
-
-    public Point2D getVelocity()
-    {
-        return velocity;
     }
 
     public boolean isAlive()
@@ -69,12 +57,10 @@ public class GameObject
         view.setTranslateY(view.getTranslateY() + velocity.getY());
     }
 
-    public void updatePreviousView()
+    public void reverse()
     {
-        this.previousX = view.getTranslateX();
-        this.previousY = view.getTranslateY();
-        this.previousAngle = view.getRotate();
-        //this.previousView = this.view;
+        view.setRotate(view.getRotate() + rand.nextInt(30) + 75);
+        setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
     }
 
     public double getRotate()
@@ -82,12 +68,14 @@ public class GameObject
         return view.getRotate();
     }
 
+    Random rand = new Random();
+
     public void rotateRight()
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() + 3);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
+            view.setRotate(view.getRotate() + rand.nextInt(3) + 1);
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
         }
     }
 
@@ -95,8 +83,8 @@ public class GameObject
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() - 3);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
+            view.setRotate(view.getRotate() - rand.nextInt(3) + 1);
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
         }
     }
 

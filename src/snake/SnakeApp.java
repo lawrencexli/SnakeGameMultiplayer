@@ -15,19 +15,17 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
-import java.util.Stack;
-import java.util.function.Consumer;
 
-public class SnakeApp extends Application
+public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
 {
     private Pane root;
 
-    private ArrayList<GameObject> foodList = new ArrayList<>();
-    private ArrayList<Wall> walls = new ArrayList<>();
+    private final ArrayList<GameObject> foodList = new ArrayList<>();
+    private final ArrayList<Wall> walls = new ArrayList<>();
 
     private GameObject player;
+    private GameObject user;
 
     @Override
     public void start(Stage stage)
@@ -35,18 +33,37 @@ public class SnakeApp extends Application
         stage.setScene(new Scene(createContent()));
         stage.getScene().setOnKeyPressed(e ->
         {
-            if (e.getCode() == KeyCode.RIGHT)
-                player.turnLeft = true;
-            else if (e.getCode() == KeyCode.LEFT)
-                player.turnRight = true;
+                if (e.getCode() == KeyCode.DOWN)
+                    ((User)user).down();
+                if (e.getCode() == KeyCode.UP)
+                    ((User)user).up();
+                if (e.getCode() == KeyCode.LEFT)
+                    ((User)user).left();
+                if (e.getCode() == KeyCode.RIGHT)
+                    ((User)user).right();
+
+            if (((User) user).getSwordStatus() == null)
+            {
+                if (e.getCode() == KeyCode.SPACE)
+                {
+                    addGameObject(((User) user).createSword(user),
+                            (user.view.getTranslateX() + user.view.getScaleX()) / 2,
+                            (user.view.getTranslateY() + user.view.getScaleY()) / 2);
+                }
+            }
         });
+
 
         stage.getScene().setOnKeyReleased(e ->
         {
             if (e.getCode() == KeyCode.RIGHT)
-                player.turnLeft = false;
+                ((User)user).stillLeft();
             else if (e.getCode() == KeyCode.LEFT)
-                player.turnRight = false;
+                ((User)user).stillLeft();
+            else if (e.getCode() == KeyCode.UP)
+                ((User)user).stillUp();
+            else if (e.getCode() == KeyCode.DOWN)
+                ((User)user).stillUp();
         });
         stage.show();
     }
@@ -55,6 +72,7 @@ public class SnakeApp extends Application
     {
         root = new Pane();
         root.setPrefSize(800, 600);
+        root.setStyle("-fx-background-color: black;");
 
         Wall wall = new Wall(new Rectangle(30, root.getPrefHeight(), Color.GRAY));
         walls.add(wall);
@@ -73,10 +91,21 @@ public class SnakeApp extends Application
         addGameObject(wall, 0 ,root.getPrefHeight() - 30);
 
 
-        player = new Player();
+        player = new Snake(root);
         player.setVelocity(new Point2D(1,0));
         addGameObject(player, root.getPrefWidth()/2, root.getPrefHeight()/2);
 
+        user = new User(root);
+        user.setVelocity(new Point2D(1,0));
+        addGameObject(user, root.getPrefWidth()/2, root.getPrefHeight()/2);
+/*
+        for(int i = 0; i < 30; i++)
+        {
+            SnakePart newSnakePart = new SnakePart(null, player);
+            ((Player) player).addPart(newSnakePart);
+            addGameObject(newSnakePart , player.getView().getTranslateX(), player.getView().getTranslateY());
+        }
+*/
 
         AnimationTimer timer = new AnimationTimer()
         {
@@ -126,21 +155,28 @@ public class SnakeApp extends Application
                 root.getChildren().removeAll(food.getView());
 
                 SnakePart newSnakePart = new SnakePart(null, player);
-                ((Player) player).addPart(newSnakePart);
+                ((Snake) player).addPart(newSnakePart);
                 addGameObject(newSnakePart , player.getView().getTranslateX(), player.getView().getTranslateY());
-
             }
+
+            if (((User) user).getSwordStatus() != null)
+                if (((User) user).swordColliding(food))
+                {
+                    food.setAlive(false);
+                    root.getChildren().removeAll(food.getView());
+                }
         }
 
         for (GameObject wall : walls)
         {
             if (player.isColliding(wall))
             {
-                player.setAlive(false);
+                player.reverse();
+                //player.setAlive(false);
             }
         }
 
-        if (((Player) player).checkForTail())
+        if (((Snake) player).checkForTail())
         {
             player.setAlive(false);
         }
@@ -151,169 +187,55 @@ public class SnakeApp extends Application
 
         foodList.forEach(GameObject::update);
         player.update();
-        ((Player) player).stackForEach(GameObject::update);
+        ((Snake) player).stackForEach(GameObject::update);
+        ((User) user).userUpdate();
 
-        if (Math.random() < 0.01)
+        if (((User) user).getSwordStatus() != null)
+            ((User) user).swordUpdate();
+
+        int rand;
+        Random randomizer = new Random();
+
+        if (Math.random() < 0.02)
         {
-            addFood(new Food(),
-                    30 + ((Math.random() * (root.getPrefWidth() - 60))),
-                    30 + ((Math.random() * (root.getPrefHeight() - 60))));
-        }
-    }
-
-    private class Wall extends GameObject
-    {
-        Stack<GameObject> tails;
-
-        Wall(Rectangle shape)
-        {
-            super(shape);
-            tails = new Stack<>();
-        }
-    }
-
-    private class Player extends GameObject
-    {
-        int timer = 0;
-        LinkedList<GameObject> bodyParts;
-        GameObject head;
-
-        Player()
-        {
-            super(new Rectangle(30, 30, Color.BLUE));
-            bodyParts = new LinkedList<>();
-
-            bodyParts.add(new SnakePart(null, this));
-        }
-
-        void addPart(GameObject lastTail)
-        {
-            ((Rectangle)lastTail.view).setFill(new ImagePattern(new Image("test.jpg")));
-
-            if (this.bodyParts.size() > 0)
-            {
-                ((SnakePart)this.bodyParts.getFirst()).parent = lastTail;
-
-                if (this.bodyParts.size() == 2 || this.bodyParts.size() == 1 || this.bodyParts.size() == 3 )
-                    ((Rectangle) ((SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
-                else
-                    ((Rectangle) ((SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
-            }
-
-            this.bodyParts.addFirst(lastTail);
-        }
-
-        void stackForEach(Consumer<? super GameObject> action)
-        {
-            this.bodyParts.forEach(action);
-        }
-
-        boolean checkForTail()
-        {
-            return false;
-        }
-
-        @Override
-        public void update()
-        {
-            if (this.isAlive())
-            {
-                super.update();
-                timer++;
-
-                /*
-                int i = 0;
-                for (GameObject tail : bodyParts)
-                {
-                    if (i++ == bodyParts.size() - 2)
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeTail.png")));
-                    else if (((SnakePart) tail).parent == null)
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("test.jpg")));
-                    else
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeBody.png")));
-                }
+            rand = randomizer.nextInt(5) + 10;
+            /*
+            if (rand % 2 == 0)
+                for (int i = 0; i < rand; i++)
+                    player.rotateLeft();
+            else
+                for (int i = 0; i < rand; i++)
+                    player.rotateRight();
 */
-                if (timer == 11)
-                {
-                    this.updatePreviousView();
-                    this.timer = 0;
-                }
+            if (rand % 2 == 0)
+            {
+                player.turnRight = false;
+                player.turnLeft = !player.turnLeft;
             }
             else
             {
-                view.setOpacity(.3);
-                for(GameObject tail : bodyParts)
-                    tail.view.setOpacity(.3);
-
-                view.setTranslateX(view.getTranslateX());
-                view.setTranslateY(view.getTranslateY());
-
-                timer++;
-
-                if (timer > 5)
-                {
-                    if (this.bodyParts.size() != 0)
-                        root.getChildren().removeAll(this.bodyParts.pop().getView());
-                    else
-                        root.getChildren().removeAll(this.view);
-
-                    this.timer = 0;
-                }
+                player.turnRight = !player.turnRight;
+                player.turnLeft = false;
             }
+
+
+            if (foodList.size() < 30)
+            addFood(new Food(),
+                    30 + ((Math.random() * (root.getPrefWidth() - 90))),
+                    30 + ((Math.random() * (root.getPrefHeight() - 90))));
+
         }
     }
 
-    private class SnakePart extends GameObject
+    private static class Wall extends GameObject
     {
-        int tailNumber;
-        int timer = 0;
-        GameObject parent;
-        GameObject head;
-
-        SnakePart(GameObject parent, GameObject head)
+        Wall(Rectangle shape)
         {
-            super(new Rectangle(30, 30, Color.BLUE));
-            ((Rectangle)this.view).setFill(new ImagePattern(new Image("snakeTail.png")));
-            this.parent = parent;
-            this.head = head;
-            this.tailNumber = 0;
-        }
-
-
-        @Override
-        public void update()
-        {
-            if (head.isAlive())
-            {
-                if (parent == null)
-                {
-                    view.setTranslateX(head.view.getTranslateX());
-                    view.setTranslateY(head.view.getTranslateY());
-                    view.setRotate(head.view.getRotate());
-
-                    timer++;
-
-                    if (timer == 10) {
-                        this.updatePreviousView();
-                        this.timer = 0;
-                    }
-                }
-                else
-                {
-                    view.setTranslateX(parent.previousX);
-                    view.setTranslateY(parent.previousY);
-                    view.setRotate(parent.previousAngle);
-
-                    timer++;
-
-                    if (timer == 10) {
-                        this.updatePreviousView();
-                        this.timer = 0;
-                    }
-                }
-            }
+            super(shape);
         }
     }
+
+
 
     private static class Food extends GameObject
     {
