@@ -74,8 +74,10 @@ public class GameObject
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() + rand.nextInt(3) + 1);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
+
+            view.setRotate(view.getRotate() + 3);
+            //view.setRotate(view.getRotate() + rand.nextInt(3) + 1);
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
         }
     }
 
@@ -83,12 +85,18 @@ public class GameObject
     {
         if (alive)
         {
-            view.setRotate(view.getRotate() - rand.nextInt(3) + 1);
-            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(2));
+            view.setRotate(view.getRotate() - 3);
+            //view.setRotate(view.getRotate() - rand.nextInt(3) + 1);
+            setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).multiply(1.6));
         }
     }
 
     public boolean isColliding(GameObject other)
+    {
+        return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
+    }
+
+    public boolean collidingWithPoint(GameObject other)
     {
         return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
     }

@@ -25,7 +25,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
     private final ArrayList<Wall> walls = new ArrayList<>();
 
     private GameObject player;
-    private GameObject user;
+    //private GameObject user;
 
     @Override
     public void start(Stage stage)
@@ -33,6 +33,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         stage.setScene(new Scene(createContent()));
         stage.getScene().setOnKeyPressed(e ->
         {
+            /*
                 if (e.getCode() == KeyCode.DOWN)
                     ((User)user).down();
                 if (e.getCode() == KeyCode.UP)
@@ -41,7 +42,12 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                     ((User)user).left();
                 if (e.getCode() == KeyCode.RIGHT)
                     ((User)user).right();
-
+*/
+            if (e.getCode() == KeyCode.LEFT)
+                ((Snake)player).turnLeft = true;
+            if (e.getCode() == KeyCode.RIGHT)
+                ((Snake)player).turnRight = true;
+            /*
             if (((User) user).getSwordStatus() == null)
             {
                 if (e.getCode() == KeyCode.SPACE)
@@ -50,12 +56,13 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                             (user.view.getTranslateX() + user.view.getScaleX()) / 2,
                             (user.view.getTranslateY() + user.view.getScaleY()) / 2);
                 }
-            }
+            }*/
         });
 
 
         stage.getScene().setOnKeyReleased(e ->
         {
+            /*
             if (e.getCode() == KeyCode.RIGHT)
                 ((User)user).stillLeft();
             else if (e.getCode() == KeyCode.LEFT)
@@ -64,6 +71,11 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                 ((User)user).stillUp();
             else if (e.getCode() == KeyCode.DOWN)
                 ((User)user).stillUp();
+*/
+            if (e.getCode() == KeyCode.RIGHT)
+                ((Snake)player).turnRight = false;
+            else if (e.getCode() == KeyCode.LEFT)
+                ((Snake)player).turnLeft = false;;
         });
         stage.show();
     }
@@ -95,9 +107,12 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         player.setVelocity(new Point2D(1,0));
         addGameObject(player, root.getPrefWidth()/2, root.getPrefHeight()/2);
 
+        /*
         user = new User(root);
         user.setVelocity(new Point2D(1,0));
         addGameObject(user, root.getPrefWidth()/2, root.getPrefHeight()/2);
+
+         */
 /*
         for(int i = 0; i < 30; i++)
         {
@@ -159,21 +174,29 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                 addGameObject(newSnakePart , player.getView().getTranslateX(), player.getView().getTranslateY());
             }
 
+            /*
             if (((User) user).getSwordStatus() != null)
                 if (((User) user).swordColliding(food))
                 {
                     food.setAlive(false);
                     root.getChildren().removeAll(food.getView());
                 }
+
+             */
         }
 
         for (GameObject wall : walls)
         {
             if (player.isColliding(wall))
             {
-                player.reverse();
-                //player.setAlive(false);
+                //player.reverse();
+                player.setAlive(false);
             }
+        }
+
+        if (((Snake)player).checkForTail())
+        {
+            player.setAlive(false);
         }
 
         if (((Snake) player).checkForTail())
@@ -188,11 +211,13 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         foodList.forEach(GameObject::update);
         player.update();
         ((Snake) player).stackForEach(GameObject::update);
+
+        /*
         ((User) user).userUpdate();
 
         if (((User) user).getSwordStatus() != null)
             ((User) user).swordUpdate();
-
+*/
         int rand;
         Random randomizer = new Random();
 
@@ -207,6 +232,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                 for (int i = 0; i < rand; i++)
                     player.rotateRight();
 */
+            /*
             if (rand % 2 == 0)
             {
                 player.turnRight = false;
@@ -217,7 +243,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
                 player.turnRight = !player.turnRight;
                 player.turnLeft = false;
             }
-
+*/
 
             if (foodList.size() < 30)
             addFood(new Food(),

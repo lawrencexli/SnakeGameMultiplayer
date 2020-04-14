@@ -49,16 +49,16 @@ public interface SnakeDriver
 
         void addPart(GameObject lastTail)
         {
-            ((Rectangle)lastTail.view).setFill(new ImagePattern(new Image("snakeHead.png")));
+            ((Circle)lastTail.view).setFill(new ImagePattern(new Image("snakeHead.png")));
 
             if (this.bodyParts.size() > 0)
             {
                 ((SnakeApp.SnakePart)this.bodyParts.getFirst()).parent = lastTail;
 
                 if (this.bodyParts.size() == 2 || this.bodyParts.size() == 1 || this.bodyParts.size() == 3 )
-                    ((Rectangle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
+                    ((Circle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
                 else
-                    ((Rectangle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
+                    ((Circle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
             }
 
             this.bodyParts.addFirst(lastTail);
@@ -71,7 +71,22 @@ public interface SnakeDriver
 
         boolean checkForTail()
         {
-            return false;
+            int count = 0;
+
+            for (int i = 0 ; i < this.bodyParts.size(); i++)
+            {
+                if (i > 30)// && i % 10 == 0)
+                {
+                    //this.bodyParts.get(i).getView().setScaleX(2);
+                    //this.bodyParts.get(i).getView().setScaleY(2);
+                    if (this.isColliding(this.bodyParts.get(i)))
+                        count++;
+                        //this.bodyParts.get(i).getView().setScaleY(1.5);
+                        //this.setAlive(false);
+                }
+            }
+
+            return count > 6;
         }
 
         @Override
@@ -80,25 +95,6 @@ public interface SnakeDriver
             if (this.isAlive())
             {
                 super.update();
-                timer++;
-
-                /*
-                int i = 0;
-                for (GameObject tail : bodyParts)
-                {
-                    if (i++ == bodyParts.size() - 2)
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeTail.png")));
-                    else if (((SnakePart) tail).parent == null)
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("test.jpg")));
-                    else
-                        ((Rectangle)tail.view).setFill(new ImagePattern(new Image("snakeBody.png")));
-                }
-                */
-                if (timer > 3)
-                {
-                    //this.updatePreviousView();
-                    this.timer = 0;
-                }
             }
             else
             {
@@ -111,7 +107,7 @@ public interface SnakeDriver
 
                 timer++;
 
-                if (timer > 5)
+                if (timer > 1)
                 {
                     if (this.bodyParts.size() != 0)
                         root.getChildren().removeAll(this.bodyParts.pop().getView());
@@ -137,8 +133,9 @@ public interface SnakeDriver
 
         SnakePart(GameObject parent, GameObject head)
         {
-            super(new Rectangle(30,30));
-            ((Rectangle)this.view).setFill(new ImagePattern(new Image("snakeTail.png")));
+            super(new Circle(15, 15,15, Color.BLUE));
+            //super(new Rectangle(30,30));
+            ((Circle)this.view).setFill(new ImagePattern(new Image("snakeTail.png")));
 
             this.previousX = -60;
             this.previousY = -60;
