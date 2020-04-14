@@ -2,6 +2,7 @@ package snake;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.shape.Shape;
 
 import java.util.Random;
 
@@ -91,9 +92,14 @@ public class GameObject
         }
     }
 
+//    public boolean isColliding(GameObject other)
+//    {
+//        return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
+//    }
+
     public boolean isColliding(GameObject other)
     {
-        return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
+        return Shape.intersect((Shape) this.getView(), (Shape) other.getView()).getBoundsInParent().getWidth() > 0;
     }
 
     public boolean collidingWithPoint(GameObject other)
