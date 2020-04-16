@@ -2,6 +2,7 @@ package snake;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,14 +18,17 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
+public class SnakeAppModel extends Application implements SnakeDriver, PlayerDriver
 {
     private Pane root;
 
     private final ArrayList<GameObject> foodList = new ArrayList<>();
     private final ArrayList<Wall> walls = new ArrayList<>();
 
-    private GameObject player;
+    protected GameObject player;
+    static GameObject snakeTest = null;
+    //private SnakeAppController controller;
+
     //private GameObject user;
 
     @Override
@@ -77,6 +81,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
             else if (e.getCode() == KeyCode.LEFT)
                 ((Snake)player).turnLeft = false;;
         });
+
         stage.show();
     }
 
@@ -104,6 +109,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
 
 
         player = new Snake(root);
+        snakeTest = player;
         player.setVelocity(new Point2D(1,0));
         addGameObject(player, root.getPrefWidth()/2, root.getPrefHeight()/2);
 
@@ -132,7 +138,6 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         };
 
         timer.start();
-
         return root;
     }
 
@@ -149,6 +154,7 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
             case 2: ((Circle) food.view).setFill(new ImagePattern(new Image("fries.png")));
                 break;
         }
+
         foodList.add(food);
         addGameObject(food, x, y);
     }
@@ -158,6 +164,26 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         object.getView().setTranslateX(x);
         object.getView().setTranslateY(y);
         root.getChildren().add(object.getView());
+    }
+
+    public ArrayList<double[]> getSnakePositions()
+    {
+        if(!((Snake) this.player).bodyParts.isEmpty())
+        {
+            ArrayList<double[]> partList = new ArrayList<>();
+
+            for (GameObject snake : ((Snake) this.player).bodyParts) {
+                double[] temp = new double[3];
+                temp[0] = snake.getView().getTranslateX();
+                temp[1] = snake.getView().getTranslateY();
+                temp[2] = snake.getView().getRotate();
+                partList.add(temp);
+            }
+
+            return partList;
+        }
+
+        return null;
     }
 
     private void updateView()
@@ -212,6 +238,15 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         player.update();
         ((Snake) player).stackForEach(GameObject::update);
 
+        //if (this.controller != null)
+        {
+            //System.out.println("nnn");
+            //controller.snakePartPositions.clear();
+            //controller.snakePartPositions.addAll(this.getSnakePositions());
+        }
+
+        //this.controller.controllerUpdate();
+
         /*
         ((User) user).userUpdate();
 
@@ -249,7 +284,6 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
             addFood(new Food(),
                     30 + ((Math.random() * (root.getPrefWidth() - 90))),
                     30 + ((Math.random() * (root.getPrefHeight() - 90))));
-
         }
     }
 
@@ -269,6 +303,19 @@ public class SnakeApp extends Application implements SnakeDriver, PlayerDriver
         {
             super(new Circle(10, 10, 10, Color.RED));
         }
+    }
+
+    public void launchMain(String[] args)
+    {
+        Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                new SnakeAppModel().start(new Stage());
+            }
+        });
+        //this.launch(args);
     }
 
     public static void main(String[] args)

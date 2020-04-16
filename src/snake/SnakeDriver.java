@@ -23,7 +23,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 import java.util.LinkedList;
 import java.util.function.Consumer;
@@ -43,7 +42,7 @@ public interface SnakeDriver
             this.root = root;
 
             bodyParts = new LinkedList<>();
-            bodyParts.add(new SnakeApp.SnakePart(null, this));
+            bodyParts.add(new SnakeAppModel.SnakePart(null, this));
 
         }
 
@@ -53,12 +52,12 @@ public interface SnakeDriver
 
             if (this.bodyParts.size() > 0)
             {
-                ((SnakeApp.SnakePart)this.bodyParts.getFirst()).parent = lastTail;
+                ((SnakeAppModel.SnakePart)this.bodyParts.getFirst()).parent = lastTail;
 
                 if (this.bodyParts.size() == 2 || this.bodyParts.size() == 1 || this.bodyParts.size() == 3 )
-                    ((Circle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
+                    ((Circle) ((SnakeAppModel.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeTail.png")));
                 else
-                    ((Circle) ((SnakeApp.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
+                    ((Circle) ((SnakeAppModel.SnakePart) this.bodyParts.getFirst()).view).setFill(new ImagePattern(new Image("snakeBody.png")));
             }
 
             this.bodyParts.addFirst(lastTail);
