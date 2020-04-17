@@ -29,34 +29,40 @@ public class Item {
     /** Name of the item */
     String name;
 
-    public Item(String name) {
+    /** Location */
+    Double[] location;
+
+    public Item(String name, Double[] location) {
         this.name = name;
+        this.location = location;
     }
 
     public String getName() { return name; }
+
+    public Double[] getLocation() { return location; }
 }
 
 /** Food inherited from Item */
 class Food extends Item {
 
-    public Food() {
-        super("Food");
+    public Food(Double[] location) {
+        super("Food",location);
     }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
-    public Potion() {
-        super("Potion");
+    public Potion(Double[] location) {
+        super("Potion",location);
     }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
-    public Poison() {
-        super("Poison");
+    public Poison(Double[] location) {
+        super("Poison",location);
     }
 }
 
