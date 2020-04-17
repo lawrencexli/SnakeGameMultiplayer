@@ -19,49 +19,44 @@
 package
         main;
 
-import javafx.geometry.Point2D;
-
 /**
  * A class that represent the items in the snake game
+ *
+ * @author: Lawrence
  */
 public class Item {
-
-    /** Location as 2D coordinates */
-    Point2D location;
 
     /** Name of the item */
     String name;
 
-    public Item(String name, Point2D location) {
-        this.location = location;
+    public Item(String name) {
         this.name = name;
     }
 
-    public Point2D getLocation() { return location; }
     public String getName() { return name; }
 }
 
 /** Food inherited from Item */
 class Food extends Item {
 
-    public Food(Point2D location) {
-        super("Food",location);
+    public Food() {
+        super("Food");
     }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
-    public Potion(Point2D location) {
-        super("Potion",location);
+    public Potion() {
+        super("Potion");
     }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
-    public Poison(Point2D location) {
-        super("Poison",location);
+    public Poison() {
+        super("Poison");
     }
 }
 
