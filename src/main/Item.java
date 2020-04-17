@@ -20,11 +20,12 @@ package
         main;
 
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
 
 /**
  * A class that represent the items in the snake game
  */
-public class Item {
+public class Item extends GameAsset{
 
     /** Location as 2D coordinates */
     Point2D location;
@@ -32,7 +33,8 @@ public class Item {
     /** Name of the item */
     String name;
 
-    public Item(String name, Point2D location) {
+    public Item(int x, int y, int radius, Color color, String name) {
+        super(x,y,radius,color);
         this.location = location;
         this.name = name;
     }
@@ -44,24 +46,24 @@ public class Item {
 /** Food inherited from Item */
 class Food extends Item {
 
-    public Food(Point2D location) {
-        super("Food",location);
+    public Food(int x, int y, int radius, Color color) {
+        super(x,y,radius,color,"Food");
     }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
-    public Potion(Point2D location) {
-        super("Potion",location);
+    public Potion(int x, int y, int radius, Color color) {
+        super(x,y,radius,color,"Potion");
     }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
-    public Poison(Point2D location) {
-        super("Poison",location);
+    public Poison(int x, int y, int radius, Color color) {
+        super(x,y,radius,color,"Poison");
     }
 }
 
