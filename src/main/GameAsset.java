@@ -18,6 +18,8 @@
  */
 package main;
 
+import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 /**
@@ -49,9 +51,9 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    public GameAsset()
+    public GameAsset(int xCenter, int yCenter, int radius, Color color)
     {
-        super();
+        super(xCenter, yCenter, radius,color);
     }
 
     /**
@@ -76,8 +78,8 @@ public abstract class GameAsset extends Circle
      */
     public void updateAsset()
     {
-        this.setTranslateX(velocityX);
-        this.setTranslateY(velocityY);
+        this.setTranslateX(this.getTranslateX() + velocityX);
+        this.setTranslateY(this.getTranslateY() + velocityY);
     }
 
     /**
@@ -91,5 +93,16 @@ public abstract class GameAsset extends Circle
     {
         this.setRotate(this.getRotate() + 3 * direction);
         this.setVelocity(Math.cos(Math.toRadians(getRotate())),Math.sin(Math.toRadians(getRotate())) );
+    }
+
+    /**
+     * A check for collisions with other Nodes in the scene
+     *
+     * @param otherAsset - the other game asset to look for bounds with
+     * @return - true if they are colliding with one another, false otherwise
+     */
+    public boolean checkForCollision(Node otherAsset)
+    {
+        return this.getBoundsInParent().intersects(otherAsset.getBoundsInParent());
     }
 }
