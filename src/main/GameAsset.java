@@ -1,0 +1,95 @@
+/* *****************************************
+ * CSCI205 - Software Engineering and Design
+ * Spring 2020
+ * Instructor: Prof. Chris Dancy
+ *
+ * Name: Christopher Asbrock
+ * Section: 11am
+ * Date: 4/16/20
+ * Time: 8:17 PM
+ *
+ * Project: csci205_final_project_sp2020
+ * Package: main
+ * Class: GameAsset
+ *
+ * Description:
+ *
+ * ****************************************
+ */
+package main;
+
+import javafx.scene.shape.Circle;
+
+/**
+ * An abstract class that contains some variables every game asset will need
+ * and an update to update the objects x, y, and rotations per tick
+ *
+ * @author Christopher Asbrock
+ */
+public abstract class GameAsset extends Circle
+{
+    /**
+     * inner class that determines the direction of a rotation
+     *
+     * @author Christopher Asbrock
+     */
+    class MyRotate
+    {
+        final static int RIGHT = 1;
+        final static int LEFT = -1;
+    }
+
+    /**the x velocity this object is moving in, 0 if stationary*/
+    private double velocityX;
+    /**the y velocity this object is moving in, 0 if stationary*/
+    private double velocityY;
+
+    /**
+     * constructor, sets up a circle node that every object in the game will be based on
+     *
+     * @author Christopher Asbrock
+     */
+    public GameAsset()
+    {
+        super();
+    }
+
+    /**
+     * sets the x and y values in the obejct velocity
+     *
+     * @author Christopher Asbrock
+     *
+     * @param velocityX - a double representing the objects x velocity
+     * @param velocityY - a double representing the objects y velocity
+     */
+    public void setVelocity(double velocityX, double velocityY)
+    {
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+    }
+
+    /**
+     * run by the games animation timer 60 times a second to update the object position
+     * based on its velocity
+     *
+     * @author Christopher Asbrock
+     */
+    public void updateAsset()
+    {
+        this.setTranslateX(velocityX);
+        this.setTranslateY(velocityY);
+    }
+
+    /**
+     * adjusts the velocity to be directed based on rotation
+     *
+     * @author Christopher Asbrock
+     *
+     * @param direction - RIGHT or LEFT
+     */
+    public void rotate(int direction)
+    {
+        this.setRotate(this.getRotate() + 3 * direction);
+        this.setVelocity(Math.cos(Math.toRadians(getRotate())),Math.sin(Math.toRadians(getRotate())) );
+    }
+}
