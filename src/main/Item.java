@@ -33,8 +33,8 @@ public class Item extends GameAsset{
     /** Name of the item */
     String name;
 
-    public Item(int x, int y, int radius, Color color, String name) {
-        super(x,y,radius,color);
+    public Item(int x, Color color, String name) {
+        super(x,color);
         this.location = location;
         this.name = name;
     }
@@ -46,24 +46,24 @@ public class Item extends GameAsset{
 /** Food inherited from Item */
 class Food extends Item {
 
-    public Food(int x, int y, int radius, Color color) {
-        super(x,y,radius,color,"Food");
+    public Food(int x, Color color) {
+        super(x,color,"Food");
     }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
-    public Potion(int x, int y, int radius, Color color) {
-        super(x,y,radius,color,"Potion");
+    public Potion(int x,  Color color) {
+        super(x,color,"Potion");
     }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
-    public Poison(int x, int y, int radius, Color color) {
-        super(x,y,radius,color,"Poison");
+    public Poison(int x, Color color) {
+        super(x,color,"Poison");
     }
 }
 
