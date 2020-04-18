@@ -67,7 +67,7 @@ public class SnakePane extends Application
     {
         if (randamizer.nextInt(30) < 1)
         {
-            Food newFood = new Food(15,15,15, Color.RED);
+            Food newFood = new Food(15, Color.RED);
             this.listOfItems.add(newFood);
             SnakeUtil.addToGame(root, newFood, this.randamizer.nextInt(WIDTH), this.randamizer.nextInt(HEIGHT));
         }
