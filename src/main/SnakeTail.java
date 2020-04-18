@@ -39,6 +39,22 @@ public class SnakeTail extends GameAsset {
         this.parent = parent;
     }
 
+    public GameAsset getParentNode() {
+        return parent;
+    }
+
+    public double getPrevX() {
+        return prevX;
+    }
+
+    public double getPrevY() {
+        return prevY;
+    }
+
+    public double getPrevAngle() {
+        return prevAngle;
+    }
+
     /**
      * Updates the position of the SnakeTail.
      * After updating the position with current velocity,

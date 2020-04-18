@@ -47,16 +47,17 @@ public class Snake extends GameAsset{
     public int getNumTails() { return numTails; }
 
     /** Add a tail */
-    public void addTail() {
+    public GameAsset addTail() {
+        SnakeTail snakeTail;
         if (snakeTails.size() == 0) {
             // The first SnakeTail attaches to the head
-            SnakeTail snakeTail = new SnakeTail(this);
-            snakeTails.add(snakeTail);
+            snakeTail = new SnakeTail(this);
         } else {
             // Other SnakeTail attach to its most recent SnakeTail
-            SnakeTail snakeTail = new SnakeTail(snakeTails.getLast());
-            snakeTails.add(snakeTail);
+            snakeTail = new SnakeTail(snakeTails.getLast());
         }
+        snakeTails.add(snakeTail);
+        return snakeTail;
     }
 
     /** Remove a tail */
