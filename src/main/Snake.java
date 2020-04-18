@@ -19,6 +19,8 @@
 package
         main;
 
+import javafx.scene.paint.Color;
+
 public class Snake extends GameAsset{
 
     /**the x velocity this object is moving in, 0 if stationary*/
@@ -28,7 +30,7 @@ public class Snake extends GameAsset{
     private double velocityY;
 
     public Snake() {
-        super();
+        super(15, Color.RED);
     }
 
     /**

@@ -20,7 +20,7 @@ class GameAssetTest
     }
 
     @Test
-    void rotate()
+    void rotateLEFT()
     {
         this.cordPrintOut();
         this.testAsset.setVelocity(1,0);
@@ -49,7 +49,7 @@ class GameAssetTest
     }
 
     @Test
-    void rotateReverse()
+    void rotateRight()
     {
         this.testAsset.setVelocity(1,0);
         for (int i = 0; i < 15; i++)
@@ -61,6 +61,11 @@ class GameAssetTest
         assertTrue(this.testAsset.getTranslateY() < 0);
         assertNotEquals(this.testAsset.getTranslateX(),this.testAsset.getTranslateY(), EPSILON );
         this.cordPrintOut();
+
+        setUp();
+        this.testAsset.setVelocity(0,1);
+        this.testAsset.updateAsset();
+        assertEquals(this.testAsset.getTranslateY(), 1, EPSILON);
     }
 
     private void cordPrintOut()

@@ -46,6 +46,10 @@ public abstract class GameAsset extends Circle
     /**the y velocity this object is moving in, 0 if stationary*/
     private double velocityY;
 
+    private double speed;
+
+    private boolean noLongerActive;
+
     /**
      * constructor, sets up a circle node that every object in the game will be based on
      *
@@ -54,6 +58,16 @@ public abstract class GameAsset extends Circle
     public GameAsset(int xCenter, Color color)
     {
         super(xCenter, xCenter, xCenter, color);
+        this.speed = 1;
+        this.noLongerActive = false;
+    }
+
+    /**
+     * swaps the asset to inactive so it can be removed from the board
+     */
+    public void deactivate()
+    {
+        this.noLongerActive = true;
     }
 
     /**
@@ -92,7 +106,7 @@ public abstract class GameAsset extends Circle
     public void rotate(int direction)
     {
         this.setRotate(this.getRotate() + 3 * direction);
-        this.setVelocity(Math.cos(Math.toRadians(getRotate())),Math.sin(Math.toRadians(getRotate())) );
+        this.setVelocity(Math.cos(Math.toRadians(getRotate())) * speed,Math.sin(Math.toRadians(getRotate())) * speed );
     }
 
     /**
