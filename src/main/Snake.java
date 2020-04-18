@@ -19,6 +19,7 @@
 package
         main;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.util.Collections;
@@ -26,27 +27,34 @@ import java.util.LinkedList;
 
 public class Snake extends GameAsset {
 
-    /**the x velocity this object is moving in, 0 if stationary*/
-    private double velocityX;
+    /** The snake body representation */
+    private LinkedList<Snake> snakeBody;
 
-    /**the y velocity this object is moving in, 0 if stationary*/
-    private double velocityY;
-
-    private LinkedList<Circle> snakeBody;
+    /** The parent node of a snake */
+    private Snake prev;
 
     public Snake() {
-        super();
-        snakeBody = new LinkedList<>(Collections.singletonList(new Circle()));
+        super(1, Color.GREEN);
     }
 
-    public double getVelocityX() { return velocityX; }
+    public void createSnakeBody() {
+        this.snakeBody = new LinkedList<>(Collections.singletonList(this));
+    }
 
-    public double getVelocityY() { return velocityY; }
-
-    public LinkedList<Circle> getSnakeBody() { return snakeBody; }
+    public LinkedList<Snake> getSnakeBody() { return snakeBody; }
 
     public void addBodyLength() {
-        this.snakeBody.addFirst(new Circle());
+        Snake newPart = new Snake();
+        newPart.setParent(this.snakeBody.getFirst());
+        this.snakeBody.addFirst(newPart);
+    }
+
+    public Snake getPrev() {
+        return prev;
+    }
+
+    public void setParent(Snake snake) {
+        this.prev = snake;
     }
 
     public void removeBodyLength() {
@@ -54,15 +62,15 @@ public class Snake extends GameAsset {
             System.out.println("The snake size is already 1!");
             return;
         }
-        this.snakeBody.removeLast();
+        this.snakeBody.removeFirst();
     }
 
     public Circle getHead() {
-        return this.snakeBody.getFirst();
+        return this.snakeBody.getLast();
     }
 
     public Circle getTail() {
-        return this.snakeBody.getLast();
+        return this.snakeBody.getFirst();
     }
 
     /**
