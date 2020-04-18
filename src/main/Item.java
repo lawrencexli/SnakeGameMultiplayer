@@ -19,50 +19,51 @@
 package
         main;
 
+import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
+
 /**
  * A class that represent the items in the snake game
- *
- * @author: Lawrence
  */
-public class Item {
+public class Item extends GameAsset{
+
+    /** Location as 2D coordinates */
+    Point2D location;
 
     /** Name of the item */
     String name;
 
-    /** Location */
-    Double[] location;
-
-    public Item(String name, Double[] location) {
-        this.name = name;
+    public Item(int x, Color color, String name) {
+        super(x,color);
         this.location = location;
+        this.name = name;
     }
 
+    public Point2D getLocation() { return location; }
     public String getName() { return name; }
-
-    public Double[] getLocation() { return location; }
 }
 
 /** Food inherited from Item */
 class Food extends Item {
 
-    public Food(Double[] location) {
-        super("Food",location);
+    public Food(int x, Color color) {
+        super(x,color,"Food");
     }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
-    public Potion(Double[] location) {
-        super("Potion",location);
+    public Potion(int x,  Color color) {
+        super(x,color,"Potion");
     }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
-    public Poison(Double[] location) {
-        super("Poison",location);
+    public Poison(int x, Color color) {
+        super(x,color,"Poison");
     }
 }
 
