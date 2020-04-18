@@ -18,6 +18,7 @@
  */
 package main;
 
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 
@@ -35,7 +36,7 @@ public class SnakeUtil
      *
      * @author Christopher Asbrock
      */
-    public static void addToGame(Pane root, Circle gameAsset, double posX, double posY)
+    public static void addToGame(Pane root, Node gameAsset, double posX, double posY)
     {
         gameAsset.setTranslateX(posX);
         gameAsset.setTranslateY(posY);
