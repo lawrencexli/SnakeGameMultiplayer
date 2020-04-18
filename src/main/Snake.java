@@ -42,9 +42,11 @@ public class Snake extends GameAsset{
         numTails = 0;
     }
 
-    /**
-     *  Add a tail
-     */
+    public LinkedList<SnakeTail> getSnakeTails() { return snakeTails; }
+
+    public int getNumTails() { return numTails; }
+
+    /** Add a tail */
     public void addTail() {
         if (snakeTails.size() == 0) {
             // The first SnakeTail attaches to the head
@@ -57,15 +59,18 @@ public class Snake extends GameAsset{
         }
     }
 
+    /** Remove a tail */
+    public void removeTail() {
+        if (!(snakeTails.size() == 0 || snakeTails.size() == 1)) {
+            snakeTails.remove();
+        }
+    }
+
     @Override
     public void updateAsset() {
         super.updateAsset();
         for (SnakeTail tail : snakeTails) {
             tail.updateAsset();
         }
-    }
-
-    public int getNumTails() {
-        return numTails;
     }
 }
