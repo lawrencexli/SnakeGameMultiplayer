@@ -20,90 +20,58 @@ package
         main;
 
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
-import java.util.Collections;
 import java.util.LinkedList;
 
-public class Snake extends GameAsset {
+public class Snake extends GameAsset{
 
-    /** The snake body representation */
-    private LinkedList<Snake> snakeBody;
+    /** The x,y velocity and rotation angle of the Snake */
+    private double velocityX;
+    private double velocityY;
+    private double angle;
 
-    /** The parent node of a snake */
-    private Snake parent;
+    /** SnakeTails with references to its parents */
+    private LinkedList<SnakeTail> snakeTails;
+
+    /** Number of tails */
+    private int numTails;
 
     public Snake() {
-        super(1, Color.GREEN);
+        super(15, Color.RED);
+        snakeTails = new LinkedList<>();
+        numTails = 0;
     }
 
-    public void createSnakeBody() {
-        this.snakeBody = new LinkedList<>(Collections.singletonList(this));
-    }
+    public LinkedList<SnakeTail> getSnakeTails() { return snakeTails; }
 
-    public LinkedList<Snake> getSnakeBody() { return snakeBody; }
+    public int getNumTails() { return numTails; }
 
-    public void addBodyLength() {
-        Snake newPart = new Snake();
-        newPart.setParent(this.snakeBody.getFirst());
-        this.snakeBody.addFirst(newPart);
-    }
-
-    public Snake getParentNode() {
-        return parent;
-    }
-
-    public void setParent(Snake snake) {
-        this.parent = snake;
-    }
-
-    public void removeBodyLength() {
-        if (snakeBody.size() == 1) {
-            System.out.println("The snake size is already 1!");
-            return;
+    /** Add a tail */
+    public GameAsset addTail() {
+        SnakeTail snakeTail;
+        if (snakeTails.size() == 0) {
+            // The first SnakeTail attaches to the head
+            snakeTail = new SnakeTail(this);
+        } else {
+            // Other SnakeTail attach to its most recent SnakeTail
+            snakeTail = new SnakeTail(snakeTails.getLast());
         }
-        this.snakeBody.removeFirst();
+        snakeTails.add(snakeTail);
+        return snakeTail;
     }
 
-    public Circle getHead() {
-        return this.snakeBody.getLast();
+    /** Remove a tail */
+    public void removeTail() {
+        if (!(snakeTails.size() == 0 || snakeTails.size() == 1)) {
+            snakeTails.remove();
+        }
     }
 
-    public Circle getTail() {
-        return this.snakeBody.getFirst();
-    }
-
-    /**
-     * sets the x and y values in the obejct velocity
-     *
-     * @param velocityX - a double representing the objects x velocity
-     * @param velocityY - a double representing the objects y velocity
-     * @author Christopher Asbrock
-     */
-    @Override
-    public void setVelocity(double velocityX, double velocityY) {
-        super.setVelocity(velocityX, velocityY);
-    }
-
-    /**
-     * run by the games animation timer 60 times a second to update the object position
-     * based on its velocity
-     *
-     * @author Christopher Asbrock
-     */
     @Override
     public void updateAsset() {
         super.updateAsset();
-    }
-
-    /**
-     * adjusts the velocity to be directed based on rotation
-     *
-     * @param direction - RIGHT or LEFT
-     * @author Christopher Asbrock
-     */
-    @Override
-    public void rotate(int direction) {
-        super.rotate(direction);
+        for (SnakeTail tail : snakeTails) {
+            tail.updateAsset();
+        }
     }
 }
