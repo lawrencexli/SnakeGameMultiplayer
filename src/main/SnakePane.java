@@ -15,6 +15,9 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static main.GameAsset.MyRotate.LEFT;
+import static main.GameAsset.MyRotate.RIGHT;
+
 /**
  * the main view for the user,
  *
@@ -42,11 +45,15 @@ public class SnakePane extends Application
     /**a list of all walls currently in the pane*/
     private ArrayList<Rectangle> listOfWalls;
 
+    private GameAsset player;
+    private boolean turnRight;
+    private boolean turnLeft;
+
     /**
      * a trash collector that collects all assets removed from the scene to be removed
      * from their list at the end of the update
      * */
-    private ArrayList<Node> inactiveNodes;
+    private ArrayList<GameAsset> inactiveNodes;
 
     /**
      * initializes lists of items and the pane to a certain size
@@ -65,6 +72,13 @@ public class SnakePane extends Application
         this.listOfWalls = new ArrayList<>();
         this.inactiveNodes = new ArrayList<>();
 
+        this.player = new Snake();
+        this.player.setVelocity(1,0);
+        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/2, this.HEIGHT/2);
+
+        this.turnLeft = false;
+        this.turnRight = false;
+
         setUpWalls(Color.DARKRED);
     }
 
@@ -77,7 +91,6 @@ public class SnakePane extends Application
         makeWall(30, root.getPrefHeight(),root.getPrefWidth() - 30 ,0, color);
         makeWall(root.getPrefWidth(), 30,0 ,0, color);
         makeWall(root.getPrefWidth(), 30,0 ,root.getPrefHeight() - 30, color);
-
     }
 
     /**
@@ -103,15 +116,30 @@ public class SnakePane extends Application
      */
     private void updateDriver()
     {
+        if (this.turnRight)
+            this.player.rotate(LEFT);
+        else if (this.turnLeft)
+            this.player.rotate(RIGHT);
+
+        for (GameAsset item : this.listOfItems)
+            if (this.player.checkForCollision(item))
+            {
+                this.root.getChildren().add(((Snake) this.player).addTail());
+                this.root.getChildren().removeAll(item);
+                this.inactiveNodes.add(item);
+            }
+
         foodPlacer();
-        updateAllAssets();
-        listOfItems.forEach(GameAsset::updateAsset);
+        tailCleanUp();
+
+        this.player.updateAsset();
+        this.listOfItems.forEach(GameAsset::updateAsset);
     }
 
     /**
      * Will remove any inactive items from the list
      */
-    private void updateAllAssets()
+    private void tailCleanUp()
     {
         listOfItems.removeAll(inactiveNodes);
         inactiveNodes.clear();
@@ -125,7 +153,7 @@ public class SnakePane extends Application
     {
         if (randomizer.nextInt(100) < 1)
         {
-            Food newFood = new Food(15, Color.RED);
+            Food newFood = new Food(15, Color.BLUE);
             this.listOfItems.add(newFood);
             SnakeUtil.addToGame(root, newFood,
                     60 + (this.randomizer.nextInt(WIDTH- 150)),
@@ -155,15 +183,7 @@ public class SnakePane extends Application
         ticks.start();
 
         primaryStage.setScene(new Scene(this.root));
-        this.userInputButtonPress(primaryStage, (event ->
-        {
-            if (event.getCode() == KeyCode.LEFT)
-                System.out.println("left");
-            if (event.getCode() == KeyCode.RIGHT)
-                System.out.println("right");
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        }));
+        this.userInputButtonPress(primaryStage);
 
         primaryStage.show();
     }
@@ -175,12 +195,27 @@ public class SnakePane extends Application
      * @author Christopher Asbrock
      *
      * @param stage - the stage to apply input to
-     * @param event - the event to lambda in
      */
-    private void userInputButtonPress(Stage stage, EventHandler<? super KeyEvent> event )
+    private void userInputButtonPress(Stage stage)
     {
-        stage.getScene().setOnKeyPressed(event);
-        stage.getScene().setOnKeyReleased(event);
+        stage.getScene().setOnKeyPressed(event ->
+        {
+            if (event.getCode() == KeyCode.LEFT)
+                this.turnLeft = true;
+            if (event.getCode() == KeyCode.RIGHT)
+                this.turnRight = true;
+            if (event.getCode() == KeyCode.UP)
+                System.out.println("up");
+        });
+        stage.getScene().setOnKeyReleased(event ->
+        {
+            if (event.getCode() == KeyCode.LEFT)
+                this.turnLeft = false;
+            if (event.getCode() == KeyCode.RIGHT)
+                this.turnRight = false;
+            if (event.getCode() == KeyCode.UP)
+                System.out.println("up");
+        });
     }
 
     public static void main(String[] args)
