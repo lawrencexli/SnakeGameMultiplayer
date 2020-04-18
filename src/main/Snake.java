@@ -31,7 +31,7 @@ public class Snake extends GameAsset {
     private LinkedList<Snake> snakeBody;
 
     /** The parent node of a snake */
-    private Snake prev;
+    private Snake parent;
 
     public Snake() {
         super(1, Color.GREEN);
@@ -49,12 +49,12 @@ public class Snake extends GameAsset {
         this.snakeBody.addFirst(newPart);
     }
 
-    public Snake getPrev() {
-        return prev;
+    public Snake getParentNode() {
+        return parent;
     }
 
     public void setParent(Snake snake) {
-        this.prev = snake;
+        this.parent = snake;
     }
 
     public void removeBodyLength() {
