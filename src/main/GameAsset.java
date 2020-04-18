@@ -37,8 +37,8 @@ public abstract class GameAsset extends Circle
      */
     class MyRotate
     {
-        final static int RIGHT = 1;
-        final static int LEFT = -1;
+        final static int RIGHT = -1;
+        final static int LEFT = 1;
     }
 
     /**the x velocity this object is moving in, 0 if stationary*/
@@ -51,9 +51,9 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    public GameAsset(int xCenter, int yCenter, int radius, Color color)
+    public GameAsset(int xCenter, Color color)
     {
-        super(xCenter, yCenter, radius,color);
+        super(xCenter, xCenter, xCenter, color);
     }
 
     /**
