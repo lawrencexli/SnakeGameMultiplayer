@@ -19,9 +19,12 @@
 package
         main;
 
-import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
-public class Snake extends GameAsset{
+import java.util.Collections;
+import java.util.LinkedList;
+
+public class Snake extends GameAsset {
 
     /**the x velocity this object is moving in, 0 if stationary*/
     private double velocityX;
@@ -29,12 +32,41 @@ public class Snake extends GameAsset{
     /**the y velocity this object is moving in, 0 if stationary*/
     private double velocityY;
 
+    private LinkedList<Circle> snakeBody;
+
     public Snake() {
-        super(15, Color.RED);
+        super();
+        snakeBody = new LinkedList<>(Collections.singletonList(new Circle()));
+    }
+
+    public double getVelocityX() { return velocityX; }
+
+    public double getVelocityY() { return velocityY; }
+
+    public LinkedList<Circle> getSnakeBody() { return snakeBody; }
+
+    public void addBodyLength() {
+        this.snakeBody.addFirst(new Circle());
+    }
+
+    public void removeBodyLength() {
+        if (snakeBody.size() == 1) {
+            System.out.println("The snake size is already 1!");
+            return;
+        }
+        this.snakeBody.removeLast();
+    }
+
+    public Circle getHead() {
+        return this.snakeBody.getFirst();
+    }
+
+    public Circle getTail() {
+        return this.snakeBody.getLast();
     }
 
     /**
-     * Override methods for snake: sets the x and y values in the obejct velocity
+     * sets the x and y values in the obejct velocity
      *
      * @param velocityX - a double representing the objects x velocity
      * @param velocityY - a double representing the objects y velocity
@@ -46,7 +78,7 @@ public class Snake extends GameAsset{
     }
 
     /**
-     * Override methods for snake: run by the games animation timer 60 times a second to update the object position
+     * run by the games animation timer 60 times a second to update the object position
      * based on its velocity
      *
      * @author Christopher Asbrock
@@ -57,7 +89,7 @@ public class Snake extends GameAsset{
     }
 
     /**
-     * Override methods for snake: adjusts the velocity to be directed based on rotation
+     * adjusts the velocity to be directed based on rotation
      *
      * @param direction - RIGHT or LEFT
      * @author Christopher Asbrock
@@ -66,6 +98,4 @@ public class Snake extends GameAsset{
     public void rotate(int direction) {
         super.rotate(direction);
     }
-
-
 }
