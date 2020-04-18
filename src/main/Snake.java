@@ -21,51 +21,51 @@ package
 
 import javafx.scene.paint.Color;
 
+import java.util.LinkedList;
+
 public class Snake extends GameAsset{
 
-    /**the x velocity this object is moving in, 0 if stationary*/
+    /** The x,y velocity and rotation angle of the Snake */
     private double velocityX;
-
-    /**the y velocity this object is moving in, 0 if stationary*/
     private double velocityY;
+    private double angle;
+
+    /** SnakeTails with references to its parents */
+    private LinkedList<SnakeTail> snakeTails;
+
+    /** Number of tails */
+    private int numTails;
 
     public Snake() {
         super(15, Color.RED);
+        snakeTails = new LinkedList<>();
+        numTails = 0;
     }
 
     /**
-     * Override methods for snake: sets the x and y values in the obejct velocity
-     *
-     * @param velocityX - a double representing the objects x velocity
-     * @param velocityY - a double representing the objects y velocity
-     * @author Christopher Asbrock
+     *  Add a tail
      */
-    @Override
-    public void setVelocity(double velocityX, double velocityY) {
-        super.setVelocity(velocityX, velocityY);
+    public void addTail() {
+        if (snakeTails.size() == 0) {
+            // The first SnakeTail attaches to the head
+            SnakeTail snakeTail = new SnakeTail(this);
+            snakeTails.add(snakeTail);
+        } else {
+            // Other SnakeTail attach to its most recent SnakeTail
+            SnakeTail snakeTail = new SnakeTail(snakeTails.getLast());
+            snakeTails.add(snakeTail);
+        }
     }
 
-    /**
-     * Override methods for snake: run by the games animation timer 60 times a second to update the object position
-     * based on its velocity
-     *
-     * @author Christopher Asbrock
-     */
     @Override
     public void updateAsset() {
         super.updateAsset();
+        for (SnakeTail tail : snakeTails) {
+            tail.updateAsset();
+        }
     }
 
-    /**
-     * Override methods for snake: adjusts the velocity to be directed based on rotation
-     *
-     * @param direction - RIGHT or LEFT
-     * @author Christopher Asbrock
-     */
-    @Override
-    public void rotate(int direction) {
-        super.rotate(direction);
+    public int getNumTails() {
+        return numTails;
     }
-
-
 }
