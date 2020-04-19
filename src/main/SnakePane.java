@@ -53,7 +53,7 @@ public class SnakePane extends Application
      * a trash collector that collects all assets removed from the scene to be removed
      * from their list at the end of the update
      * */
-    private ArrayList<GameAsset> inactiveNodes;
+    private ArrayList<GameAsset> inactiveFoodNodes;
 
     /**
      * initializes lists of items and the pane to a certain size
@@ -70,7 +70,7 @@ public class SnakePane extends Application
 
         this.listOfItems = new ArrayList<>();
         this.listOfWalls = new ArrayList<>();
-        this.inactiveNodes = new ArrayList<>();
+        this.inactiveFoodNodes = new ArrayList<>();
 
         this.player = new Snake();
         this.player.setVelocity(1,0);
@@ -116,6 +116,22 @@ public class SnakePane extends Application
      */
     private void updateDriver()
     {
+        foodPlacer();
+        itemCleanUp();
+
+        if (player != null)
+        {
+            handlePlayer();
+        }
+
+        //this.listOfItems.forEach(GameAsset::updateAsset);
+    }
+
+    /**
+     * handles the players status and interaction with other nodes
+     */
+    private void handlePlayer()
+    {
         if (this.turnRight)
             this.player.rotate(LEFT);
         else if (this.turnLeft)
@@ -126,14 +142,30 @@ public class SnakePane extends Application
             {
                 handleItemCollision(item);
                 this.root.getChildren().removeAll(item);
-                this.inactiveNodes.add(item);
+                this.inactiveFoodNodes.add(item);
             }
 
-        foodPlacer();
-        tailCleanUp();
+        updatePlayer();
+    }
 
-        this.player.updateAsset();
-        this.listOfItems.forEach(GameAsset::updateAsset);
+    /**
+     * updates the player based on whether they are active or not,
+     * if they are it will update them and their pieces,
+     * if not it will remove them from the game
+     */
+    private void updatePlayer()
+    {
+        if (this.player.isNoLongerActive())
+        {
+            this.root.getChildren().removeAll(((Snake) this.player).getSnakeTails());
+            ((Snake) this.player).getSnakeTails().clear();
+            this.root.getChildren().removeAll(this.player);
+            this.player = null;
+        }
+        else
+        {
+            this.player.updateAsset();
+        }
     }
 
     /**
@@ -161,10 +193,10 @@ public class SnakePane extends Application
      *
      * @author Christopher Asbrock
      */
-    private void tailCleanUp()
+    private void itemCleanUp()
     {
-        listOfItems.removeAll(inactiveNodes);
-        inactiveNodes.clear();
+        listOfItems.removeAll(inactiveFoodNodes);
+        inactiveFoodNodes.clear();
     }
 
     /**
