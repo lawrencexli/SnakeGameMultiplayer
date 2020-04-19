@@ -20,7 +20,6 @@ package main;
 
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
 
 /**
  * some utilities that any GUI instance of the snake game will need

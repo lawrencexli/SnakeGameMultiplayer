@@ -145,6 +145,23 @@ public class SnakePane extends Application
                 this.inactiveFoodNodes.add(item);
             }
 
+        for (Rectangle wall : this.listOfWalls) {
+            if (this.player.checkForCollision(wall)) {
+                player.deactivate();
+            }
+        }
+
+        int i = 0;
+        for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
+            if (i++ < 50)
+                continue;       // First several SnakeTails always collide with the head
+
+            if (this.player.checkForCollision(tail)) {
+                System.out.printf("Collided with tail number %d\n", tail.id);
+                player.deactivate();
+            }
+        }
+
         updatePlayer();
     }
 
