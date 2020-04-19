@@ -2,11 +2,8 @@ package main;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -45,8 +42,11 @@ public class SnakePane extends Application
     /**a list of all walls currently in the pane*/
     private ArrayList<Rectangle> listOfWalls;
 
+    /**the player character*/
     private GameAsset player;
+    /**trigger for a right turn*/
     private boolean turnRight;
+    /**trigger for a left turn*/
     private boolean turnLeft;
 
     /**
@@ -74,7 +74,7 @@ public class SnakePane extends Application
 
         this.player = new Snake();
         this.player.setVelocity(1,0);
-        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/2, this.HEIGHT/2);
+        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/2.0, this.HEIGHT/2.0);
 
         this.turnLeft = false;
         this.turnRight = false;
@@ -124,7 +124,7 @@ public class SnakePane extends Application
         for (GameAsset item : this.listOfItems)
             if (this.player.checkForCollision(item))
             {
-                this.root.getChildren().add(((Snake) this.player).addTail());
+                handleItemCollision(item);
                 this.root.getChildren().removeAll(item);
                 this.inactiveNodes.add(item);
             }
@@ -137,7 +137,29 @@ public class SnakePane extends Application
     }
 
     /**
+     * when colliding with an Item this determines the instance type and adds or removes peices of the snake
+     * accordingly
+     *
+     * @author Christopher Asbrock
+     *
+     * @param item - the idem being collided with
+     */
+    private void handleItemCollision(GameAsset item)
+    {
+        if (item instanceof Potion)
+            for (int i = 0; i < 50; i++)
+                this.root.getChildren().add(((Snake) this.player).addTail());
+        else if (item instanceof Poison)
+            for (int i = 0; i < 100; i++)
+                this.root.getChildren().removeAll(((Snake) player).removeTail());
+        else
+            this.root.getChildren().add(((Snake) this.player).addTail());
+    }
+
+    /**
      * Will remove any inactive items from the list
+     *
+     * @author Christopher Asbrock
      */
     private void tailCleanUp()
     {
@@ -148,14 +170,29 @@ public class SnakePane extends Application
     /**
      * called per tick, creates a randomized number, if the value is under a specific amount it will
      * create a food item randomly on the field
+     *
+     * @author Christopher Asbrock
      */
     private void foodPlacer()
     {
-        if (randomizer.nextInt(100) < 1)
+        int randomInt = randomizer.nextInt(2000);
+        if (randomInt < 50)
         {
-            Food newFood = new Food(15, Color.BLUE);
-            this.listOfItems.add(newFood);
-            SnakeUtil.addToGame(root, newFood,
+            Item newItem;
+            switch (randomInt)
+            {
+                case 1:
+                    newItem = new Potion(12, Color.GOLD);
+                    break;
+                case 2:
+                    newItem = new Poison(11, Color.GREEN);
+                    break;
+                default:
+                    newItem = new Food(10, Color.BLUE);
+            }
+
+            this.listOfItems.add(newItem);
+            SnakeUtil.addToGame(root, newItem,
                     60 + (this.randomizer.nextInt(WIDTH- 150)),
                     60 + (this.randomizer.nextInt(HEIGHT- 150)));
         }
