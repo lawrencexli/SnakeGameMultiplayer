@@ -119,4 +119,9 @@ public abstract class GameAsset extends Circle
     {
         return this.getBoundsInParent().intersects(otherAsset.getBoundsInParent());
     }
+
+    public boolean isNoLongerActive()
+    {
+        return noLongerActive;
+    }
 }
