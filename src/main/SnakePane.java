@@ -153,7 +153,7 @@ public class SnakePane extends Application
 
         int i = 0;
         for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
-            if (i++ < 50)
+            if (i++ < 100)
                 continue;       // First several SnakeTails always collide with the head
 
             if (this.player.checkForCollision(tail)) {
@@ -224,26 +224,29 @@ public class SnakePane extends Application
      */
     private void foodPlacer()
     {
-        int randomInt = randomizer.nextInt(2000);
-        if (randomInt < 50)
+        if (this.listOfItems.size() < 30)
         {
-            Item newItem;
-            switch (randomInt)
+            int randomInt = randomizer.nextInt(2000);
+            if (randomInt < 50)
             {
-                case 1:
-                    newItem = new Potion(12, Color.GOLD);
-                    break;
-                case 2:
-                    newItem = new Poison(11, Color.GREEN);
-                    break;
-                default:
-                    newItem = new Food(10, Color.BLUE);
-            }
+                Item newItem;
+                switch (randomInt)
+                {
+                    case 1:
+                        newItem = new Potion(12, Color.GOLD);
+                        break;
+                    case 2:
+                        newItem = new Poison(11, Color.GREEN);
+                        break;
+                    default:
+                        newItem = new Food(10, Color.BLUE);
+                }
 
-            this.listOfItems.add(newItem);
-            SnakeUtil.addToGame(root, newItem,
-                    60 + (this.randomizer.nextInt(WIDTH- 150)),
-                    60 + (this.randomizer.nextInt(HEIGHT- 150)));
+                this.listOfItems.add(newItem);
+                SnakeUtil.addToGame(root, newItem,
+                        60 + (this.randomizer.nextInt(WIDTH- 150)),
+                        60 + (this.randomizer.nextInt(HEIGHT- 150)));
+            }
         }
     }
 
