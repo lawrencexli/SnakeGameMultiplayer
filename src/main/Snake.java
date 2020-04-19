@@ -33,18 +33,12 @@ public class Snake extends GameAsset{
     /** SnakeTails with references to its parents */
     private LinkedList<SnakeTail> snakeTails;
 
-    /** Number of tails */
-    private int numTails;
-
     public Snake() {
         super(15, Color.RED);
         snakeTails = new LinkedList<>();
-        numTails = 0;
     }
 
     public LinkedList<SnakeTail> getSnakeTails() { return snakeTails; }
-
-    public int getNumTails() { return numTails; }
 
     /** Add a tail */
     public GameAsset addTail() {
@@ -52,9 +46,11 @@ public class Snake extends GameAsset{
         if (snakeTails.size() == 0) {
             // The first SnakeTail attaches to the head
             snakeTail = new SnakeTail(this);
+            snakeTail.id = 1;
         } else {
             // Other SnakeTail attach to its most recent SnakeTail
             snakeTail = new SnakeTail(snakeTails.getLast());
+            snakeTail.id = snakeTails.getLast().id + 1;
         }
         snakeTails.add(snakeTail);
         return snakeTail;

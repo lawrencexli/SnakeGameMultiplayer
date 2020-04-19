@@ -23,6 +23,9 @@ import javafx.scene.paint.Color;
 
 public class SnakeTail extends GameAsset {
 
+    /** For debugging */
+    public int id;
+
     /**
      * The parent tail which represents the next state of the tail,
      *      creating the tail illusion
@@ -37,6 +40,8 @@ public class SnakeTail extends GameAsset {
     public SnakeTail(GameAsset parent) {
         super(15,  Color.RED);
         this.parent = parent;
+        this.setTranslateX(parent.getTranslateX());
+        this.setTranslateY(parent.getTranslateY());
     }
 
     public GameAsset getParentNode() {
