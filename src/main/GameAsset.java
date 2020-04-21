@@ -36,7 +36,7 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    class MyRotate
+    public class MyRotate
     {
         final static int RIGHT = -1;
         final static int LEFT = 1;
