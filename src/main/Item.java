@@ -35,7 +35,6 @@ public class Item extends GameAsset{
 
     public Item(int x, Color color, String name) {
         super(x,color);
-        this.location = location;
         this.name = name;
     }
 
