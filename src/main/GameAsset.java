@@ -59,7 +59,7 @@ public abstract class GameAsset extends Circle
     public GameAsset(int xCenter, Color color)
     {
         super(xCenter, xCenter, xCenter, color);
-        this.speed = 1;
+        this.speed = 2;
         this.noLongerActive = false;
     }
 

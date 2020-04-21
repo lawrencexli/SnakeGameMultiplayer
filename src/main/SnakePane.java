@@ -49,6 +49,13 @@ public class SnakePane extends Application
     /**trigger for a left turn*/
     private boolean turnLeft;
 
+    /**Length of snake added for potion*/
+    private int potionLength= 50;
+    /**Length of snake added for food*/
+    private int foodLength= 5;
+    /**Length of snake deleted for poison*/
+    private int poisonLength= 100;
+
     /**
      * a trash collector that collects all assets removed from the scene to be removed
      * from their list at the end of the update
@@ -74,12 +81,28 @@ public class SnakePane extends Application
 
         this.player = new Snake();
         this.player.setVelocity(1,0);
-        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/2.0, this.HEIGHT/2.0);
+        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
 
         this.turnLeft = false;
         this.turnRight = false;
 
         setUpWalls(Color.DARKRED);
+    }
+
+    /**
+     * creates and adds a wall to the pane and list of walls
+     *
+     * @param width - the width of the wall
+     * @param height - the height of the wall
+     * @param posX - the x position to place the wall
+     * @param posY - the y position to place the wall
+     * @param color - the color of the wall
+     */
+    private void makeWall(double width, double height, double posX, double posY, Color color)
+    {
+        Rectangle wall = new Rectangle(width, height, color);
+        listOfWalls.add(wall);
+        SnakeUtil.addToGame(this.root, wall, posX ,posY);
     }
 
     /**
@@ -94,33 +117,17 @@ public class SnakePane extends Application
     }
 
     /**
-     * creates and adds a wall to the pane and list of walls
-     *
-     * @param width - the wide of the wall
-     * @param height - the height of the wall
-     * @param posX - the x position to place the wall
-     * @param posY - the y position to place the wall
-     * @param color - the color of the wall
-     */
-    private void makeWall(double width, double height, double posX, double posY, Color color)
-    {
-        Rectangle wall = new Rectangle(width, height, color);
-        listOfWalls.add(wall);
-        SnakeUtil.addToGame(this.root, wall, posX ,posY);
-    }
-
-    /**
-     * the main driver that updates the screen 60 times a second
+     * the main driver that updates the screen 60 times a second.
+     * food actions will only happen when player is alive
      *
      * @author Christopher Asbrock
      */
     private void updateDriver()
     {
-        foodPlacer();
-        itemCleanUp();
-
         if (player != null)
         {
+            foodPlacer();
+            itemCleanUp();
             handlePlayer();
         }
 
@@ -153,7 +160,7 @@ public class SnakePane extends Application
 
         int i = 0;
         for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
-            if (i++ < 50)
+            if (i++ < 100)
                 continue;       // First several SnakeTails always collide with the head
 
             if (this.player.checkForCollision(tail)) {
@@ -186,7 +193,7 @@ public class SnakePane extends Application
     }
 
     /**
-     * when colliding with an Item this determines the instance type and adds or removes peices of the snake
+     * when colliding with an Item this determines the instance type and adds or removes pieces of the snake
      * accordingly
      *
      * @author Christopher Asbrock
@@ -195,14 +202,16 @@ public class SnakePane extends Application
      */
     private void handleItemCollision(GameAsset item)
     {
-        if (item instanceof Potion)
-            for (int i = 0; i < 50; i++)
+        if (item instanceof Potion) {
+            for (int i = 0; i < potionLength; i++)
                 this.root.getChildren().add(((Snake) this.player).addTail());
-        else if (item instanceof Poison)
-            for (int i = 0; i < 100; i++)
+        } else if (item instanceof Poison) {
+            for (int i = 0; i < poisonLength; i++)
                 this.root.getChildren().removeAll(((Snake) player).removeTail());
-        else
-            this.root.getChildren().add(((Snake) this.player).addTail());
+        } else {
+            for (int i = 0; i < foodLength; i++)
+                this.root.getChildren().add(((Snake) this.player).addTail());
+        }
     }
 
     /**
@@ -224,26 +233,29 @@ public class SnakePane extends Application
      */
     private void foodPlacer()
     {
-        int randomInt = randomizer.nextInt(2000);
-        if (randomInt < 50)
+        if (this.listOfItems.size() < 30)
         {
-            Item newItem;
-            switch (randomInt)
+            int randomInt = randomizer.nextInt(2000);
+            if (randomInt < 25)
             {
-                case 1:
-                    newItem = new Potion(12, Color.GOLD);
-                    break;
-                case 2:
-                    newItem = new Poison(11, Color.GREEN);
-                    break;
-                default:
-                    newItem = new Food(10, Color.BLUE);
-            }
+                Item newItem;
+                switch (randomInt)
+                {
+                    case 1:
+                        newItem = new Potion(12, Color.GOLD);
+                        break;
+                    case 2:
+                        newItem = new Poison(11, Color.GREEN);
+                        break;
+                    default:
+                        newItem = new Food(10, Color.BLUE);
+                }
 
-            this.listOfItems.add(newItem);
-            SnakeUtil.addToGame(root, newItem,
-                    60 + (this.randomizer.nextInt(WIDTH- 150)),
-                    60 + (this.randomizer.nextInt(HEIGHT- 150)));
+                this.listOfItems.add(newItem);
+                SnakeUtil.addToGame(root, newItem,
+                        60 + (this.randomizer.nextInt(WIDTH- 150)),
+                        60 + (this.randomizer.nextInt(HEIGHT- 150)));
+            }
         }
     }
 
