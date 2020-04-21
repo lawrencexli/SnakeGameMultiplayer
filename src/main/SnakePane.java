@@ -49,6 +49,13 @@ public class SnakePane extends Application
     /**trigger for a left turn*/
     private boolean turnLeft;
 
+    /**Length of snake added for potion*/
+    private int potionLength= 50;
+    /**Length of snake added for food*/
+    private int foodLength= 5;
+    /**Length of snake deleted for poison*/
+    private int poisonLength= 100;
+
     /**
      * a trash collector that collects all assets removed from the scene to be removed
      * from their list at the end of the update
@@ -73,8 +80,8 @@ public class SnakePane extends Application
         this.inactiveFoodNodes = new ArrayList<>();
 
         this.player = new Snake();
-        this.player.setVelocity(0,0);
-        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/2.0, this.HEIGHT/2.0);
+        this.player.setVelocity(1,0);
+        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
 
         this.turnLeft = false;
         this.turnRight = false;
@@ -195,15 +202,16 @@ public class SnakePane extends Application
      */
     private void handleItemCollision(GameAsset item)
     {
-        if (item instanceof Potion)
-            for (int i = 0; i < 50; i++)
+        if (item instanceof Potion) {
+            for (int i = 0; i < potionLength; i++)
                 this.root.getChildren().add(((Snake) this.player).addTail());
-        else if (item instanceof Poison)
-            for (int i = 0; i < 100; i++)
+        } else if (item instanceof Poison) {
+            for (int i = 0; i < poisonLength; i++)
                 this.root.getChildren().removeAll(((Snake) player).removeTail());
-        else
-            for (int i = 0; i < 5; i++)
+        } else {
+            for (int i = 0; i < foodLength; i++)
                 this.root.getChildren().add(((Snake) this.player).addTail());
+        }
     }
 
     /**
