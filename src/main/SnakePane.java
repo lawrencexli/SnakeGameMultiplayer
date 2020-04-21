@@ -236,7 +236,7 @@ public class SnakePane extends Application
         if (this.listOfItems.size() < 30)
         {
             int randomInt = randomizer.nextInt(2000);
-            if (randomInt < 20)
+            if (randomInt < 25)
             {
                 Item newItem;
                 switch (randomInt)
