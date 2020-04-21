@@ -45,25 +45,40 @@ public class Item extends GameAsset{
 /** Food inherited from Item */
 class Food extends Item {
 
+    /** Length of snake added for food */
+    private final int foodLength = 5;
+
     public Food(int x, Color color) {
         super(x,color,"Food");
     }
+
+    public int getFoodLength() { return foodLength; }
 }
 
 /** Potion inherited from Item */
 class Potion extends Item {
 
+    /** Length of snake added for potion */
+    private final int potionLength = 50;
+
     public Potion(int x,  Color color) {
         super(x,color,"Potion");
     }
+
+    public int getPotionLength() { return potionLength; }
 }
 
 /** Poison inherited from Item */
 class Poison extends Item {
 
+    /** Length of snake deleted for poison */
+    private final int poisonLength = 100;
+
     public Poison(int x, Color color) {
         super(x,color,"Poison");
     }
+
+    public int getPoisonLength() { return poisonLength; }
 }
 
 
