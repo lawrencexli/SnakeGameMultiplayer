@@ -17,11 +17,11 @@
  * ****************************************
  */
 package
-        main.network;
+        network;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import main.GameAsset;
+import network.GameAsset;
 
 /**
  * A class that represent the items in the snake game

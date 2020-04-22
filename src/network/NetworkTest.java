@@ -9,14 +9,14 @@
  * Time: 11:19 AM
  *
  * Project: csci205_final_project_sp2020
- * Package: main.network
+ * Package: network
  * Class: NetworkTest
  *
  * Description:
  *
  * ****************************************
  */
-package main.network;
+package network;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -42,8 +42,17 @@ public class NetworkTest
 
             while (true)
             {
+                String[]test = scanner.nextLine().split("%");
+                for (int i = 0; i < test.length; i++)
+                {
+                    if (i > 0)
+                        System.out.print("\t");
+                    System.out.println(test[i]);
+                }
                 System.out.println(scanner.nextLine());
             }
+
+
 
 
 

@@ -1,14 +1,7 @@
-package main.network;
+package network;
 
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import main.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,7 +20,7 @@ import java.util.Scanner;
  *
  * @author Christopher Asbrock
  */
-public class SnakeNetwork extends Application
+public class SnakeNetwork
 {
     private Socket socket;
     private ServerSocket server;
@@ -36,11 +29,6 @@ public class SnakeNetwork extends Application
     private PrintStream networkOut;
 
     private boolean gameIsOn = false;
-
-
-
-    /**Main game javafx window*/
-    private Pane root;
 
     /**fixed width of the window*/
     private final int WIDTH = 800;
@@ -63,11 +51,11 @@ public class SnakeNetwork extends Application
     private boolean turnLeft;
 
     /**Length of snake added for potion*/
-    private int potionLength= 50;
+    private final int POTION_LENGTH = 50;
     /**Length of snake added for food*/
-    private int foodLength= 5;
+    private final int FOOD_LENGTH = 5;
     /**Length of snake deleted for poison*/
-    private int poisonLength= 100;
+    private final int POISON_LENGTH = 100;
 
     /**
      * a trash collector that collects all assets removed from the scene to be removed
@@ -80,12 +68,8 @@ public class SnakeNetwork extends Application
      *
      * @author Christopher Asbrock
      */
-    @Override
     public void init()
     {
-        this.root = new Pane();
-        this.root.setPrefSize(WIDTH, HEIGHT);
-
         this.randomizer = new Random();
 
         this.listOfItems = new ArrayList<>();
@@ -94,18 +78,18 @@ public class SnakeNetwork extends Application
 
         this.player = new Snake();
         this.player.setVelocity(1,0);
-        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
+        SnakeUtil.addToGame(this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
 
-        this.turnLeft = false;
+        this.turnLeft = true;
         this.turnRight = false;
 
-        Thread thread = new Thread(() -> run());
+        Thread thread = new Thread(this::setUpNetworkConnection);
         thread.start();
 
         setUpWalls(Color.DARKRED);
     }
 
-    private void run()
+    private void setUpNetworkConnection()
     {
         try
         {
@@ -136,7 +120,7 @@ public class SnakeNetwork extends Application
     {
         Rectangle wall = new Rectangle(width, height, color);
         listOfWalls.add(wall);
-        SnakeUtil.addToGame(this.root, wall, posX ,posY);
+        SnakeUtil.addToGame(wall, posX ,posY);
     }
 
     /**
@@ -144,10 +128,10 @@ public class SnakeNetwork extends Application
      */
     private void setUpWalls(Color color)
     {
-        makeWall(30, this.root.getPrefHeight(),0 ,0, color);
-        makeWall(30, root.getPrefHeight(),root.getPrefWidth() - 30 ,0, color);
-        makeWall(root.getPrefWidth(), 30,0 ,0, color);
-        makeWall(root.getPrefWidth(), 30,0 ,root.getPrefHeight() - 30, color);
+        makeWall(30, HEIGHT,0 ,0, color);
+        makeWall(30, HEIGHT,WIDTH - 30 ,0, color);
+        makeWall(WIDTH, 30,0 ,0, color);
+        makeWall(WIDTH, 30,0 ,HEIGHT - 30, color);
     }
 
     /**
@@ -181,8 +165,11 @@ public class SnakeNetwork extends Application
 
         allInfo += "%";
 
-        for (SnakeTail tail : ((Snake) this.player).getSnakeTails())
-            allInfo += tail.getTranslateX() + "," + tail.getTranslateY() + "," + tail.getRotate() + ";";
+        if (this.player != null)
+            for (SnakeTail tail : ((Snake) this.player).getSnakeTails())
+                allInfo += tail.getTranslateX() + "," + tail.getTranslateY() + "," + tail.getRotate() + ";";
+        else
+            allInfo += null;
 
         this.networkOut.println(allInfo);
     }
@@ -201,7 +188,6 @@ public class SnakeNetwork extends Application
             if (this.player.checkForCollision(item))
             {
                 handleItemCollision(item);
-                this.root.getChildren().removeAll(item);
                 this.inactiveFoodNodes.add(item);
             }
 
@@ -234,9 +220,7 @@ public class SnakeNetwork extends Application
     {
         if (this.player.isNoLongerActive())
         {
-            this.root.getChildren().removeAll(((Snake) this.player).getSnakeTails());
             ((Snake) this.player).getSnakeTails().clear();
-            this.root.getChildren().removeAll(this.player);
             this.player = null;
         }
         else
@@ -255,16 +239,16 @@ public class SnakeNetwork extends Application
      */
     private void handleItemCollision(GameAsset item)
     {
-        if (item instanceof Potion) {
-            for (int i = 0; i < potionLength; i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        } else if (item instanceof Poison) {
-            for (int i = 0; i < poisonLength; i++)
-                this.root.getChildren().removeAll(((Snake) player).removeTail());
-        } else {
-            for (int i = 0; i < foodLength; i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        }
+        if (item instanceof Potion)
+            for (int i = 0; i < POTION_LENGTH; i++)
+                ((Snake) this.player).addTail();
+        else if (item instanceof Poison)
+            for (int i = 0; i < POISON_LENGTH; i++)
+                ((Snake) player).removeTail();
+        else
+            for (int i = 0; i < FOOD_LENGTH; i++)
+                ((Snake) this.player).addTail();
+
     }
 
     /**
@@ -286,7 +270,7 @@ public class SnakeNetwork extends Application
      */
     private void foodPlacer()
     {
-        if (this.listOfItems.size() < 30)
+        if (this.listOfItems.size() < 130)
         {
             int randomInt = randomizer.nextInt(2000);
             if (randomInt < 25)
@@ -305,7 +289,7 @@ public class SnakeNetwork extends Application
                 }
 
                 this.listOfItems.add(newItem);
-                SnakeUtil.addToGame(root, newItem,
+                SnakeUtil.addToGame(newItem,
                         60 + (this.randomizer.nextInt(WIDTH- 150)),
                         60 + (this.randomizer.nextInt(HEIGHT- 150)));
             }
@@ -317,60 +301,42 @@ public class SnakeNetwork extends Application
      *
      * @author Christopher Asbrock
      *
-     * @param primaryStage - the primary stage
      */
-    @Override
-    public void start(Stage primaryStage)
+    public void start()
     {
-        AnimationTimer ticks = new AnimationTimer()
+        Thread timer = new Thread(this::tickTimer);
+        timer.start();
+        while (true)
         {
-            @Override
-            public void handle(long now)
-            {
-                updateDriver();
-            }
-        };
-
-        ticks.start();
-
-        primaryStage.setScene(new Scene(this.root));
-        this.userInputButtonPress(primaryStage);
-
-        primaryStage.show();
+            if (player.isNoLongerActive())
+                break;
+        }
     }
 
-    /**
-     * revamps the stages button inputs to activate on both the up and down stroke to trigger a boolean
-     * as true on down and false on up
-     *
-     * @author Christopher Asbrock
-     *
-     * @param stage - the stage to apply input to
-     */
-    private void userInputButtonPress(Stage stage)
+    private void tickTimer()
     {
-        stage.getScene().setOnKeyPressed(event ->
+        long now = System.currentTimeMillis();
+
+        System.out.println("start");
+        while (player != null && !player.isNoLongerActive())
         {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = true;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = true;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
-        stage.getScene().setOnKeyReleased(event ->
-        {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = false;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = false;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
+
+            if ((System.currentTimeMillis() - now) > 20) {
+                now = System.currentTimeMillis();
+                //System.out.println("tick");
+
+                updateDriver();
+            }
+        }
+
+        System.out.println("GameOver");
     }
 
     public static void main(String[] args)
     {
-        launch(args);
+        SnakeNetwork test = new SnakeNetwork();
+        test.init();
+        test.start();
     }
 }
+
