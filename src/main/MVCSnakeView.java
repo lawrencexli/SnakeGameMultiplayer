@@ -104,4 +104,11 @@ public class MVCSnakeView{
         //TODO - updateView
     }
 
+    public Pane getRoot() { return root; }
+
+    public int getWIDTH() { return WIDTH; }
+
+    public int getHEIGHT() { return HEIGHT; }
+
+    public GameAsset getPlayer() { return player; }
 }
