@@ -45,26 +45,8 @@ public class MVCSnakeView{
     /** Fixed height of the window */
     private final int HEIGHT = 600;
 
-    /** Random number generator */
-    private Random randomNumGen;
-
-    /** A list containing all items currently in the pane */
-    private ArrayList<GameAsset> listOfItems;
-    /** A list of all walls currently in the pane */
-    private ArrayList<Rectangle> listOfWalls;
-
     /** The player character */
     private GameAsset player;
-    /** Trigger for a right turn */
-    private boolean turnRight;
-    /** Trigger for a left turn */
-    private boolean turnLeft;
-
-    /**
-     * A trash collector that collects all assets removed from the scene to be removed
-     * from their list at the end of the update
-     */
-    private ArrayList<GameAsset> inactiveFoodNodes;
 
     /**
      * initializes lists of items and the pane to a certain size
@@ -72,16 +54,10 @@ public class MVCSnakeView{
      * @author Christopher Asbrock
      */
     public MVCSnakeView() {
-        //this.theModel = new MVCSnakeModel(); //Needs snake model
+        //this.theModel = new MVCSnakeModel();
         this.root = new Pane();
         this.root.setStyle("-fx-background-color: dark;");
         this.root.setPrefSize(WIDTH, HEIGHT);
-
-        this.randomNumGen = new Random();
-
-        this.listOfItems = new ArrayList<>();
-        this.listOfWalls = new ArrayList<>();
-        this.inactiveFoodNodes = new ArrayList<>();
 
         makeSnake();
         setUpWalls();
@@ -94,8 +70,6 @@ public class MVCSnakeView{
         this.player = new Snake();
         this.player.setVelocity(1,0);
         SnakeUtil.addToGame(this.root, this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
-        this.turnLeft = false;
-        this.turnRight = false;
     }
 
     /**
@@ -107,7 +81,7 @@ public class MVCSnakeView{
      */
     private void makeWall(double width, double height, double posX, double posY) {
         Rectangle wall = new Rectangle(width, height, Color.DARKRED);
-        listOfWalls.add(wall);
+        //theModel.getListOfWalls().add(wall);
         SnakeUtil.addToGame(this.root, wall, posX ,posY);
     }
 
@@ -126,168 +100,8 @@ public class MVCSnakeView{
      * controller to update the size of this classes SnakeTails list to the same size,
      * then update the positioning of each tail piece based on the presented data.
      */
-     private void updateView() {
-         //TODO - complete updateView
-         if (this.turnRight) {
-
-         }
-
-         if (this.turnLeft) {
-
-         }
-     }
-
-    /**
-     * the main driver that updates the screen 60 times a second.
-     * food actions will only happen when player is alive
-     *
-     * @author Christopher Asbrock
-     */
-    private void updateDriver() {
-        if (player != null) {
-            foodPlacer();
-            itemCleanUp();
-            handlePlayer();
-        }
-        this.listOfItems.forEach(GameAsset::updateAsset);
+    private void updateView() {
+        //TODO - updateView
     }
 
-    /**
-     * handles the players status and interaction with other nodes
-     */
-    private void handlePlayer() {
-        if (this.turnRight)
-            this.player.rotate(LEFT);
-        else if (this.turnLeft)
-            this.player.rotate(RIGHT);
-
-        for (GameAsset item : this.listOfItems)
-            if (this.player.checkForCollision(item)) {
-                handleItemCollision(item);
-                this.root.getChildren().removeAll(item);
-                this.inactiveFoodNodes.add(item);
-            }
-
-        for (Rectangle wall : this.listOfWalls) {
-            if (this.player.checkForCollision(wall)) {
-                player.deactivate();
-            }
-        }
-
-        int i = 0;
-        for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
-            if (i++ < 100)
-                continue;       // First several SnakeTails always collide with the head
-
-            if (this.player.checkForCollision(tail)) {
-                System.out.printf("Collided with tail number %d\n", tail.id);
-                player.deactivate();
-            }
-        }
-        updatePlayer();
-    }
-
-    /**
-     * updates the player based on whether they are active or not,
-     * if they are it will update them and their pieces,
-     * if not it will remove them from the game
-     */
-    private void updatePlayer() {
-        if (this.player.isNoLongerActive()) {
-            this.root.getChildren().removeAll(((Snake) this.player).getSnakeTails());
-            ((Snake) this.player).getSnakeTails().clear();
-            this.root.getChildren().removeAll(this.player);
-            this.player = null;
-        }
-        else {
-            this.player.updateAsset();
-        }
-    }
-
-    /**
-     * called per tick, creates a randomized number, if the value is under a specific amount it will
-     * create a food item randomly on the field
-     *
-     * @author Christopher Asbrock
-     */
-    private void foodPlacer() {
-        if (this.listOfItems.size() < 30) {
-            int randomInt = randomNumGen.nextInt(2000);
-            if (randomInt < 25) {
-                Item newItem;
-                switch (randomInt) {
-                    case 1:
-                        newItem = new Potion(12, Color.GOLD);
-                        break;
-                    case 2:
-                        newItem = new Poison(11, Color.GREEN);
-                        break;
-                    default:
-                        newItem = new Food(10, Color.BLUE);
-                }
-                this.listOfItems.add(newItem);
-                SnakeUtil.addToGame(root, newItem,
-                        60 + (this.randomNumGen.nextInt(WIDTH- 150)),
-                        60 + (this.randomNumGen.nextInt(HEIGHT- 150)));
-            }
-        }
-    }
-
-    /**
-     * Will remove any inactive items from the list
-     *
-     * @author Christopher Asbrock
-     */
-    private void itemCleanUp() {
-        listOfItems.removeAll(inactiveFoodNodes);
-        inactiveFoodNodes.clear();
-    }
-
-    /**
-     * When colliding with an Item this determines the instance type and adds or removes pieces of the snake
-     * accordingly
-     *
-     * @author Christopher Asbrock
-     *
-     * @param item - the idem being collided with
-     */
-    private void handleItemCollision(GameAsset item) {
-        if (item instanceof Potion) {
-            for (int i = 0; i < ((Potion) item).getPotionLength(); i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        } else if (item instanceof Poison) {
-            for (int i = 0; i < ((Poison) item).getPoisonLength(); i++)
-                this.root.getChildren().removeAll(((Snake) player).removeTail());
-        } else if (item instanceof Food){
-            for (int i = 0; i < ((Food) item).getFoodLength(); i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        }
-    }
-
-    /**
-     * revamps the stages button inputs to activate on both the up and down stroke to trigger a boolean
-     * as true on down and false on up
-     *
-     * @author Christopher Asbrock
-     *
-     * @param stage - the stage to apply input to
-     */
-    private void userInputButtonPress(Stage stage) {
-        stage.getScene().setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = true;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = true;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
-        stage.getScene().setOnKeyReleased(event -> {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = false;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = false;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
-    }
 }
