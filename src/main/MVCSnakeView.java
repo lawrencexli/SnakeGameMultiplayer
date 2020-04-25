@@ -29,9 +29,6 @@ public class MVCSnakeView{
     /** Main display window for the snake game */
     private Pane root;
 
-    /** The MVC Snake Model */
-    //private MVCSnakeModel theModel;
-
     /** Fixed width of the window */
     private final int WIDTH = 800;
     /** Fixed height of the window */
@@ -49,7 +46,7 @@ public class MVCSnakeView{
      * @author Christopher Asbrock
      */
     public MVCSnakeView() {
-        this.theModel = new MVCSnakeModel();
+        this.theModel = new MVCSnakeModel(new MVCSnakeController());
         this.root = new Pane();
         this.root.setStyle("-fx-background-color: dark;");
         this.root.setPrefSize(WIDTH, HEIGHT);
@@ -76,7 +73,7 @@ public class MVCSnakeView{
      */
     private void makeWall(double width, double height, double posX, double posY) {
         Rectangle wall = new Rectangle(width, height, Color.DARKRED);
-        theModel.getListOfWalls().add(wall);
+        //theModel.getListOfWalls().add(wall);
         SnakeUtil.addToGame(this.root, wall, posX ,posY);
     }
 
@@ -96,7 +93,7 @@ public class MVCSnakeView{
      * then update the positioning of each tail piece based on the presented data.
      */
     private void updateView() {
-        //TODO - updateView
+        this.player.updateAsset();
     }
 
     public Pane getRoot() { return root; }
