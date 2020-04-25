@@ -31,9 +31,7 @@ import static main.GameAsset.MyRotate.LEFT;
 import static main.GameAsset.MyRotate.RIGHT;
 
 public class MVCSnakeController {
-
-
-
+    
     private ArrayList<double[]> itemListPositions;
     private ArrayList<double[]> snakeListPositions;
 
@@ -69,6 +67,13 @@ public class MVCSnakeController {
         return snakeListPositions;
     }
 
+    public void run()
+    {
+        System.out.println("setting up model");
+        this.theModel = new MVCSnakeModel(this);
+        this.theModel.runListener();
+    }
+
     /**
      * handles the players status and interaction with other nodes
      */
@@ -78,11 +83,10 @@ public class MVCSnakeController {
             this.theView.getPlayer().rotate(LEFT);
         else if (this.turnLeft)
             this.theView.getPlayer().rotate(RIGHT);
-
-
-        int i = 0;
+        
+        int snakeCollisionCounter = 0;
         for (SnakeTail tail : ((Snake) this.theView.getPlayer()).getSnakeTails()) {
-            if (i++ < 100)
+            if (snakeCollisionCounter++ < 100)
                 continue;       // First several SnakeTails always collide with the head
 
             if (this.theView.getPlayer().checkForCollision(tail)) {
@@ -136,9 +140,7 @@ public class MVCSnakeController {
     {
 
     }
-
-
-
+    
     /**
      * the main driver that updates the screen 60 times a second.
      * food actions will only happen when player is alive
@@ -185,23 +187,5 @@ public class MVCSnakeController {
             if (event.getCode() == KeyCode.UP)
                 System.out.println("up");
         });
-    }
-
-    public void run()
-    {
-        System.out.println("setting up model");
-        this.theModel = new MVCSnakeModel(this);
-        this.theModel.runListener();
-    }
-
-    public static void main(String [] args)
-    {
-        MVCSnakeController controller = new MVCSnakeController();
-        controller.run();
-
-        while (true)
-        {
-            //needs to keep running so the thread can function properly
-        }
     }
 }

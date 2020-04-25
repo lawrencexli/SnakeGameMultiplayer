@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 
 public class SnakeTail extends GameAsset {
 
-    /** For debugging */
+    /** For debugging (identification of a snake player) */
     public int id;
 
     /**

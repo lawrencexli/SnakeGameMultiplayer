@@ -93,7 +93,7 @@ public class MVCSnakeView{
      * then update the positioning of each tail piece based on the presented data.
      */
     private void updateView() {
-        //TODO - updateView
+        this.player.updateAsset();
     }
 
     public Pane getRoot() { return root; }
