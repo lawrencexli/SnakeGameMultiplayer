@@ -84,7 +84,7 @@ public class MVCSnakeView{
      */
     private void makeWall(double width, double height, double posX, double posY) {
         Rectangle wall = new Rectangle(width, height, Color.DARKRED);
-        theModel.getListOfWalls().add(wall);
+        //theModel.getListOfWalls().add(wall);
         SnakeUtil.addToGame(this.root, wall, posX ,posY);
     }
 
@@ -109,13 +109,13 @@ public class MVCSnakeView{
     private void handleItemCollision(GameAsset item)
     {
         if (item instanceof Potion) {
-            for (int i = 0; i < theModel.getPotionLength(); i++)
+            //for (int i = 0; i < theModel.getPotionLength(); i++)
                 this.root.getChildren().add(((Snake) this.player).addTail());
         } else if (item instanceof Poison) {
-            for (int i = 0; i < theModel.getPoisonLength(); i++)
+            //for (int i = 0; i < theModel.getPoisonLength(); i++)
                 this.root.getChildren().removeAll(((Snake) player).removeTail());
         } else {
-            for (int i = 0; i < theModel.getFoodLength(); i++)
+            //for (int i = 0; i < theModel.getFoodLength(); i++)
                 this.root.getChildren().add(((Snake) this.player).addTail());
         }
     }
