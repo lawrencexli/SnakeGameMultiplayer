@@ -24,12 +24,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static main.GameAsset.MyRotate.LEFT;
 import static main.GameAsset.MyRotate.RIGHT;
 
 public class MVCSnakeController {
+
+
+
+    private ArrayList<double[]> itemListPositions;
+    private ArrayList<double[]> snakeListPositions;
 
     /**trigger for a right turn*/
     private boolean turnRight;
@@ -45,10 +51,22 @@ public class MVCSnakeController {
     private MVCSnakeModel theModel;
 
     public MVCSnakeController() {
-        this.theView = new MVCSnakeView();
-        this.theModel = new MVCSnakeModel();
+        //this.theView = new MVCSnakeView();
+        //this.theModel = new MVCSnakeModel(this);
+
+        this.itemListPositions = new ArrayList<>();
+        this.snakeListPositions = new ArrayList<>();
+
         this.turnLeft = false;
         this.turnRight = false;
+    }
+
+    public ArrayList<double[]> getItemListPositions() {
+        return itemListPositions;
+    }
+
+    public ArrayList<double[]> getSnakeListPositions() {
+        return snakeListPositions;
     }
 
     /**
@@ -61,19 +79,6 @@ public class MVCSnakeController {
         else if (this.turnLeft)
             this.theView.getPlayer().rotate(RIGHT);
 
-        for (GameAsset item : this.theModel.getListOfItems())
-            if (this.theView.getPlayer().checkForCollision(item))
-            {
-                handleItemCollision(item);
-                this.theView.getRoot().getChildren().removeAll(item);
-                this.theModel.getInactiveFoodNodes().add(item);
-            }
-
-        for (Rectangle wall : this.theModel.getListOfWalls()) {
-            if (this.theView.getPlayer().checkForCollision(wall)) {
-                theView.getPlayer().deactivate();
-            }
-        }
 
         int i = 0;
         for (SnakeTail tail : ((Snake) this.theView.getPlayer()).getSnakeTails()) {
@@ -98,16 +103,7 @@ public class MVCSnakeController {
      */
     private void handleItemCollision(GameAsset item)
     {
-        if (item instanceof Potion) {
-            for (int i = 0; i < theModel.getPotionLength(); i++)
-                this.theView.getRoot().getChildren().add(((Snake) this.theView.getPlayer()).addTail());
-        } else if (item instanceof Poison) {
-            for (int i = 0; i < theModel.getPoisonLength(); i++)
-                this.theView.getRoot().getChildren().removeAll(((Snake) theView.getPlayer()).removeTail());
-        } else {
-            for (int i = 0; i < theModel.getFoodLength(); i++)
-                this.theView.getRoot().getChildren().add(((Snake) this.theView.getPlayer()).addTail());
-        }
+
     }
 
     /**
@@ -138,42 +134,10 @@ public class MVCSnakeController {
      */
     private void foodPlacer()
     {
-        if (this.theModel.getListOfItems().size() < 30)
-        {
-            int randomInt = randomNumGen.nextInt(2000);
-            if (randomInt < 25)
-            {
-                Item newItem;
-                switch (randomInt)
-                {
-                    case 1:
-                        newItem = new Potion(12, Color.GOLD);
-                        break;
-                    case 2:
-                        newItem = new Poison(11, Color.GREEN);
-                        break;
-                    default:
-                        newItem = new Food(10, Color.BLUE);
-                }
 
-                this.theModel.getListOfItems().add(newItem);
-                SnakeUtil.addToGame(theView.getRoot(), newItem,
-                        60 + (this.randomNumGen.nextInt(theView.getWIDTH() - 150)),
-                        60 + (this.randomNumGen.nextInt(theView.getHEIGHT() - 150)));
-            }
-        }
     }
 
-    /**
-     * Will remove any inactive items from the list
-     *
-     * @author Christopher Asbrock
-     */
-    private void itemCleanUp()
-    {
-        theModel.getListOfItems().removeAll(theModel.getInactiveFoodNodes());
-        theModel.getInactiveFoodNodes().clear();
-    }
+
 
     /**
      * the main driver that updates the screen 60 times a second.
@@ -186,7 +150,7 @@ public class MVCSnakeController {
         if (theView.getPlayer() != null)
         {
             foodPlacer();
-            itemCleanUp();
+
             handlePlayer();
         }
 
@@ -221,5 +185,23 @@ public class MVCSnakeController {
             if (event.getCode() == KeyCode.UP)
                 System.out.println("up");
         });
+    }
+
+    public void run()
+    {
+        System.out.println("setting up model");
+        this.theModel = new MVCSnakeModel(this);
+        this.theModel.runListener();
+    }
+
+    public static void main(String [] args)
+    {
+        MVCSnakeController controller = new MVCSnakeController();
+        controller.run();
+
+        while (true)
+        {
+            //needs to keep running so the thread can function properly
+        }
     }
 }

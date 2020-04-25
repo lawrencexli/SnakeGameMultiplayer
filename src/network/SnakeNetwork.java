@@ -188,7 +188,8 @@ public class SnakeNetwork
         else
             allInfo += null;
 
-        this.networkOut.println(allInfo);
+        //System.out.println(allInfo);
+        this.networkOut.println("DATA " + allInfo);
     }
 
     /**
