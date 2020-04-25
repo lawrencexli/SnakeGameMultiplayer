@@ -35,7 +35,7 @@ public class SnakePane extends Application
     private final int HEIGHT = 600;
 
     /**random number generator*/
-    private Random randomizer;
+    private Random randomNumGen;
 
     /**a list containing all items currently in the pane*/
     private ArrayList<GameAsset> listOfItems;
@@ -50,11 +50,11 @@ public class SnakePane extends Application
     private boolean turnLeft;
 
     /**Length of snake added for potion*/
-    private int potionLength= 50;
+    private int potionLength = 50;
     /**Length of snake added for food*/
-    private int foodLength= 5;
+    private int foodLength = 5;
     /**Length of snake deleted for poison*/
-    private int poisonLength= 100;
+    private int poisonLength = 100;
 
     /**
      * a trash collector that collects all assets removed from the scene to be removed
@@ -73,7 +73,7 @@ public class SnakePane extends Application
         this.root = new Pane();
         this.root.setPrefSize(WIDTH, HEIGHT);
 
-        this.randomizer = new Random();
+        this.randomNumGen = new Random();
 
         this.listOfItems = new ArrayList<>();
         this.listOfWalls = new ArrayList<>();
@@ -235,7 +235,7 @@ public class SnakePane extends Application
     {
         if (this.listOfItems.size() < 30)
         {
-            int randomInt = randomizer.nextInt(2000);
+            int randomInt = randomNumGen.nextInt(2000);
             if (randomInt < 25)
             {
                 Item newItem;
@@ -253,8 +253,8 @@ public class SnakePane extends Application
 
                 this.listOfItems.add(newItem);
                 SnakeUtil.addToGame(root, newItem,
-                        60 + (this.randomizer.nextInt(WIDTH- 150)),
-                        60 + (this.randomizer.nextInt(HEIGHT- 150)));
+                        60 + (this.randomNumGen.nextInt(WIDTH- 150)),
+                        60 + (this.randomNumGen.nextInt(HEIGHT- 150)));
             }
         }
     }

@@ -36,7 +36,7 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    public class MyRotate
+    static class MyRotate
     {
         final static int RIGHT = -1;
         final static int LEFT = 1;
@@ -119,9 +119,7 @@ public abstract class GameAsset extends Circle
     public boolean checkForCollision(Node otherAsset)
     {
 //        return this.getBoundsInParent().intersects(otherAsset.getBoundsInParent());
-        return (Math.abs(this.getTranslateX() - otherAsset.getTranslateX()) < otherAsset.getBoundsInParent().getWidth())
-                && (Math.abs(this.getTranslateY() - otherAsset.getTranslateY()) < otherAsset.getBoundsInParent().getHeight());
-        //return Shape.intersect(this, (Shape) otherAsset).getBoundsInParent().getWidth() > 0;
+        return Shape.intersect(this, (Shape) otherAsset).getBoundsInParent().getWidth() > 0;
     }
 
     public boolean isNoLongerActive()
