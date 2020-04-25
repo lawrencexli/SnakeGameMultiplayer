@@ -49,17 +49,6 @@ public class MVCSnakeModel {
         this.inactiveFoodNodes = new ArrayList<>();
     }
 
-    /**
-     * Will remove any inactive items from the list
-     *
-     * @author Christopher Asbrock
-     */
-    private void itemCleanUp()
-    {
-        listOfItems.removeAll(inactiveFoodNodes);
-        inactiveFoodNodes.clear();
-    }
-
     public ArrayList<GameAsset> getListOfItems() {
         return listOfItems;
     }

@@ -19,17 +19,9 @@
 package
         main;
 
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-
-import java.util.ArrayList;
-import java.util.Random;
-
-import static main.GameAsset.MyRotate.LEFT;
-import static main.GameAsset.MyRotate.RIGHT;
 
 /** The MVC snake view class */
 public class MVCSnakeView{
@@ -99,48 +91,6 @@ public class MVCSnakeView{
     }
 
     /**
-     * when colliding with an Item this determines the instance type and adds or removes pieces of the snake
-     * accordingly
-     *
-     * @author Christopher Asbrock
-     *
-     * @param item - the idem being collided with
-     */
-    private void handleItemCollision(GameAsset item)
-    {
-        if (item instanceof Potion) {
-            for (int i = 0; i < theModel.getPotionLength(); i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        } else if (item instanceof Poison) {
-            for (int i = 0; i < theModel.getPoisonLength(); i++)
-                this.root.getChildren().removeAll(((Snake) player).removeTail());
-        } else {
-            for (int i = 0; i < theModel.getFoodLength(); i++)
-                this.root.getChildren().add(((Snake) this.player).addTail());
-        }
-    }
-
-    /**
-     * updates the player based on whether they are active or not,
-     * if they are it will update them and their pieces,
-     * if not it will remove them from the game
-     */
-    private void updatePlayer()
-    {
-        if (this.player.isNoLongerActive())
-        {
-            this.root.getChildren().removeAll(((Snake) this.player).getSnakeTails());
-            ((Snake) this.player).getSnakeTails().clear();
-            this.root.getChildren().removeAll(this.player);
-            this.player = null;
-        }
-        else
-        {
-            this.player.updateAsset();
-        }
-    }
-
-    /**
      * UpdateView when called by the controller will use the corresponding list of coordinates in
      * controller to update the size of this classes SnakeTails list to the same size,
      * then update the positioning of each tail piece based on the presented data.
@@ -156,4 +106,6 @@ public class MVCSnakeView{
     public int getHEIGHT() { return HEIGHT; }
 
     public GameAsset getPlayer() { return player; }
+
+    public void setPlayerNull() { this.player = null; }
 }
