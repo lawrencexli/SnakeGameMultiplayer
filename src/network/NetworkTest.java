@@ -50,6 +50,8 @@ public class NetworkTest
                     System.out.println(test[i]);
                 }
                 System.out.println(scanner.nextLine());
+
+                printStream.println("PROTOCOL some type of message here");
             }
 
 

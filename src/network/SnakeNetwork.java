@@ -83,8 +83,7 @@ public class SnakeNetwork
         this.turnLeft = true;
         this.turnRight = false;
 
-        Thread thread = new Thread(this::setUpNetworkConnection);
-        thread.start();
+        new Thread(this::setUpNetworkConnection).start();
 
         setUpWalls(Color.DARKRED);
     }
@@ -99,11 +98,29 @@ public class SnakeNetwork
             networkIn = new Scanner(socket.getInputStream());
             networkOut = new PrintStream(socket.getOutputStream());
 
+            new Thread(this::networkListener).start();
             this.gameIsOn = true;
         }
         catch (IOException e)
         {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void networkListener()
+    {
+        while (this.gameIsOn)
+        {
+            String input = this.networkIn.nextLine();
+
+            String protocol = input.split(" ")[0];
+            String message = input.substring(protocol.length() + 1);
+
+            System.out.println(protocol);
+            System.out.println(message);
+
+
+
         }
     }
 
