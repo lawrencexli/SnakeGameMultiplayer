@@ -20,6 +20,7 @@ package
         main;
 
 import javafx.scene.shape.Rectangle;
+import network.SnakeUtil;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -34,18 +35,13 @@ public class MVCSnakeModel
     private Scanner networkIn;
     private PrintStream networkOut;
 
-
-
-    /**
-     * a trash collector that collects all assets removed from the scene to be removed
-     * from their list at the end of the update
-     * */
-    private ArrayList<GameAsset> inactiveFoodNodes;
+    protected boolean gameRunning;
 
     public MVCSnakeModel(MVCSnakeController controller)
     {
         try
         {
+            this.gameRunning = true;
             this.controller = controller;
 
             this.socket = new Socket("localhost", 1111);
@@ -65,15 +61,13 @@ public class MVCSnakeModel
         int itemPrev = 0;
         int snakePrev = 0;
 
-        while (true)
+        while (gameRunning)
         {
-
             try
             {
                 String input = this.networkIn.nextLine();
                 String protocol = input.split(" ")[0];
 
-                //System.out.println(input);
                 switch (protocol)
                 {
                     default:
@@ -82,13 +76,13 @@ public class MVCSnakeModel
 
                 if (itemPrev != this.controller.getItemListPositions().size())
                 {
-                    System.out.println("ITEM -> " + this.controller.getItemListPositions().size());
+                    System.out.println("ITEM -> " + this.controller.getItemListPositions());
                     itemPrev = this.controller.getItemListPositions().size();
                 }
 
                 if (snakePrev != this.controller.getSnakeListPositions().size())
                 {
-                    System.out.println("SNAKE -> " + this.controller.getSnakeListPositions().size());
+                    System.out.println("SNAKE -> " + this.controller.getSnakeListPositions());
                     snakePrev = this.controller.getSnakeListPositions().size();
                 }
             }
@@ -102,44 +96,47 @@ public class MVCSnakeModel
 
     private void updateSnake(String snakeInfo)
     {
-
-            //this.networkOut.println("PROTOCOL " + snakeInfo);
             String[] positions = snakeInfo.split("%");
 
             if (positions.length > 0)
             {
                 String[] itemPos = positions[0].split(";");
 
-                if (itemPos.length < this.controller.getItemListPositions().size())
-                    while (itemPos.length < this.controller.getItemListPositions().size())
-                        this.controller.getItemListPositions().remove(0);
-                else if (itemPos.length > this.controller.getItemListPositions().size())
-                    while (itemPos.length > this.controller.getItemListPositions().size())
-                        this.controller.getItemListPositions().add(new double[2]);
+                SnakeUtil.resizeArrayList(itemPos.length, this.controller.getItemListPositions());
 
-                for (int i = 0; i < itemPos.length; i++) {
+                for (int i = 0; i < itemPos.length; i++)
+                {
+                    if (this.controller.getItemListPositions().get(i) == null)
+                        this.controller.getItemListPositions().set(i, new Positioning());
+
                     String[] xAndy = itemPos[i].split(",");
-                    this.controller.getItemListPositions().get(i)[0] = Double.parseDouble(xAndy[0]);
-                    this.controller.getItemListPositions().get(i)[0] = Double.parseDouble(xAndy[1]);
+                    this.controller.getItemListPositions().get(i).x = Double.parseDouble(xAndy[0]);
+                    this.controller.getItemListPositions().get(i).y = Double.parseDouble(xAndy[1]);
                 }
             }
 
             if (positions.length > 1)
             {
-                String[] snakePos = positions[1].split(";");
+                if (positions[1].equalsIgnoreCase("null"))
+                {
+                    this.gameRunning = false;
+                }
+                else
+                {
+                    String[] snakePos = positions[1].split(";");
 
-                if (snakePos.length < this.controller.getSnakeListPositions().size())
-                    while (snakePos.length < this.controller.getSnakeListPositions().size())
-                        this.controller.getSnakeListPositions().remove(0);
-                else if (snakePos.length > this.controller.getSnakeListPositions().size())
-                    while (snakePos.length > this.controller.getSnakeListPositions().size())
-                        this.controller.getSnakeListPositions().add(new double[2]);
+                    SnakeUtil.resizeArrayList(snakePos.length, this.controller.getSnakeListPositions());
 
-                for (int i = 0; i < snakePos.length; i++) {
-                    String[] xYAndRot = snakePos[i].split(",");
-                    this.controller.getItemListPositions().get(i)[0] = Double.parseDouble(xYAndRot[0]);
-                    this.controller.getItemListPositions().get(i)[0] = Double.parseDouble(xYAndRot[1]);
-                    this.controller.getItemListPositions().get(i)[0] = Double.parseDouble(xYAndRot[2]);
+                    for (int i = 0; i < snakePos.length; i++)
+                    {
+                        String[] xYAndRot = snakePos[i].split(",");
+                        if (this.controller.getSnakeListPositions().get(i) == null)
+                            this.controller.getSnakeListPositions().set(i, new Positioning());
+
+                        this.controller.getSnakeListPositions().get(i).x = Double.parseDouble(xYAndRot[0]);
+                        this.controller.getSnakeListPositions().get(i).y = Double.parseDouble(xYAndRot[1]);
+                        this.controller.getSnakeListPositions().get(i).rotate = Double.parseDouble(xYAndRot[2]);
+                    }
                 }
             }
     }
@@ -149,15 +146,53 @@ public class MVCSnakeModel
     {
         new Thread(this::listener).start();
 
-        while (true)
+        while (gameRunning)
         {
+            if(!this.gameRunning)
+                System.out.println("done");
             //run forever for now...
         }
+
+        try
+        {
+            this.networkOut.close();
+            this.networkIn.close();
+            this.socket.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        System.out.println("Model closed down");
     }
 
     public static void main(String[] args)
     {
         MVCSnakeModel model = new MVCSnakeModel(null);
         model.runListener();
+    }
+}
+class Positioning
+{
+    double x;
+    double y;
+    double rotate;
+
+    Positioning()
+    {
+        x = 0;
+        y = 0;
+        rotate = 0;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Positioning{" +
+                "x=" + x +
+                ", y=" + y +
+                ", rotate=" + rotate +
+                '}';
     }
 }

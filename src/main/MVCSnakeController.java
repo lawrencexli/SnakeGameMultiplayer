@@ -34,8 +34,8 @@ public class MVCSnakeController {
 
 
 
-    private ArrayList<double[]> itemListPositions;
-    private ArrayList<double[]> snakeListPositions;
+    private ArrayList<Positioning> itemListPositions;
+    private ArrayList<Positioning> snakeListPositions;
 
     /**trigger for a right turn*/
     private boolean turnRight;
@@ -61,11 +61,11 @@ public class MVCSnakeController {
         this.turnRight = false;
     }
 
-    public ArrayList<double[]> getItemListPositions() {
+    public ArrayList<Positioning> getItemListPositions() {
         return itemListPositions;
     }
 
-    public ArrayList<double[]> getSnakeListPositions() {
+    public ArrayList<Positioning> getSnakeListPositions() {
         return snakeListPositions;
     }
 
@@ -157,51 +157,22 @@ public class MVCSnakeController {
         //this.listOfItems.forEach(GameAsset::updateAsset);
     }
 
-    /**
-     * revamps the stages button inputs to activate on both the up and down stroke to trigger a boolean
-     * as true on down and false on up
-     *
-     * @author Christopher Asbrock
-     *
-     * @param stage - the stage to apply input to
-     */
-    private void userInputButtonPress(Stage stage)
-    {
-        stage.getScene().setOnKeyPressed(event ->
-        {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = true;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = true;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
-        stage.getScene().setOnKeyReleased(event ->
-        {
-            if (event.getCode() == KeyCode.LEFT)
-                this.turnLeft = false;
-            if (event.getCode() == KeyCode.RIGHT)
-                this.turnRight = false;
-            if (event.getCode() == KeyCode.UP)
-                System.out.println("up");
-        });
-    }
-
     public void run()
     {
-        System.out.println("setting up model");
         this.theModel = new MVCSnakeModel(this);
         this.theModel.runListener();
+
+        while (this.theModel.gameRunning)
+        {
+            //needs to keep running so the thread can function properly
+        }
+
+        System.out.println("Controller ShutDown");
     }
 
     public static void main(String [] args)
     {
         MVCSnakeController controller = new MVCSnakeController();
         controller.run();
-
-        while (true)
-        {
-            //needs to keep running so the thread can function properly
-        }
     }
 }

@@ -21,6 +21,9 @@ package network;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * some utilities that any GUI instance of the snake game will need
  *
@@ -39,5 +42,15 @@ public class SnakeUtil
     {
         gameAsset.setTranslateX(posX);
         gameAsset.setTranslateY(posY);
+    }
+
+    public static void resizeArrayList(int size, List<?> list)
+    {
+        if (list.size() < size)
+            while (list.size() < size)
+                list.add(null);
+        else if (list.size() > size)
+            while (list.size() > size)
+                list.remove(0);
     }
 }
