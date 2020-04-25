@@ -48,13 +48,16 @@ public class MVCSnakeView{
     /** The player character */
     private GameAsset player;
 
+    /** MVC Snake model */
+    private MVCSnakeModel theModel;
+
     /**
      * initializes lists of items and the pane to a certain size
      *
      * @author Christopher Asbrock
      */
     public MVCSnakeView() {
-        //this.theModel = new MVCSnakeModel();
+        this.theModel = new MVCSnakeModel();
         this.root = new Pane();
         this.root.setStyle("-fx-background-color: dark;");
         this.root.setPrefSize(WIDTH, HEIGHT);
@@ -81,7 +84,7 @@ public class MVCSnakeView{
      */
     private void makeWall(double width, double height, double posX, double posY) {
         Rectangle wall = new Rectangle(width, height, Color.DARKRED);
-        //theModel.getListOfWalls().add(wall);
+        theModel.getListOfWalls().add(wall);
         SnakeUtil.addToGame(this.root, wall, posX ,posY);
     }
 
@@ -93,6 +96,48 @@ public class MVCSnakeView{
         makeWall(30, root.getPrefHeight(),root.getPrefWidth() - 30 ,0);
         makeWall(root.getPrefWidth(), 30,0 ,0);
         makeWall(root.getPrefWidth(), 30,0 ,root.getPrefHeight() - 30);
+    }
+
+    /**
+     * when colliding with an Item this determines the instance type and adds or removes pieces of the snake
+     * accordingly
+     *
+     * @author Christopher Asbrock
+     *
+     * @param item - the idem being collided with
+     */
+    private void handleItemCollision(GameAsset item)
+    {
+        if (item instanceof Potion) {
+            for (int i = 0; i < theModel.getPotionLength(); i++)
+                this.root.getChildren().add(((Snake) this.player).addTail());
+        } else if (item instanceof Poison) {
+            for (int i = 0; i < theModel.getPoisonLength(); i++)
+                this.root.getChildren().removeAll(((Snake) player).removeTail());
+        } else {
+            for (int i = 0; i < theModel.getFoodLength(); i++)
+                this.root.getChildren().add(((Snake) this.player).addTail());
+        }
+    }
+
+    /**
+     * updates the player based on whether they are active or not,
+     * if they are it will update them and their pieces,
+     * if not it will remove them from the game
+     */
+    private void updatePlayer()
+    {
+        if (this.player.isNoLongerActive())
+        {
+            this.root.getChildren().removeAll(((Snake) this.player).getSnakeTails());
+            ((Snake) this.player).getSnakeTails().clear();
+            this.root.getChildren().removeAll(this.player);
+            this.player = null;
+        }
+        else
+        {
+            this.player.updateAsset();
+        }
     }
 
     /**
