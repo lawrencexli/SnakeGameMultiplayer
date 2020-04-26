@@ -45,9 +45,11 @@ public class TempView extends Application
     {
         ArrayList<Circle> tempOne = (ArrayList<Circle>) this.controller.getSnakeListPositions().clone();
         ArrayList<Circle> tempTwo = (ArrayList<Circle>) this.controller.getItemListPositions().clone();
+        ArrayList<Node> tempThree = (ArrayList<Node>) this.controller.getTrash().clone();
+        this.controller.getTrash().clear();
 
-        while (!this.controller.getTrash().isEmpty())
-            this.root.getChildren().remove(this.controller.getTrash().remove(0));
+        while (!tempThree.isEmpty())
+            this.root.getChildren().remove(tempThree.remove(0));
 
         for (Circle part : tempOne)
             if (part != null && !this.root.getChildren().contains(part))
