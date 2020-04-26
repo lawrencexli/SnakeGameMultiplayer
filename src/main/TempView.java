@@ -43,10 +43,9 @@ public class TempView extends Application
 
     public synchronized void updateView()
     {
-        ArrayList<Circle> tempOne = (ArrayList<Circle>) this.controller.getSnakeListPositions().clone();
-        ArrayList<Circle> tempTwo = (ArrayList<Circle>) this.controller.getItemListPositions().clone();
-        ArrayList<Node> tempThree = (ArrayList<Node>) this.controller.getTrash().clone();
-        this.controller.getTrash().clear();
+        ArrayList<Circle> tempOne = this.controller.getSnakeListPositions();
+        ArrayList<Circle> tempTwo = this.controller.getItemListPositions();
+        ArrayList<Node> tempThree = this.controller.getTrash();
 
         while (!tempThree.isEmpty())
             this.root.getChildren().remove(tempThree.remove(0));
