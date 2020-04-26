@@ -78,6 +78,7 @@ public class SnakeNetwork
 
         this.player = new Snake();
         this.player.setVelocity(1,0);
+        ((Snake) this.player).addTail();
         SnakeUtil.addToGame(this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
 
         this.turnLeft = true;
@@ -116,8 +117,17 @@ public class SnakeNetwork
             String protocol = input.split(" ")[0];
             String message = input.substring(protocol.length() + 1);
 
-            System.out.println(protocol);
-            System.out.println(message);
+            switch (protocol)
+            {
+                case "TURN_LEFT":
+                    this.turnLeft = message.equalsIgnoreCase("true");
+                    break;
+                case "TURN_RIGHT":
+                    this.turnRight = message.equalsIgnoreCase("true");
+                    break;
+            }
+            //System.out.println(protocol);
+            //System.out.println(message);
 
 
 

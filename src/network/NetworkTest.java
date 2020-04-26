@@ -31,8 +31,6 @@ public class NetworkTest
         Scanner scanner;
         PrintStream printStream;
 
-
-
         try
         {
             socket = new Socket("localhost", 1111);

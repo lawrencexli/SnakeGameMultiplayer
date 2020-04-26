@@ -19,23 +19,21 @@
 package
         main;
 
-import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-
-import static main.GameAsset.MyRotate.LEFT;
-import static main.GameAsset.MyRotate.RIGHT;
 
 public class MVCSnakeController {
 
 
 
-    private ArrayList<Positioning> itemListPositions;
-    private ArrayList<Positioning> snakeListPositions;
+    private ArrayList<Circle> itemListPositions;
+    private ArrayList<Circle> snakeListPositions;
+    private ArrayList<Node> scrapNodes;
 
     /**trigger for a right turn*/
     private boolean turnRight;
@@ -46,115 +44,33 @@ public class MVCSnakeController {
     private Random randomNumGen;
 
     /** MVC Snake View */
-    private MVCSnakeView theView;
+    private TempView theView;
     /** MVC Snake Model */
     private MVCSnakeModel theModel;
 
-    public MVCSnakeController() {
+    public MVCSnakeController(TempView view) {
         //this.theView = new MVCSnakeView();
         //this.theModel = new MVCSnakeModel(this);
 
+        this.theView = view;
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
+        this.scrapNodes = new ArrayList<>();
 
         this.turnLeft = false;
         this.turnRight = false;
     }
 
-    public ArrayList<Positioning> getItemListPositions() {
+    public ArrayList<Circle> getItemListPositions() {
         return itemListPositions;
     }
 
-    public ArrayList<Positioning> getSnakeListPositions() {
+    public ArrayList<Circle> getSnakeListPositions() {
         return snakeListPositions;
     }
 
-    /**
-     * handles the players status and interaction with other nodes
-     */
-    private void handlePlayer()
-    {
-        if (this.turnRight)
-            this.theView.getPlayer().rotate(LEFT);
-        else if (this.turnLeft)
-            this.theView.getPlayer().rotate(RIGHT);
-
-
-        int i = 0;
-        for (SnakeTail tail : ((Snake) this.theView.getPlayer()).getSnakeTails()) {
-            if (i++ < 100)
-                continue;       // First several SnakeTails always collide with the head
-
-            if (this.theView.getPlayer().checkForCollision(tail)) {
-                System.out.printf("Collided with tail number %d\n", tail.id);
-                theView.getPlayer().deactivate();
-            }
-        }
-        updatePlayer();
-    }
-
-    /**
-     * when colliding with an Item this determines the instance type and adds or removes pieces of the snake
-     * accordingly
-     *
-     * @author Christopher Asbrock
-     *
-     * @param item - the idem being collided with
-     */
-    private void handleItemCollision(GameAsset item)
-    {
-
-    }
-
-    /**
-     * updates the player based on whether they are active or not,
-     * if they are it will update them and their pieces,
-     * if not it will remove them from the game
-     */
-    private void updatePlayer()
-    {
-        if (this.theView.getPlayer().isNoLongerActive())
-        {
-            this.theView.getRoot().getChildren().removeAll(((Snake) this.theView.getPlayer()).getSnakeTails());
-            ((Snake) this.theView.getPlayer()).getSnakeTails().clear();
-            this.theView.getRoot().getChildren().removeAll(this.theView.getPlayer());
-            this.theView.setPlayerNull();
-        }
-        else
-        {
-            this.theView.getPlayer().updateAsset();
-        }
-    }
-
-    /**
-     * called per tick, creates a randomized number, if the value is under a specific amount it will
-     * create a food item randomly on the field
-     *
-     * @author Christopher Asbrock
-     */
-    private void foodPlacer()
-    {
-
-    }
-
-
-
-    /**
-     * the main driver that updates the screen 60 times a second.
-     * food actions will only happen when player is alive
-     *
-     * @author Christopher Asbrock
-     */
-    private void updateDriver()
-    {
-        if (theView.getPlayer() != null)
-        {
-            foodPlacer();
-
-            handlePlayer();
-        }
-
-        //this.listOfItems.forEach(GameAsset::updateAsset);
+    public ArrayList<Node> getTrash() {
+        return scrapNodes;
     }
 
     public void run()
@@ -172,7 +88,27 @@ public class MVCSnakeController {
 
     public static void main(String [] args)
     {
-        MVCSnakeController controller = new MVCSnakeController();
+        MVCSnakeController controller = new MVCSnakeController(null);
         controller.run();
+    }
+
+    public void updateView()
+    {
+        Platform.runLater(()->this.theView.updateView());
+    }
+
+    public void resizeArrayList(int size, List<Circle> list)
+    {
+        if (list.size() < size)
+            while (list.size() < size)
+                list.add(null);
+        else if (list.size() > size)
+            while (list.size() > size)
+                this.scrapNodes.add(list.remove(0));
+    }
+
+    public void sendDirection(String turn_left, boolean b)
+    {
+        this.theModel.sendDirection(turn_left,b);
     }
 }

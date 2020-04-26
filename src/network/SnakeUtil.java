@@ -43,14 +43,4 @@ public class SnakeUtil
         gameAsset.setTranslateX(posX);
         gameAsset.setTranslateY(posY);
     }
-
-    public static void resizeArrayList(int size, List<?> list)
-    {
-        if (list.size() < size)
-            while (list.size() < size)
-                list.add(null);
-        else if (list.size() > size)
-            while (list.size() > size)
-                list.remove(0);
-    }
 }

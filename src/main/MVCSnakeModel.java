@@ -19,6 +19,8 @@
 package
         main;
 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import network.SnakeUtil;
 
@@ -98,20 +100,21 @@ public class MVCSnakeModel
     {
             String[] positions = snakeInfo.split("%");
 
-            if (positions.length > 0)
+            //System.out.println(snakeInfo);
+            if (positions.length > 0 && !positions[0].equals(""))
             {
                 String[] itemPos = positions[0].split(";");
 
-                SnakeUtil.resizeArrayList(itemPos.length, this.controller.getItemListPositions());
+                controller.resizeArrayList(itemPos.length, this.controller.getItemListPositions());
 
                 for (int i = 0; i < itemPos.length; i++)
                 {
                     if (this.controller.getItemListPositions().get(i) == null)
-                        this.controller.getItemListPositions().set(i, new Positioning());
+                        this.controller.getItemListPositions().set(i, new Circle(5,5,5, Color.RED));
 
                     String[] xAndy = itemPos[i].split(",");
-                    this.controller.getItemListPositions().get(i).x = Double.parseDouble(xAndy[0]);
-                    this.controller.getItemListPositions().get(i).y = Double.parseDouble(xAndy[1]);
+                    this.controller.getItemListPositions().get(i).setTranslateX(Double.parseDouble(xAndy[0]));
+                    this.controller.getItemListPositions().get(i).setTranslateY(Double.parseDouble(xAndy[1]));
                 }
             }
 
@@ -125,20 +128,27 @@ public class MVCSnakeModel
                 {
                     String[] snakePos = positions[1].split(";");
 
-                    SnakeUtil.resizeArrayList(snakePos.length, this.controller.getSnakeListPositions());
+                    controller.resizeArrayList(snakePos.length, this.controller.getSnakeListPositions());
 
                     for (int i = 0; i < snakePos.length; i++)
                     {
                         String[] xYAndRot = snakePos[i].split(",");
                         if (this.controller.getSnakeListPositions().get(i) == null)
-                            this.controller.getSnakeListPositions().set(i, new Positioning());
+                            this.controller.getSnakeListPositions().set(i, new Circle(15,15,15,Color.GOLD));
 
-                        this.controller.getSnakeListPositions().get(i).x = Double.parseDouble(xYAndRot[0]);
-                        this.controller.getSnakeListPositions().get(i).y = Double.parseDouble(xYAndRot[1]);
-                        this.controller.getSnakeListPositions().get(i).rotate = Double.parseDouble(xYAndRot[2]);
+                        this.controller.getSnakeListPositions().get(i).setTranslateX(Double.parseDouble(xYAndRot[0]));
+                        this.controller.getSnakeListPositions().get(i).setTranslateY(Double.parseDouble(xYAndRot[1]));
+                        this.controller.getSnakeListPositions().get(i).setRotate(Double.parseDouble(xYAndRot[2]));
                     }
                 }
             }
+
+            this.controller.updateView();
+    }
+
+    public void sendDirection(String turn_left, boolean b)
+    {
+        networkOut.println(turn_left + " " + b);
     }
 
 
@@ -173,6 +183,7 @@ public class MVCSnakeModel
         model.runListener();
     }
 }
+
 class Positioning
 {
     double x;
