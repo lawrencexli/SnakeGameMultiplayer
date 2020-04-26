@@ -75,7 +75,7 @@ public class MVCSnakeModel
                     default:
                         this.updateSnake(input.substring(protocol.length() + 1));
                 }
-
+/*
                 if (itemPrev != this.controller.getItemListPositions().size())
                 {
                     System.out.println("ITEM -> " + this.controller.getItemListPositions());
@@ -87,6 +87,8 @@ public class MVCSnakeModel
                     System.out.println("SNAKE -> " + this.controller.getSnakeListPositions());
                     snakePrev = this.controller.getSnakeListPositions().size();
                 }
+
+ */
             }
             catch (Exception e)
             {
@@ -96,11 +98,10 @@ public class MVCSnakeModel
 
     }
 
-    private void updateSnake(String snakeInfo)
+    private synchronized void updateSnake(String snakeInfo)
     {
             String[] positions = snakeInfo.split("%");
 
-            //System.out.println(snakeInfo);
             if (positions.length > 0 && !positions[0].equals(""))
             {
                 String[] itemPos = positions[0].split(";");
@@ -158,8 +159,6 @@ public class MVCSnakeModel
 
         while (gameRunning)
         {
-            if(!this.gameRunning)
-                System.out.println("done");
             //run forever for now...
         }
 
@@ -181,29 +180,5 @@ public class MVCSnakeModel
     {
         MVCSnakeModel model = new MVCSnakeModel(null);
         model.runListener();
-    }
-}
-
-class Positioning
-{
-    double x;
-    double y;
-    double rotate;
-
-    Positioning()
-    {
-        x = 0;
-        y = 0;
-        rotate = 0;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Positioning{" +
-                "x=" + x +
-                ", y=" + y +
-                ", rotate=" + rotate +
-                '}';
     }
 }

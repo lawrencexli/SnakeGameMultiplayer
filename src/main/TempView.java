@@ -1,6 +1,7 @@
 package main;
 
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -40,17 +41,20 @@ public class TempView extends Application
         primaryStage.show();
     }
 
-    public void updateView()
+    public synchronized void updateView()
     {
+        ArrayList<Circle> tempOne = (ArrayList<Circle>) this.controller.getSnakeListPositions().clone();
+        ArrayList<Circle> tempTwo = (ArrayList<Circle>) this.controller.getItemListPositions().clone();
+
         while (!this.controller.getTrash().isEmpty())
             this.root.getChildren().remove(this.controller.getTrash().remove(0));
 
-        for (Circle part : this.controller.getSnakeListPositions())
-            if (!this.root.getChildren().contains(part))
+        for (Circle part : tempOne)
+            if (part != null && !this.root.getChildren().contains(part))
                 this.root.getChildren().add(part);
 
-        for (Circle part : this.controller.getItemListPositions())
-            if (!this.root.getChildren().contains(part))
+        for (Circle part : tempTwo)
+            if (part != null && !this.root.getChildren().contains(part))
                 this.root.getChildren().add(part);
     }
 
@@ -63,6 +67,7 @@ public class TempView extends Application
             if (event.getCode() == KeyCode.RIGHT)
                 this.controller.sendDirection("TURN_RIGHT", true);
         });
+
         stage.getScene().setOnKeyReleased(event ->
         {
             if (event.getCode() == KeyCode.LEFT)

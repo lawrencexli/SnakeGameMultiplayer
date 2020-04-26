@@ -35,14 +35,6 @@ public class MVCSnakeController {
     private ArrayList<Circle> snakeListPositions;
     private ArrayList<Node> scrapNodes;
 
-    /**trigger for a right turn*/
-    private boolean turnRight;
-    /**trigger for a left turn*/
-    private boolean turnLeft;
-
-    /**random number generator*/
-    private Random randomNumGen;
-
     /** MVC Snake View */
     private TempView theView;
     /** MVC Snake Model */
@@ -53,29 +45,27 @@ public class MVCSnakeController {
         //this.theModel = new MVCSnakeModel(this);
 
         this.theView = view;
+        this.theModel = new MVCSnakeModel(this);
+
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
         this.scrapNodes = new ArrayList<>();
-
-        this.turnLeft = false;
-        this.turnRight = false;
     }
 
-    public ArrayList<Circle> getItemListPositions() {
+    public synchronized ArrayList<Circle> getItemListPositions() {
         return itemListPositions;
     }
 
-    public ArrayList<Circle> getSnakeListPositions() {
+    public synchronized ArrayList<Circle> getSnakeListPositions() {
         return snakeListPositions;
     }
 
-    public ArrayList<Node> getTrash() {
+    public synchronized ArrayList<Node> getTrash() {
         return scrapNodes;
     }
 
     public void run()
     {
-        this.theModel = new MVCSnakeModel(this);
         this.theModel.runListener();
 
         while (this.theModel.gameRunning)
@@ -92,12 +82,12 @@ public class MVCSnakeController {
         controller.run();
     }
 
-    public void updateView()
+    public synchronized void updateView()
     {
         Platform.runLater(()->this.theView.updateView());
     }
 
-    public void resizeArrayList(int size, List<Circle> list)
+    public synchronized void resizeArrayList(int size, List<Circle> list)
     {
         if (list.size() < size)
             while (list.size() < size)
