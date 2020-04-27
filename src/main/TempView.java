@@ -1,5 +1,6 @@
 package main;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -43,6 +44,8 @@ public class TempView extends Application
 
     public synchronized void updateView()
     {
+        this.controller.dataWrite = true;
+
         ArrayList<Circle> tempOne = this.controller.getSnakeListPositions();
         ArrayList<Circle> tempTwo = this.controller.getItemListPositions();
         ArrayList<Node> tempThree = this.controller.getTrash();
@@ -57,6 +60,8 @@ public class TempView extends Application
         for (Circle part : tempTwo)
             if (part != null && !this.root.getChildren().contains(part))
                 this.root.getChildren().add(part);
+
+        this.controller.dataWrite = false;
     }
 
     private void userInputButtonPress(Stage stage)

@@ -221,6 +221,7 @@ public class SnakeNetwork
 
         for (Rectangle wall : this.listOfWalls) {
             if (this.player.checkForCollision(wall)) {
+                System.out.println("HitWall");
                 player.deactivate();
             }
         }

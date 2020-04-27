@@ -19,6 +19,7 @@
 package
         main;
 
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MVCSnakeModel
@@ -37,10 +39,29 @@ public class MVCSnakeModel
     private Scanner networkIn;
     private PrintStream networkOut;
 
+    public ArrayList<Circle> getItemListPositions() {
+        return itemListPositions;
+    }
+
+    public ArrayList<Circle> getSnakeListPositions() {
+        return snakeListPositions;
+    }
+
+    public ArrayList<Node> getScrapNodes() {
+        return scrapNodes;
+    }
+
+    private ArrayList<Circle> itemListPositions;
+    private ArrayList<Circle> snakeListPositions;
+    private ArrayList<Node> scrapNodes;
+
     protected boolean gameRunning;
 
     public MVCSnakeModel(MVCSnakeController controller)
     {
+        this.itemListPositions = new ArrayList<>();
+        this.snakeListPositions = new ArrayList<>();
+        this.scrapNodes = new ArrayList<>();
         try
         {
             this.gameRunning = true;
@@ -100,22 +121,22 @@ public class MVCSnakeModel
 
     private synchronized void updateSnake(String snakeInfo)
     {
+        if (!this.controller.dataWrite)
+        {
             String[] positions = snakeInfo.split("%");
 
-            if (positions.length > 0 && !positions[0].equals(""))
-            {
+            if (positions.length > 0 && !positions[0].equals("")) {
                 String[] itemPos = positions[0].split(";");
 
-                controller.resizeArrayList(itemPos.length, this.controller.getItemListPositions());
+                this.resizeArrayList(itemPos.length, this.itemListPositions);
 
-                for (int i = 0; i < itemPos.length; i++)
-                {
-                    if (this.controller.getItemListPositions().get(i) == null)
-                        this.controller.getItemListPositions().set(i, new Circle(5,5,5, Color.RED));
+                for (int i = 0; i < itemPos.length; i++) {
+                    if (this.itemListPositions.get(i) == null)
+                        this.itemListPositions.set(i, new Circle(5, 5, 5, Color.RED));
 
                     String[] xAndy = itemPos[i].split(",");
-                    this.controller.getItemListPositions().get(i).setTranslateX(Double.parseDouble(xAndy[0]));
-                    this.controller.getItemListPositions().get(i).setTranslateY(Double.parseDouble(xAndy[1]));
+                    this.itemListPositions.get(i).setTranslateX(Double.parseDouble(xAndy[0]));
+                    this.itemListPositions.get(i).setTranslateY(Double.parseDouble(xAndy[1]));
                 }
             }
 
@@ -129,22 +150,22 @@ public class MVCSnakeModel
                 {
                     String[] snakePos = positions[1].split(";");
 
-                    controller.resizeArrayList(snakePos.length, this.controller.getSnakeListPositions());
+                    this.resizeArrayList(snakePos.length, this.snakeListPositions);
 
-                    for (int i = 0; i < snakePos.length; i++)
-                    {
+                    for (int i = 0; i < snakePos.length; i++) {
                         String[] xYAndRot = snakePos[i].split(",");
-                        if (this.controller.getSnakeListPositions().get(i) == null)
-                            this.controller.getSnakeListPositions().set(i, new Circle(15,15,15,Color.GOLD));
+                        if (this.snakeListPositions.get(i) == null)
+                            this.snakeListPositions.set(i, new Circle(15, 15, 15, Color.GOLD));
 
-                        this.controller.getSnakeListPositions().get(i).setTranslateX(Double.parseDouble(xYAndRot[0]));
-                        this.controller.getSnakeListPositions().get(i).setTranslateY(Double.parseDouble(xYAndRot[1]));
-                        this.controller.getSnakeListPositions().get(i).setRotate(Double.parseDouble(xYAndRot[2]));
+                        this.snakeListPositions.get(i).setTranslateX(Double.parseDouble(xYAndRot[0]));
+                        this.snakeListPositions.get(i).setTranslateY(Double.parseDouble(xYAndRot[1]));
+                        this.snakeListPositions.get(i).setRotate(Double.parseDouble(xYAndRot[2]));
                     }
                 }
             }
 
             this.controller.updateView();
+        }
     }
 
     public void sendDirection(String turn_left, boolean b)
@@ -180,5 +201,15 @@ public class MVCSnakeModel
     {
         MVCSnakeModel model = new MVCSnakeModel(null);
         model.runListener();
+    }
+
+    public synchronized void resizeArrayList(int size, List<Circle> list)
+    {
+        if (list.size() < size)
+            while (list.size() < size)
+                list.add(null);
+        else if (list.size() > size)
+            while (list.size() > size)
+                this.scrapNodes.add(list.remove(0));
     }
 }

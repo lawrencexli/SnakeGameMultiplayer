@@ -29,7 +29,7 @@ import java.util.Random;
 
 public class MVCSnakeController {
 
-
+    protected boolean dataWrite;
 
     private ArrayList<Circle> itemListPositions;
     private ArrayList<Circle> snakeListPositions;
@@ -47,9 +47,11 @@ public class MVCSnakeController {
         this.theView = view;
         this.theModel = new MVCSnakeModel(this);
 
-        this.itemListPositions = new ArrayList<>();
-        this.snakeListPositions = new ArrayList<>();
-        this.scrapNodes = new ArrayList<>();
+        this.itemListPositions = this.theModel.getItemListPositions();
+        this.snakeListPositions = this.theModel.getSnakeListPositions();
+        this.scrapNodes = this.theModel.getScrapNodes();
+
+        this.dataWrite = false;
     }
 
     public synchronized ArrayList<Circle> getItemListPositions() {
@@ -85,16 +87,6 @@ public class MVCSnakeController {
     public synchronized void updateView()
     {
         Platform.runLater(()->this.theView.updateView());
-    }
-
-    public synchronized void resizeArrayList(int size, List<Circle> list)
-    {
-        if (list.size() < size)
-            while (list.size() < size)
-                list.add(null);
-        else if (list.size() > size)
-            while (list.size() > size)
-                this.scrapNodes.add(list.remove(0));
     }
 
     public void sendDirection(String turn_left, boolean b)
