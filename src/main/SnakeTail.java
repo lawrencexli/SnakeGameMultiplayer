@@ -20,10 +20,11 @@ package main;
 
 
 import javafx.scene.paint.Color;
+import main.GameAsset;
 
 public class SnakeTail extends GameAsset {
 
-    /** For debugging (identification of a snake player) */
+    /** For debugging */
     public int id;
 
     /**
@@ -40,8 +41,11 @@ public class SnakeTail extends GameAsset {
     public SnakeTail(GameAsset parent) {
         super(15,  Color.RED);
         this.parent = parent;
-        this.setTranslateX(parent.getTranslateX());
-        this.setTranslateY(parent.getTranslateY());
+        if (parent != null)
+        {
+            this.setTranslateX(parent.getTranslateX());
+            this.setTranslateY(parent.getTranslateY());
+        }
     }
 
     public GameAsset getParentNode() {

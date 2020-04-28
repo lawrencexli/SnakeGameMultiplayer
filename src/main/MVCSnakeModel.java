@@ -22,8 +22,6 @@ package
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import network.SnakeUtil;
 
 import java.io.IOException;
 import java.io.PrintStream;

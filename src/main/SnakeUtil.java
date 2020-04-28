@@ -21,6 +21,9 @@ package main;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * some utilities that any GUI instance of the snake game will need
  *
@@ -35,10 +38,9 @@ public class SnakeUtil
      *
      * @author Christopher Asbrock
      */
-    public static void addToGame(Pane root, Node gameAsset, double posX, double posY)
+    public static void addToGame(Node gameAsset, double posX, double posY)
     {
         gameAsset.setTranslateX(posX);
         gameAsset.setTranslateY(posY);
-        root.getChildren().add(gameAsset);
     }
 }

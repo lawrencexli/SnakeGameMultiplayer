@@ -1,108 +1,86 @@
-/* *****************************************
- * CSCI205 - Software Engineering and Design
- * Spring 2020
- * Instructor: Prof. Chris Dancy
- *
- * Name: Lawrence Li
- * Section: 8am
- * Date: 4/21/20
- * Time: 11:11 AM
- *
- * Project: csci205_final_project_sp2020
- * Package: main
- * Class: MVCSnakeView
- *
- * Description:
- * MVC snake view
- * ****************************************
- */
-package
-        main;
+package main;
 
+import javafx.application.Application;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 
-/** The MVC snake view class */
-public class MVCSnakeView{
+import java.util.ArrayList;
 
-    /** Main display window for the snake game */
+public class MVCSnakeView extends Application
+{
     private Pane root;
 
-    /** Fixed width of the window */
-    private final int WIDTH = 800;
-    /** Fixed height of the window */
-    private final int HEIGHT = 600;
+    private ArrayList<SnakeTail> snakeTails;
+    private ArrayList<Item> items;
 
-    /** The player character */
-    private GameAsset player;
+    private MVCSnakeController controller;
 
-    /** MVC Snake model */
-    private MVCSnakeModel theModel;
+    public void init()
+    {
+        root = new Pane();
+        root.setPrefSize(800, 600);
 
-    /**
-     * initializes lists of items and the pane to a certain size
-     *
-     * @author Christopher Asbrock
-     */
-    public MVCSnakeView() {
-        this.theModel = new MVCSnakeModel(new MVCSnakeController());
-        this.root = new Pane();
-        this.root.setStyle("-fx-background-color: dark;");
-        this.root.setPrefSize(WIDTH, HEIGHT);
-
-        makeSnake();
-        setUpWalls();
+        snakeTails = new ArrayList<>();
+        items = new ArrayList<>();
+        controller = new MVCSnakeController(this);
+        new Thread(()-> this.controller.run()).start();
     }
 
-    /**
-     * Creates and adds a snake (a object including a list of SnakeTail)
-     */
-    private void makeSnake() {
-        this.player = new Snake();
-        this.player.setVelocity(1,0);
-        SnakeUtil.addToGame(this.root, this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
+    @Override
+    public void start(Stage primaryStage)
+    {
+        primaryStage.setScene(new Scene(this.root));
+        this.userInputButtonPress(primaryStage);
+        primaryStage.show();
     }
 
-    /**
-     * creates and adds a wall to the pane and list of walls
-     * @param width - the width of the wall
-     * @param height - the height of the wall
-     * @param posX - the x position to place the wall
-     * @param posY - the y position to place the wall
-     */
-    private void makeWall(double width, double height, double posX, double posY) {
-        Rectangle wall = new Rectangle(width, height, Color.DARKRED);
-        //theModel.getListOfWalls().add(wall);
-        SnakeUtil.addToGame(this.root, wall, posX ,posY);
+    public synchronized void updateView()
+    {
+        this.controller.dataWrite = true;
+
+        ArrayList<Circle> tempOne = this.controller.getSnakeListPositions();
+        ArrayList<Circle> tempTwo = this.controller.getItemListPositions();
+        ArrayList<Node> tempThree = this.controller.getTrash();
+
+        while (!tempThree.isEmpty())
+            this.root.getChildren().remove(tempThree.remove(0));
+
+        for (Circle part : tempOne)
+            if (part != null && !this.root.getChildren().contains(part))
+                this.root.getChildren().add(part);
+
+        for (Circle part : tempTwo)
+            if (part != null && !this.root.getChildren().contains(part))
+                this.root.getChildren().add(part);
+
+        this.controller.dataWrite = false;
     }
 
-    /**
-     * sets up 4 rectangles around the parameter of the pane to act as walls
-     */
-    private void setUpWalls() {
-        makeWall(30, this.root.getPrefHeight(),0 ,0);
-        makeWall(30, root.getPrefHeight(),root.getPrefWidth() - 30 ,0);
-        makeWall(root.getPrefWidth(), 30,0 ,0);
-        makeWall(root.getPrefWidth(), 30,0 ,root.getPrefHeight() - 30);
+    private void userInputButtonPress(Stage stage)
+    {
+        stage.getScene().setOnKeyPressed(event ->
+        {
+            if (event.getCode() == KeyCode.LEFT)
+                this.controller.sendDirection("TURN_LEFT", true);
+            if (event.getCode() == KeyCode.RIGHT)
+                this.controller.sendDirection("TURN_RIGHT", true);
+        });
+
+        stage.getScene().setOnKeyReleased(event ->
+        {
+            if (event.getCode() == KeyCode.LEFT)
+                this.controller.sendDirection("TURN_LEFT", false);
+            if (event.getCode() == KeyCode.RIGHT)
+                this.controller.sendDirection("TURN_RIGHT", false);
+        });
     }
 
-    /**
-     * UpdateView when called by the controller will use the corresponding list of coordinates in
-     * controller to update the size of this classes SnakeTails list to the same size,
-     * then update the positioning of each tail piece based on the presented data.
-     */
-    private void updateView() {
-        this.player.updateAsset();
+    public static void main(String[] args)
+    {
+        launch(args);
     }
-
-    public Pane getRoot() { return root; }
-
-    public int getWIDTH() { return WIDTH; }
-
-    public int getHEIGHT() { return HEIGHT; }
-
-    public GameAsset getPlayer() { return player; }
-
-    public void setPlayerNull() { this.player = null; }
 }

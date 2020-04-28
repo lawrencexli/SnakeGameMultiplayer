@@ -1,6 +1,7 @@
 package network;
 
 import javafx.scene.shape.Circle;
+import main.Snake;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

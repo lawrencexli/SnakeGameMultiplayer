@@ -21,7 +21,6 @@ package main;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
 
 /**
  * An abstract class that contains some variables every game asset will need
@@ -36,7 +35,7 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    static class MyRotate
+    public class MyRotate
     {
         final static int RIGHT = -1;
         final static int LEFT = 1;
@@ -119,7 +118,9 @@ public abstract class GameAsset extends Circle
     public boolean checkForCollision(Node otherAsset)
     {
 //        return this.getBoundsInParent().intersects(otherAsset.getBoundsInParent());
-        return Shape.intersect(this, (Shape) otherAsset).getBoundsInParent().getWidth() > 0;
+        return (Math.abs(this.getTranslateX() - otherAsset.getTranslateX()) < otherAsset.getBoundsInParent().getWidth())
+                && (Math.abs(this.getTranslateY() - otherAsset.getTranslateY()) < otherAsset.getBoundsInParent().getHeight());
+        //return Shape.intersect(this, (Shape) otherAsset).getBoundsInParent().getWidth() > 0;
     }
 
     public boolean isNoLongerActive()

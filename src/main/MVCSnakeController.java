@@ -34,11 +34,11 @@ public class MVCSnakeController {
     private ArrayList<Node> scrapNodes;
 
     /** MVC Snake View */
-    private TempView theView;
+    private MVCSnakeView theView;
     /** MVC Snake Model */
     private MVCSnakeModel theModel;
 
-    public MVCSnakeController(TempView view) {
+    public MVCSnakeController(MVCSnakeView view) {
         //this.theView = new MVCSnakeView();
         //this.theModel = new MVCSnakeModel(this);
 

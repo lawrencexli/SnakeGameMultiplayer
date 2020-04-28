@@ -25,7 +25,7 @@ import javafx.scene.paint.Color;
 /**
  * A class that represent the items in the snake game
  */
-public class Item extends GameAsset{
+public class Item extends GameAsset {
 
     /** Location as 2D coordinates */
     Point2D location;
@@ -35,6 +35,7 @@ public class Item extends GameAsset{
 
     public Item(int x, Color color, String name) {
         super(x,color);
+        this.location = location;
         this.name = name;
     }
 
