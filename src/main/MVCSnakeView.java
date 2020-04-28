@@ -4,10 +4,12 @@ import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class MVCSnakeView extends Application
@@ -23,6 +25,7 @@ public class MVCSnakeView extends Application
     {
         root = new Pane();
         root.setPrefSize(800, 600);
+        root.setStyle("-fx-background-color: black");
 
         snakeTails = new ArrayList<>();
         items = new ArrayList<>();
@@ -34,6 +37,7 @@ public class MVCSnakeView extends Application
     public void start(Stage primaryStage)
     {
         primaryStage.setScene(new Scene(this.root));
+        primaryStage.setTitle("Snake Game");
         this.userInputButtonPress(primaryStage);
         primaryStage.show();
     }
