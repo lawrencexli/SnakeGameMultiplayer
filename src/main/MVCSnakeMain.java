@@ -33,7 +33,7 @@ public class MVCSnakeMain {
 
     public static void main(String [] args)
     {
-        MVCSnakeController controller = new MVCSnakeController();
+        MVCSnakeController controller = new MVCSnakeController(null);
         controller.run();
 
         while (true)

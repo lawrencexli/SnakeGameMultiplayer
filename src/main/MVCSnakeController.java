@@ -24,8 +24,6 @@ import javafx.scene.Node;
 import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class MVCSnakeController {
 
