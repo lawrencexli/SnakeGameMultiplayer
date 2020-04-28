@@ -36,12 +36,13 @@ public class MVCSnakeModel
     private Socket socket;
     private Scanner networkIn;
     private PrintStream networkOut;
+    private SnakeNetwork hostedNetwork;
 
     public ArrayList<Circle> getItemListPositions() {
         return itemListPositions;
     }
 
-    public ArrayList<Circle> getSnakeListPositions() {
+    public ArrayList<ArrayList<Circle>> getSnakeListPositions() {
         return snakeListPositions;
     }
 
@@ -50,22 +51,29 @@ public class MVCSnakeModel
     }
 
     private ArrayList<Circle> itemListPositions;
-    private ArrayList<Circle> snakeListPositions;
+    private ArrayList<ArrayList<Circle>> snakeListPositions;
     private ArrayList<Node> scrapNodes;
 
     protected boolean gameRunning;
 
-    public MVCSnakeModel(MVCSnakeController controller)
+    public MVCSnakeModel()
     {
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
+        for (int i = 0; i < 4;i++)
+            this.snakeListPositions.add(new ArrayList<Circle>());
+
         this.scrapNodes = new ArrayList<>();
+    }
+
+    protected void modelInit(MVCSnakeController controller, String host, String port)
+    {
         try
         {
             this.gameRunning = true;
             this.controller = controller;
 
-            this.socket = new Socket("localhost", 1111);
+            this.socket = new Socket(host, Integer.parseInt(port));
             System.out.println("Connected");
 
             this.networkIn = new Scanner(this.socket.getInputStream());
@@ -79,9 +87,6 @@ public class MVCSnakeModel
 
     private void listener()
     {
-        int itemPrev = 0;
-        int snakePrev = 0;
-
         while (gameRunning)
         {
             try
@@ -89,10 +94,13 @@ public class MVCSnakeModel
                 String input = this.networkIn.nextLine();
                 String protocol = input.split(" ")[0];
 
+                System.out.println(input);
                 switch (protocol)
                 {
-                    default:
+                    case "DATA":
                         this.updateSnake(input.substring(protocol.length() + 1));
+                    default:
+                        System.out.println("problem");
                 }
             }
             catch (Exception e)
@@ -100,7 +108,6 @@ public class MVCSnakeModel
                 e.printStackTrace();
             }
         }
-
     }
 
     private synchronized void updateSnake(String snakeInfo)
@@ -109,7 +116,8 @@ public class MVCSnakeModel
         {
             String[] positions = snakeInfo.split("%");
 
-            if (positions.length > 0 && !positions[0].equals("")) {
+            if (positions.length > 0 && !positions[0].equals(""))
+            {
                 String[] itemPos = positions[0].split(";");
 
                 this.resizeArrayList(itemPos.length, this.itemListPositions);
@@ -136,26 +144,30 @@ public class MVCSnakeModel
                 }
             }
 
-            if (positions.length > 1)
+
+            for (int i = 0; i < this.snakeListPositions.size(); i++)
             {
-                if (positions[1].equalsIgnoreCase("null"))
+                if (positions.length > 1 + i)
                 {
-                    this.gameRunning = false;
-                }
-                else
-                {
-                    String[] snakePos = positions[1].split(";");
+                    if (positions[1 + i].equalsIgnoreCase("null") || positions[1 + i].equalsIgnoreCase("") )
+                    {
+                        //this.gameRunning = false;
+                    }
+                    else
+                    {
+                        String[] snakePos = positions[1 + i].split(";");
 
-                    this.resizeArrayList(snakePos.length, this.snakeListPositions);
+                        this.resizeArrayList(snakePos.length, this.snakeListPositions.get(i));
 
-                    for (int i = 0; i < snakePos.length; i++) {
-                        String[] xYAndRot = snakePos[i].split(",");
-                        if (this.snakeListPositions.get(i) == null)
-                            this.snakeListPositions.set(i, new Circle(15, 15, 15, Color.GOLD));
+                        for (int j = 0; j < snakePos.length; j++) {
+                            String[] xYAndRot = snakePos[j].split(",");
+                            if (this.snakeListPositions.get(i).get(j) == null)
+                                this.snakeListPositions.get(i).set(j, new Circle(15, 15, 15, getColor(i)));
 
-                        this.snakeListPositions.get(i).setTranslateX(Double.parseDouble(xYAndRot[0]));
-                        this.snakeListPositions.get(i).setTranslateY(Double.parseDouble(xYAndRot[1]));
-                        this.snakeListPositions.get(i).setRotate(Double.parseDouble(xYAndRot[2]));
+                            this.snakeListPositions.get(i).get(j).setTranslateX(Double.parseDouble(xYAndRot[0]));
+                            this.snakeListPositions.get(i).get(j).setTranslateY(Double.parseDouble(xYAndRot[1]));
+                            this.snakeListPositions.get(i).get(j).setRotate(Double.parseDouble(xYAndRot[2]));
+                        }
                     }
                 }
             }
@@ -164,11 +176,23 @@ public class MVCSnakeModel
         }
     }
 
+    private Color getColor(int player)
+    {
+        switch (player)
+        {
+            case 0: return Color.FIREBRICK;
+            case 1: return Color.OLDLACE;
+            case 2: return Color.GOLD;
+            case 3: return Color.PURPLE;
+            default:
+                return Color.BLACK;
+        }
+    }
+
     public void sendDirection(String turn_left, boolean b)
     {
         networkOut.println(turn_left + " " + b);
     }
-
 
     void runListener()
     {
@@ -193,12 +217,6 @@ public class MVCSnakeModel
         System.out.println("Model closed down");
     }
 
-    public static void main(String[] args)
-    {
-        MVCSnakeModel model = new MVCSnakeModel(null);
-        model.runListener();
-    }
-
     public synchronized void resizeArrayList(int size, List<Circle> list)
     {
         if (list.size() < size)
@@ -207,5 +225,10 @@ public class MVCSnakeModel
         else if (list.size() > size)
             while (list.size() > size)
                 this.scrapNodes.add(list.remove(0));
+    }
+
+    public void createNetwork(int port)
+    {
+        new Thread(()->new SnakeNetwork(4).init(port)).start();
     }
 }

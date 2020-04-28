@@ -28,9 +28,10 @@ import java.util.ArrayList;
 public class MVCSnakeController {
 
     protected boolean dataWrite;
+    protected boolean gameGoing;
 
     private ArrayList<Circle> itemListPositions;
-    private ArrayList<Circle> snakeListPositions;
+    private ArrayList<ArrayList<Circle>> snakeListPositions;
     private ArrayList<Node> scrapNodes;
 
     /** MVC Snake View */
@@ -38,12 +39,11 @@ public class MVCSnakeController {
     /** MVC Snake Model */
     private MVCSnakeModel theModel;
 
-    public MVCSnakeController(MVCSnakeView view) {
-        //this.theView = new MVCSnakeView();
-        //this.theModel = new MVCSnakeModel(this);
-
+    public MVCSnakeController(MVCSnakeView view)
+    {
         this.theView = view;
-        this.theModel = new MVCSnakeModel(this);
+        this.theModel = new MVCSnakeModel();
+        this.gameGoing = false;
 
         this.itemListPositions = this.theModel.getItemListPositions();
         this.snakeListPositions = this.theModel.getSnakeListPositions();
@@ -52,11 +52,35 @@ public class MVCSnakeController {
         this.dataWrite = false;
     }
 
+    public void setHost(String port)
+    {
+        System.out.println("start host");
+        this.theModel.createNetwork(Integer.parseInt(port));
+        long time = System.currentTimeMillis();
+
+        while (System.currentTimeMillis() - time < 5000)
+        {
+
+        }
+
+        this.setJoin("localhost", port);
+    }
+
+    public void setJoin(String host, String port)
+    {
+        System.out.println("start join");
+        this.theModel.modelInit(this,host, port);
+        this.gameGoing = true;
+        this.getTrash().addAll(this.theView.startMenu.getChildren());
+        this.getTrash().add(this.theView.startMenu);
+        new Thread(()-> this.run()).start();
+    }
+
     public synchronized ArrayList<Circle> getItemListPositions() {
         return itemListPositions;
     }
 
-    public synchronized ArrayList<Circle> getSnakeListPositions() {
+    public synchronized ArrayList<ArrayList<Circle>> getSnakeListPositions() {
         return snakeListPositions;
     }
 
@@ -70,19 +94,12 @@ public class MVCSnakeController {
 
         while (this.theModel.gameRunning)
         {
-            //needs to keep running so the thread can function properly
         }
 
         System.out.println("Controller ShutDown");
     }
 
-    public static void main(String [] args)
-    {
-        MVCSnakeController controller = new MVCSnakeController(null);
-        controller.run();
-    }
-
-    public synchronized void updateView()
+    public void updateView()
     {
         Platform.runLater(()->this.theView.updateView());
     }

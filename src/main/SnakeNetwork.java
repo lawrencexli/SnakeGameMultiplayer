@@ -22,11 +22,11 @@ import java.util.Scanner;
  */
 public class SnakeNetwork
 {
-    private Socket socket;
+    private Socket[] socket;
     private ServerSocket server;
 
-    private Scanner networkIn;
-    private PrintStream networkOut;
+    private Scanner [] networkIn;
+    private PrintStream [] networkOut;
 
     private boolean gameIsOn = false;
 
@@ -42,11 +42,11 @@ public class SnakeNetwork
     private ArrayList<GameAsset> listOfItems;
 
     /**the player character*/
-    private GameAsset player;
+    private GameAsset[] player;
     /**trigger for a right turn*/
-    private boolean turnRight;
+    private boolean[] turnRight;
     /**trigger for a left turn*/
-    private boolean turnLeft;
+    private boolean[] turnLeft;
 
     /**Length of snake added for potion*/
     private final int POTION_LENGTH = 50;
@@ -55,48 +55,83 @@ public class SnakeNetwork
     /**Length of snake deleted for poison*/
     private final int POISON_LENGTH = 100;
 
+    private int numOfPlayer;
+
     /**
      * a trash collector that collects all assets removed from the scene to be removed
      * from their list at the end of the update
      * */
     private ArrayList<GameAsset> inactiveFoodNodes;
 
+    public SnakeNetwork(int numberOfPlayers)
+    {
+        this.numOfPlayer = numberOfPlayers;
+    }
     /**
      * initializes lists of items and the pane to a certain size
      *
      * @author Christopher Asbrock
      */
-    public void init()
+    public void init(int port)
     {
         this.randomizer = new Random();
 
         this.listOfItems = new ArrayList<>();
         this.inactiveFoodNodes = new ArrayList<>();
 
-        this.player = new Snake();
-        this.player.setVelocity(0,0);
-        this.player.setRotate(-90);
-        ((Snake) this.player).addTail();
-        SnakeUtil.addToGame(this.player, this.WIDTH/2.0, this.HEIGHT/2.0);
+        this.player = new GameAsset[this.numOfPlayer];
+        this.socket = new Socket[this.numOfPlayer];
+        this.networkIn = new Scanner[this.numOfPlayer];
+        this.networkOut = new PrintStream[this.numOfPlayer];
 
-        this.turnLeft = false;
-        this.turnRight = false;
+        for (int i = 0; i < this.numOfPlayer; i++)
+        {
+            this.player[i] = new Snake();
+            this.player[i].setVelocity(0, 0);
+            this.player[i].setRotate(90 * i);
+            ((Snake) this.player[i]).addTail();
 
-        new Thread(this::setUpNetworkConnection).start();
+            SnakeUtil.addToGame(this.player[i],
+                    WIDTH / 2 + 50 * Math.cos(Math.toRadians(90 * i)),
+                    HEIGHT / 2 + 50 * Math.sin(Math.toRadians(90 * i)));
+        }
+
+        this.turnLeft = new boolean[this.numOfPlayer];
+        for (int i = 0; i < this.turnLeft.length; i++)
+            this.turnLeft[i] = true;
+        this.turnRight = new boolean[this.numOfPlayer];
+
+        try
+        {
+            server = new ServerSocket(port);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < this.player.length; i++)
+            if (this.player[i] != null)
+                this.setUpNetworkConnection(i);
+
+        System.out.println("init");
+
+        this.start();
     }
 
-    private void setUpNetworkConnection()
+    private void setUpNetworkConnection(int player)
     {
         try
         {
-            server = new ServerSocket(1111);
-            socket = server.accept();
+            System.out.println("Waiting on Player " + (player + 1));
+            socket[player] = server.accept();
+            System.out.println("Player " + (player + 1) + " connected");
 
-            networkIn = new Scanner(socket.getInputStream());
-            networkOut = new PrintStream(socket.getOutputStream());
+            networkIn[player] = new Scanner(socket[player].getInputStream());
+            networkOut[player] = new PrintStream(socket[player].getOutputStream());
 
-            new Thread(this::networkListener).start();
-            this.gameIsOn = true;
+            new Thread(() -> networkListener(player)).start();
+            if (player == this.numOfPlayer - 1)
+                this.gameIsOn = true;
         }
         catch (IOException e)
         {
@@ -104,22 +139,22 @@ public class SnakeNetwork
         }
     }
 
-    private void networkListener()
+    private void networkListener(int player)
     {
         while (this.gameIsOn)
         {
-            String input = this.networkIn.nextLine();
-
+            String input = this.networkIn[player].nextLine();
+            System.out.println(player + " " + input);
             String protocol = input.split(" ")[0];
             String message = input.substring(protocol.length() + 1);
 
             switch (protocol)
             {
                 case "TURN_LEFT":
-                    this.turnLeft = message.equalsIgnoreCase("true");
+                    this.turnLeft[player] = message.equalsIgnoreCase("true");
                     break;
                 case "TURN_RIGHT":
-                    this.turnRight = message.equalsIgnoreCase("true");
+                    this.turnRight[player] = message.equalsIgnoreCase("true");
                     break;
             }
             //System.out.println(protocol);
@@ -153,33 +188,45 @@ public class SnakeNetwork
     {
         String allInfo = "";
 
-        for (GameAsset item : this.listOfItems)
+        for (int i = 0; i < this.listOfItems.size(); i++)
         {
-            allInfo += item.getTranslateX() + "," + item.getTranslateY() + ",";
-            if (item instanceof Poison)
-                allInfo += "2;";
-            else if (item instanceof Potion)
-                allInfo += "1;";
+            allInfo += this.listOfItems.get(i).getTranslateX() + "," + this.listOfItems.get(i).getTranslateY() + ",";
+            if (this.listOfItems.get(i) instanceof Poison)
+                allInfo += "2";
+            else if (this.listOfItems.get(i) instanceof Potion)
+                allInfo += "1";
             else
-                allInfo += "0;";
+                allInfo += "0";
+
+            allInfo += (i != this.listOfItems.size() - 1) ? ";" : "";
         }
 
-        allInfo += "%";
+        for (int i = 0; i < this.player.length; i ++)
+        {
+            allInfo += "%";
 
-        if (this.player != null)
-            for (SnakeTail tail : ((Snake) this.player).getSnakeTails())
-                allInfo += tail.getTranslateX() + "," + tail.getTranslateY() + "," + tail.getRotate() + ";";
-        else
-            allInfo += null;
-
+            if (this.player[i] != null)
+                for (int j = 0; j < ((Snake) this.player[i]).getSnakeTails().size(); j++)
+                    allInfo +=
+                            ((Snake) this.player[i]).getSnakeTails().get(j).getTranslateX() +
+                                    "," +
+                                    ((Snake) this.player[i]).getSnakeTails().get(j).getTranslateY() +
+                                    "," +
+                                    ((Snake) this.player[i]).getSnakeTails().get(j).getRotate() +
+                                    ((((Snake) this.player[i]).getSnakeTails().size() - 1 != j) ? ";" : "");
+            else
+                allInfo += null;
+        }
         //System.out.println(allInfo);
        // this.networkOut.println("DATA " + allInfo);
+       // System.out.println(allInfo);
         pushNetwork(allInfo);
     }
 
     private void pushNetwork(String info)
     {
-        this.networkOut.println("DATA " + info);
+        for (int i = 0; i < this.player.length; i++)
+            this.networkOut[i].println("DATA " + info);
     }
 
     /**
@@ -187,46 +234,48 @@ public class SnakeNetwork
      */
     private void handlePlayer()
     {
-        if (this.turnRight)
-            this.player.rotate(1);
-        else if (this.turnLeft)
-            this.player.rotate(-1);
-
-        for (GameAsset item : this.listOfItems)
-            if (this.player.checkForCollision(item))
+        for (int i = 0; i < this.player.length; i++)
+        {
+            if (this.player[i] != null)
             {
-                handleItemCollision(item);
-                this.inactiveFoodNodes.add(item);
-            }
+                if (this.turnRight[i])
+                    this.player[i].rotate(1);
+                else if (this.turnLeft[i])
+                    this.player[i].rotate(-1);
 
-        if (this.player.getTranslateX() < 30 || this.player.getTranslateX() > this.WIDTH - 60)
-        {
-            System.out.println("Hit X Wall");
-            player.deactivate();
-        }
+                for (GameAsset item : this.listOfItems)
+                    if (this.player[i] != null && this.player[i].checkForCollision(item)) {
+                        handleItemCollision(item, (Snake) this.player[i]);
+                        this.inactiveFoodNodes.add(item);
+                    }
 
-        if (this.player.getTranslateY() < 30 || this.player.getTranslateY() > this.HEIGHT - 60)
-        {
-            System.out.println("Hit Y Wall");
-            player.deactivate();
-        }
 
-            /*
-        for (Rectangle wall : this.listOfWalls) {
-            if (this.player.checkForCollision(wall)) {
-                System.out.println("HitWall");
-                player.deactivate();
-            }
-        }
-*/
-        int i = 0;
-        for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
-            if (i++ < 100)
-                continue;       // First several SnakeTails always collide with the head
+                if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
+                {
+                    System.out.println("PLayer" +
+                            (i + 1) +
+                            "Hit X Wall");
+                    player[i].deactivate();
+                }
 
-            if (this.player.checkForCollision(tail)) {
-                System.out.printf("Collided with tail number %d\n", tail.id);
-                player.deactivate();
+                if (this.player[i].getTranslateY() < 30 || this.player[i].getTranslateY() > this.HEIGHT - 60)
+                {
+                    System.out.println("Player" +
+                            (i+1) +
+                            "Hit Y Wall");
+                    player[i].deactivate();
+                }
+
+                int j = 0;
+                for (SnakeTail tail : ((Snake) this.player[i]).getSnakeTails()) {
+                    if (j++ < 100)
+                        continue;       // First several SnakeTails always collide with the head
+
+                    if (this.player[i].checkForCollision(tail)) {
+                        System.out.printf("Collided with tail number %d\n", tail.id);
+                        player[i].deactivate();
+                    }
+                }
             }
         }
 
@@ -240,14 +289,16 @@ public class SnakeNetwork
      */
     private void updatePlayer()
     {
-        if (this.player.isNoLongerActive())
+        for (int i = 0; i < this.player.length; i++)
         {
-            ((Snake) this.player).getSnakeTails().clear();
-            this.player = null;
-        }
-        else
-        {
-            this.player.updateAsset();
+            if (this.player[i] != null)
+                if (this.player[i].isNoLongerActive())
+                {
+                    ((Snake) this.player[i]).getSnakeTails().clear();
+                    this.player[i] = null;
+                }
+                else
+                    this.player[i].updateAsset();
         }
     }
 
@@ -259,17 +310,17 @@ public class SnakeNetwork
      *
      * @param item - the idem being collided with
      */
-    private void handleItemCollision(GameAsset item)
+    private void handleItemCollision(GameAsset item, Snake currPlayer)
     {
         if (item instanceof Potion)
             for (int i = 0; i < POTION_LENGTH; i++)
-                ((Snake) this.player).addTail();
+                currPlayer.addTail();
         else if (item instanceof Poison)
             for (int i = 0; i < POISON_LENGTH; i++)
-                ((Snake) player).removeTail();
+                currPlayer.removeTail();
         else
             for (int i = 0; i < FOOD_LENGTH; i++)
-                ((Snake) this.player).addTail();
+                currPlayer.addTail();
 
     }
 
@@ -318,20 +369,13 @@ public class SnakeNetwork
         }
     }
 
-    /**
-     * Inherited start method to set up and start the scene
-     *
-     * @author Christopher Asbrock
-     *
-     */
     public void start()
     {
         Thread timer = new Thread(this::tickTimer);
         timer.start();
         while (true)
         {
-            if (player.isNoLongerActive())
-                break;
+            System.out.println("start");
         }
     }
 
@@ -340,7 +384,7 @@ public class SnakeNetwork
         long now = System.currentTimeMillis();
 
         System.out.println("start");
-        while (player != null && !player.isNoLongerActive())
+        while (player != null)
         {
             if ((System.currentTimeMillis() - now) > 30) {
                 now = System.currentTimeMillis();
@@ -354,8 +398,8 @@ public class SnakeNetwork
 
     public static void main(String[] args)
     {
-        SnakeNetwork test = new SnakeNetwork();
-        test.init();
+        SnakeNetwork test = new SnakeNetwork(4);
+        test.init(1111);
         test.start();
     }
 }

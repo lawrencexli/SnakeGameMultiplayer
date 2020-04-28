@@ -3,7 +3,11 @@ package main;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
@@ -14,8 +18,15 @@ public class MVCSnakeView extends Application
 {
     private Pane root;
 
-    private ArrayList<SnakeTail> snakeTails;
-    private ArrayList<Item> items;
+    protected GridPane startMenu;
+    private Button clientButton;
+    private Button hostButton;
+    private TextField hostText;
+    private TextField portText;
+    private TextField hostPortField;
+    private Label hostPrompt;
+    private Label portPrompt;
+    private Label hostPortLabel;
 
     private MVCSnakeController controller;
 
@@ -23,18 +34,57 @@ public class MVCSnakeView extends Application
     {
         root = new Pane();
         root.setPrefSize(800, 600);
-
-        snakeTails = new ArrayList<>();
-        items = new ArrayList<>();
         controller = new MVCSnakeController(this);
-        new Thread(()-> this.controller.run()).start();
+
+        this.startMenu = new GridPane();
+        this.startMenu.setPrefSize(400,300);
+        this.hostPrompt = new Label();
+        this.hostPrompt.setText("HOST:");
+        this.portPrompt = new Label();
+        this.portPrompt.setText("PORT:");
+        this.hostText = new TextField();
+        this.portText = new TextField();
+        this.hostPortField = new TextField();
+        this.hostPortLabel = new Label();
+        this.hostPortLabel.setText("PORT:");
+
+        this.clientButton = new Button();
+        this.clientButton.setText("JOIN");
+        this.hostButton = new Button();
+        this.hostButton.setText("HOST");
+
+        this.startMenu.add(this.hostPrompt, 1,1);
+        this.startMenu.add(this.hostText, 2,1);
+        this.startMenu.add(this.portPrompt, 1,2);
+        this.startMenu.add(this.portText,2,2);
+        this.startMenu.add(this.clientButton,2,3);
+        this.startMenu.add(this.hostPortLabel, 1,4);
+        this.startMenu.add(this.hostPortField, 2,4);
+        this.startMenu.add(this.hostButton,2,5);
+
+        this.root.getChildren().add(this.startMenu);
+        this.startMenu.setTranslateX(800/2);
+        this.startMenu.setTranslateY(600/2);
     }
 
     @Override
     public void start(Stage primaryStage)
     {
         primaryStage.setScene(new Scene(this.root));
-        this.userInputButtonPress(primaryStage);
+        if (this.controller.gameGoing)
+            this.userInputButtonPress(primaryStage);
+        else
+        {
+            this.hostButton.setOnAction((event) ->
+            {
+                this.controller.setHost(this.hostPortField.getText());
+            });
+
+            this.clientButton.setOnAction((event) ->
+            {
+                this.controller.setJoin(this.hostText.getText(), this.portText.getText());
+            });
+        }
         primaryStage.show();
     }
 
@@ -42,7 +92,11 @@ public class MVCSnakeView extends Application
     {
         this.controller.dataWrite = true;
 
-        ArrayList<Circle> tempOne = this.controller.getSnakeListPositions();
+        int i = 0;
+        ArrayList<Circle> tempOne = this.controller.getSnakeListPositions().get(i++);
+        ArrayList<Circle> tempTwos = this.controller.getSnakeListPositions().get(i++);
+        ArrayList<Circle> tempThrees = this.controller.getSnakeListPositions().get(i++);
+        ArrayList<Circle> tempFours = this.controller.getSnakeListPositions().get(i);
         ArrayList<Circle> tempTwo = this.controller.getItemListPositions();
         ArrayList<Node> tempThree = this.controller.getTrash();
 
@@ -53,7 +107,19 @@ public class MVCSnakeView extends Application
             if (part != null && !this.root.getChildren().contains(part))
                 this.root.getChildren().add(part);
 
+        for (Circle part : tempTwos)
+            if (part != null && !this.root.getChildren().contains(part))
+                this.root.getChildren().add(part);
+
+        for (Circle part : tempThrees)
+            if (part != null && !this.root.getChildren().contains(part))
+                this.root.getChildren().add(part);
+
         for (Circle part : tempTwo)
+            if (part != null && !this.root.getChildren().contains(part))
+                this.root.getChildren().add(part);
+
+        for (Circle part : tempFours)
             if (part != null && !this.root.getChildren().contains(part))
                 this.root.getChildren().add(part);
 
