@@ -208,7 +208,7 @@ public class SnakeNetwork
         pushNetwork(allInfo);
     }
 
-    private synchronized void pushNetwork(String info)
+    private void pushNetwork(String info)
     {
         this.networkOut.println("DATA " + info);
     }
@@ -360,8 +360,7 @@ public class SnakeNetwork
         System.out.println("start");
         while (player != null && !player.isNoLongerActive())
         {
-
-            if ((System.currentTimeMillis() - now) > 20) {
+            if ((System.currentTimeMillis() - now) > 30) {
                 now = System.currentTimeMillis();
                 //System.out.println("tick");
 

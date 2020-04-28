@@ -25,10 +25,6 @@ import java.util.LinkedList;
 
 public class Snake extends GameAsset {
 
-    /** The x,y velocity and rotation angle of the Snake */
-    private double velocityX;
-    private double velocityY;
-    private double angle;
 
     /** SnakeTails with references to its parents */
     private LinkedList<SnakeTail> snakeTails;
