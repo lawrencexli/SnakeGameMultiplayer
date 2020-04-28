@@ -362,7 +362,6 @@ public class SnakeNetwork
         {
             if ((System.currentTimeMillis() - now) > 30) {
                 now = System.currentTimeMillis();
-                //System.out.println("tick");
 
                 updateDriver();
             }

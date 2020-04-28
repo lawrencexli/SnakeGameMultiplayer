@@ -94,20 +94,6 @@ public class MVCSnakeModel
                     default:
                         this.updateSnake(input.substring(protocol.length() + 1));
                 }
-/*
-                if (itemPrev != this.controller.getItemListPositions().size())
-                {
-                    System.out.println("ITEM -> " + this.controller.getItemListPositions());
-                    itemPrev = this.controller.getItemListPositions().size();
-                }
-
-                if (snakePrev != this.controller.getSnakeListPositions().size())
-                {
-                    System.out.println("SNAKE -> " + this.controller.getSnakeListPositions());
-                    snakePrev = this.controller.getSnakeListPositions().size();
-                }
-
- */
             }
             catch (Exception e)
             {
