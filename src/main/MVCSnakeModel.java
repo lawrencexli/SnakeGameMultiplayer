@@ -132,11 +132,23 @@ public class MVCSnakeModel
 
                 for (int i = 0; i < itemPos.length; i++) {
                     if (this.itemListPositions.get(i) == null)
-                        this.itemListPositions.set(i, new Circle(5, 5, 5, Color.RED));
+                        this.itemListPositions.set(i, new Circle(10, 10, 10, Color.RED));
 
                     String[] xAndy = itemPos[i].split(",");
                     this.itemListPositions.get(i).setTranslateX(Double.parseDouble(xAndy[0]));
                     this.itemListPositions.get(i).setTranslateY(Double.parseDouble(xAndy[1]));
+                    switch(Integer.parseInt(xAndy[2]))
+                    {
+                        case 0:
+                            this.itemListPositions.get(i).setFill(Color.RED);
+                            break;
+                        case 1:
+                            this.itemListPositions.get(i).setFill(Color.YELLOWGREEN);
+                            break;
+                        case 2:
+                            this.itemListPositions.get(i).setFill(Color.GREEN);
+                            break;
+                    }
                 }
             }
 

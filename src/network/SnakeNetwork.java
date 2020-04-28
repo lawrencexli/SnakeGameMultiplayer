@@ -128,9 +128,6 @@ public class SnakeNetwork
             }
             //System.out.println(protocol);
             //System.out.println(message);
-
-
-
         }
     }
 
@@ -179,8 +176,8 @@ public class SnakeNetwork
             }
 
             sendNetworkInfo();
+
         }
-        //this.listOfItems.forEach(GameAsset::updateAsset);
     }
 
     private void sendNetworkInfo()
@@ -188,7 +185,15 @@ public class SnakeNetwork
         String allInfo = "";
 
         for (GameAsset item : this.listOfItems)
-            allInfo += item.getTranslateX() + "," + item.getTranslateY() + ";";
+        {
+            allInfo += item.getTranslateX() + "," + item.getTranslateY() + ",";
+            if (item instanceof Poison)
+                allInfo += "2;";
+            else if (item instanceof Potion)
+                allInfo += "1;";
+            else
+                allInfo += "0;";
+        }
 
         allInfo += "%";
 
@@ -199,7 +204,13 @@ public class SnakeNetwork
             allInfo += null;
 
         //System.out.println(allInfo);
-        this.networkOut.println("DATA " + allInfo);
+       // this.networkOut.println("DATA " + allInfo);
+        pushNetwork(allInfo);
+    }
+
+    private synchronized void pushNetwork(String info)
+    {
+        this.networkOut.println("DATA " + info);
     }
 
     /**
