@@ -40,8 +40,6 @@ public class SnakeNetwork
 
     /**a list containing all items currently in the pane*/
     private ArrayList<GameAsset> listOfItems;
-    /**a list of all walls currently in the pane*/
-    private ArrayList<Rectangle> listOfWalls;
 
     /**the player character*/
     private GameAsset player;
@@ -73,20 +71,18 @@ public class SnakeNetwork
         this.randomizer = new Random();
 
         this.listOfItems = new ArrayList<>();
-        this.listOfWalls = new ArrayList<>();
         this.inactiveFoodNodes = new ArrayList<>();
 
         this.player = new Snake();
-        this.player.setVelocity(1,0);
+        this.player.setVelocity(0,0);
+        this.player.setRotate(-90);
         ((Snake) this.player).addTail();
-        SnakeUtil.addToGame(this.player, this.WIDTH/4.0, this.HEIGHT/2.0);
+        SnakeUtil.addToGame(this.player, this.WIDTH/2.0, this.HEIGHT/2.0);
 
-        this.turnLeft = true;
+        this.turnLeft = false;
         this.turnRight = false;
 
         new Thread(this::setUpNetworkConnection).start();
-
-        setUpWalls(Color.DARKRED);
     }
 
     private void setUpNetworkConnection()
@@ -129,33 +125,6 @@ public class SnakeNetwork
             //System.out.println(protocol);
             //System.out.println(message);
         }
-    }
-
-    /**
-     * creates and adds a wall to the pane and list of walls
-     *
-     * @param width - the width of the wall
-     * @param height - the height of the wall
-     * @param posX - the x position to place the wall
-     * @param posY - the y position to place the wall
-     * @param color - the color of the wall
-     */
-    private void makeWall(double width, double height, double posX, double posY, Color color)
-    {
-        Rectangle wall = new Rectangle(width, height, color);
-        listOfWalls.add(wall);
-        SnakeUtil.addToGame(wall, posX ,posY);
-    }
-
-    /**
-     * sets up 4 rectangles around the parameter of the pane to act as walls
-     */
-    private void setUpWalls(Color color)
-    {
-        makeWall(30, HEIGHT,0 ,0, color);
-        makeWall(30, HEIGHT,WIDTH - 30 ,0, color);
-        makeWall(WIDTH, 30,0 ,0, color);
-        makeWall(WIDTH, 30,0 ,HEIGHT - 30, color);
     }
 
     /**
@@ -230,13 +199,26 @@ public class SnakeNetwork
                 this.inactiveFoodNodes.add(item);
             }
 
+        if (this.player.getTranslateX() < 30 || this.player.getTranslateX() > this.WIDTH - 60)
+        {
+            System.out.println("Hit X Wall");
+            player.deactivate();
+        }
+
+        if (this.player.getTranslateY() < 30 || this.player.getTranslateY() > this.HEIGHT - 60)
+        {
+            System.out.println("Hit Y Wall");
+            player.deactivate();
+        }
+
+            /*
         for (Rectangle wall : this.listOfWalls) {
             if (this.player.checkForCollision(wall)) {
                 System.out.println("HitWall");
                 player.deactivate();
             }
         }
-
+*/
         int i = 0;
         for (SnakeTail tail : ((Snake) this.player).getSnakeTails()) {
             if (i++ < 100)
