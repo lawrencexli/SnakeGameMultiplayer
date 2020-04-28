@@ -14,7 +14,7 @@
 # Project Description
 
 Everybody loves the good old classic game snake! 
-In this project, we further enhance the game by adding a brand new online mode for 2 players to compete with each other!  
+In this project, we further enhance the game by adding a brand new online mode for 2 players to compete with each other! 
 In addition to the 2 player multiplayer, we also have some other creativity with the snake game that will
 enhance the gameplay compared to the original snake game. This includes some items that extended
 from the original foods in the snake game. 
