@@ -33,6 +33,13 @@ public class MVCSnakeView extends Application
     private TextField numOfPlayerField;
     private TextField setHeightField;
     private TextField setWidthField;
+
+    public TextField getDisplayMessage()
+    {
+        return displayMessage;
+    }
+
+    private TextField displayMessage;
     private MVCSnakeController controller;
 
     public void init()
@@ -63,6 +70,11 @@ public class MVCSnakeView extends Application
         this.hostButton = new Button();
         this.hostButton.setText("HOST");
 
+        this.displayMessage = new TextField();
+        this.displayMessage.setMouseTransparent(true);
+        this.displayMessage.setStyle("-fx-background-color: #c8c8c8; -fx-text-fill: red");
+        this.displayMessage.setAlignment(Pos.CENTER);
+
         this.startMenu.add(new Label("JOIN GAME"), 2, 1,3,1);
         this.startMenu.add(new Label("HOST:"), 1,2);
         this.startMenu.add(this.hostText, 2,2);
@@ -83,6 +95,8 @@ public class MVCSnakeView extends Application
         this.startMenu.add(this.setHeightField,2,9);
         this.startMenu.add(new Label("PANE WIDTH:"), 1,10);
         this.startMenu.add(this.setWidthField,2,10);
+
+        this.startMenu.add(this.displayMessage, 1, 13,4,1);
 
 
         this.root.getChildren().add(this.startMenu);

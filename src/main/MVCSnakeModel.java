@@ -58,8 +58,9 @@ public class MVCSnakeModel
 
     protected volatile boolean gameRunning;
 
-    public MVCSnakeModel()
+    public MVCSnakeModel(MVCSnakeController controller)
     {
+        this.controller = controller;
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
         for (int i = 0; i < 4;i++)
@@ -68,22 +69,28 @@ public class MVCSnakeModel
         this.scrapNodes = new ArrayList<>();
     }
 
-    protected void modelInit(MVCSnakeController controller, String host, String port)
+    protected void modelInit(String host, String port)
     {
         try
         {
             this.gameRunning = true;
-            this.controller = controller;
 
+            this.controller.displayError("Waiting For More Players...");
             this.socket = new Socket(host, Integer.parseInt(port));
             System.out.println("Connected");
 
             this.networkIn = new Scanner(this.socket.getInputStream());
             this.networkOut = new PrintStream(this.socket.getOutputStream());
+
+            this.startModel();
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            this.controller.displayError(e.getMessage());
+        }
+        catch (NumberFormatException e)
+        {
+            this.controller.displayError(e.getMessage());
         }
     }
 
@@ -229,8 +236,31 @@ public class MVCSnakeModel
                 this.scrapNodes.add(list.remove(0));
     }
 
-    public void createNetwork(int port,int players,int width,int height)
+    public void createNetwork(String port,String players,String width,String height)
     {
-        new Thread(()->new SnakeNetwork(4).init(port,players, width,height)).start();
+        try
+        {
+            this.controller.displayError("Starting NetWork...");
+            int thisPort = Integer.parseInt(port);
+            this.playerCount = Integer.parseInt(players);
+            this.width = Integer.parseInt(width);
+            this.height = Integer.parseInt(height);
+
+            new Thread(() -> new SnakeNetwork(4).init(thisPort, this.playerCount, this.width, this.height)).start();
+        }
+        catch (NumberFormatException e)
+        {
+            this.controller.displayError("Port, Player, Width, and Height Must Be An Integers");
+        }
+    }
+
+    public void startModel()
+    {
+        this.controller.displayError("Waiting For Other Players");
+        this.controller.getVIEW().startMenu.getChildren().forEach((node)->node.setDisable(true));
+        this.controller.gameGoing = true;
+        this.scrapNodes.addAll(this.controller.getVIEW().startMenu.getChildren());
+        this.scrapNodes.add(this.controller.getVIEW().startMenu);
+        new Thread(this::listener).start();
     }
 }
