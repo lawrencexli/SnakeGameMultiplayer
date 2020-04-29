@@ -31,7 +31,7 @@ import java.util.Scanner;
 
 public class MVCSnakeModel implements Protocol
 {
-    private MVCSnakeController controller;
+    private final MVCSnakeController CONTROLLER;
     private Socket socket;
     private Scanner networkIn;
     private PrintStream networkOut;
@@ -39,18 +39,6 @@ public class MVCSnakeModel implements Protocol
     protected int height;
     protected int width;
     protected int playerCount;
-
-    public ArrayList<Circle> getItemListPositions() {
-        return itemListPositions;
-    }
-
-    public ArrayList<ArrayList<Circle>> getSnakeListPositions() {
-        return snakeListPositions;
-    }
-
-    public ArrayList<Node> getScrapNodes() {
-        return scrapNodes;
-    }
 
     private final ArrayList<Circle> itemListPositions;
     private final ArrayList<ArrayList<Circle>> snakeListPositions;
@@ -60,7 +48,7 @@ public class MVCSnakeModel implements Protocol
 
     public MVCSnakeModel(MVCSnakeController controller)
     {
-        this.controller = controller;
+        this.CONTROLLER = controller;
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
         for (int i = 0; i < 4;i++)
@@ -75,7 +63,7 @@ public class MVCSnakeModel implements Protocol
         {
             this.gameRunning = true;
 
-            this.controller.displayMessage("Waiting For More Players...");
+            this.CONTROLLER.displayMessage("Waiting For More Players...");
             this.socket = new Socket(host, Integer.parseInt(port));
             System.out.println("Connected");
 
@@ -86,11 +74,11 @@ public class MVCSnakeModel implements Protocol
         }
         catch (IOException e)
         {
-            this.controller.displayMessage(e.getMessage());
+            this.CONTROLLER.displayMessage(e.getMessage());
         }
         catch (NumberFormatException e)
         {
-            this.controller.displayMessage(e.getMessage());
+            this.CONTROLLER.displayMessage("Port, Players, Width, And Height Can Only Be Integers");
         }
     }
 
@@ -110,7 +98,8 @@ public class MVCSnakeModel implements Protocol
                         this.updateSnake(input.substring(protocol.length() + 1));
                         break;
                     case START_GAME:
-                        this.controller.gameGoing = true;
+                        this.CONTROLLER.gameGoing = true;
+                        this.playerCount = Integer.parseInt(input.substring(protocol.length() + 1));
                         break;
                     default:
                         System.out.println("problem");
@@ -121,71 +110,93 @@ public class MVCSnakeModel implements Protocol
                 e.printStackTrace();
             }
         }
+
+        this.close();
+    }
+
+    private void close()
+    {
+        try
+        {
+            this.networkOut.close();
+            this.networkIn.close();
+            this.socket.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        System.out.println("Model closed down");
     }
 
     private synchronized void updateSnake(String snakeInfo)
     {
-        if (!this.controller.dataWrite)
+        if (!this.CONTROLLER.dataWrite)
         {
             String[] positions = snakeInfo.split("%");
 
             if (positions.length > 0 && !positions[0].equals(""))
             {
-                String[] itemPos = positions[0].split(";");
-
-                this.resizeArrayList(itemPos.length, this.itemListPositions);
-
-                for (int i = 0; i < itemPos.length; i++) {
-                    if (this.itemListPositions.get(i) == null)
-                        this.itemListPositions.set(i, new Circle(10, 10, 10, Color.RED));
-
-                    String[] xAndy = itemPos[i].split(",");
-                    this.itemListPositions.get(i).setTranslateX(Double.parseDouble(xAndy[0]));
-                    this.itemListPositions.get(i).setTranslateY(Double.parseDouble(xAndy[1]));
-                    switch(Integer.parseInt(xAndy[2]))
-                    {
-                        case 0:
-                            this.itemListPositions.get(i).setFill(Color.RED);
-                            break;
-                        case 1:
-                            this.itemListPositions.get(i).setFill(Color.YELLOWGREEN);
-                            break;
-                        case 2:
-                            this.itemListPositions.get(i).setFill(Color.GREEN);
-                            break;
-                    }
-                }
+                setItemPositioning(positions[0].split(";"));
             }
-
 
             for (int i = 0; i < this.playerCount; i++)
             {
-                if (positions.length > 1 + i)
+                if (!(positions[1 + i].equalsIgnoreCase("null")
+                        || positions[1 + i].equalsIgnoreCase("")))
                 {
-                    if (positions[1 + i].equalsIgnoreCase("null") || positions[1 + i].equalsIgnoreCase("") )
-                    {
-                        //this.gameRunning = false;
-                    }
-                    else
-                    {
-                        String[] snakePos = positions[1 + i].split(";");
-
-                        this.resizeArrayList(snakePos.length, this.snakeListPositions.get(i));
-
-                        for (int j = 0; j < snakePos.length; j++) {
-                            String[] xYAndRot = snakePos[j].split(",");
-                            if (this.snakeListPositions.get(i).get(j) == null)
-                                this.snakeListPositions.get(i).set(j, new Circle(15, 15, 15, getColor(i)));
-
-                            this.snakeListPositions.get(i).get(j).setTranslateX(Double.parseDouble(xYAndRot[0]));
-                            this.snakeListPositions.get(i).get(j).setTranslateY(Double.parseDouble(xYAndRot[1]));
-                            this.snakeListPositions.get(i).get(j).setRotate(Double.parseDouble(xYAndRot[2]));
-                        }
-                    }
+                    setSnakePositioning(i, positions[1 + i].split(";"));
                 }
             }
 
-            this.controller.updateView();
+            this.CONTROLLER.updateView();
+        }
+    }
+
+    private void setItemPositioning(String[] itemPos) {
+        this.resizeArrayList(itemPos.length, this.itemListPositions);
+
+        for (int i = 0; i < itemPos.length; i++)
+        {
+            if (this.itemListPositions.get(i) == null)
+                this.itemListPositions.set(i, new Circle(10, 10, 10, Color.RED));
+
+            String[] xAndY = itemPos[i].split(",");
+            this.itemListPositions.get(i).setTranslateX(Double.parseDouble(xAndY[0]));
+            this.itemListPositions.get(i).setTranslateY(Double.parseDouble(xAndY[1]));
+            setItemType(i, xAndY);
+        }
+    }
+
+    private void setItemType(int i, String[] xAndy) {
+        switch(Integer.parseInt(xAndy[2]))
+        {
+            case 0:
+                this.itemListPositions.get(i).setFill(Color.RED);
+                break;
+            case 1:
+                this.itemListPositions.get(i).setFill(Color.YELLOWGREEN);
+                break;
+            case 2:
+                this.itemListPositions.get(i).setFill(Color.GREEN);
+                break;
+        }
+    }
+
+    private void setSnakePositioning(int i, String[] snakePos)
+    {
+        this.resizeArrayList(snakePos.length, this.snakeListPositions.get(i));
+
+        for (int j = 0; j < snakePos.length; j++)
+        {
+            String[] xYAndRot = snakePos[j].split(",");
+            if (this.snakeListPositions.get(i).get(j) == null)
+                this.snakeListPositions.get(i).set(j, new Circle(15, 15, 15, getColor(i)));
+
+            this.snakeListPositions.get(i).get(j).setTranslateX(Double.parseDouble(xYAndRot[0]));
+            this.snakeListPositions.get(i).get(j).setTranslateY(Double.parseDouble(xYAndRot[1]));
+            this.snakeListPositions.get(i).get(j).setRotate(Double.parseDouble(xYAndRot[2]));
         }
     }
 
@@ -207,29 +218,6 @@ public class MVCSnakeModel implements Protocol
         networkOut.println(turn_left + " " + b);
     }
 
-    void runListener()
-    {
-        new Thread(this::listener).start();
-
-        while (gameRunning)
-        {
-            Thread.onSpinWait();
-        }
-
-        try
-        {
-            this.networkOut.close();
-            this.networkIn.close();
-            this.socket.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        System.out.println("Model closed down");
-    }
-
     public synchronized void resizeArrayList(int size, List<Circle> list)
     {
         if (list.size() < size)
@@ -244,7 +232,7 @@ public class MVCSnakeModel implements Protocol
     {
         try
         {
-            this.controller.displayMessage("Starting NetWork...");
+            this.CONTROLLER.displayMessage("Starting NetWork...");
             int thisPort = Integer.parseInt(port);
             this.playerCount = Integer.parseInt(players);
             this.width = Integer.parseInt(width);
@@ -254,18 +242,32 @@ public class MVCSnakeModel implements Protocol
         }
         catch (NumberFormatException e)
         {
-            this.controller.displayMessage("Port, Player, Width, and Height Must Be An Integers");
+            this.CONTROLLER.displayMessage("Port, Player, Width, and Height Must Be An Integers");
         }
     }
 
     public void startModel()
     {
-        this.controller.displayMessage("Waiting For Other Players");
-        this.controller.getVIEW().startMenu.deactivateMenu();
+        this.CONTROLLER.displayMessage("Waiting For Other Players");
+        this.CONTROLLER.getVIEW().getStartMenu().deactivateMenu();
 
         //game is about to start we can get rid of the menu now
-        this.scrapNodes.addAll(this.controller.getVIEW().startMenu.getChildren());
-        this.scrapNodes.add(this.controller.getVIEW().startMenu);
+        this.scrapNodes.addAll(this.CONTROLLER.getVIEW().getStartMenu().getChildren());
+        this.scrapNodes.add(this.CONTROLLER.getVIEW().getStartMenu());
+
         new Thread(this::listener).start();
     }
+
+    public ArrayList<Circle> getItemListPositions() {
+        return itemListPositions;
+    }
+
+    public ArrayList<ArrayList<Circle>> getSnakeListPositions() {
+        return snakeListPositions;
+    }
+
+    public ArrayList<Node> getScrapNodes() {
+        return scrapNodes;
+    }
+
 }

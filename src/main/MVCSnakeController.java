@@ -27,7 +27,9 @@ import java.util.ArrayList;
 
 public class MVCSnakeController {
 
-    public String menuMessage;
+    protected String menuMessage;
+    protected final int WIDTH = 800;
+    protected final int HEIGHT = 600;
     protected boolean dataWrite;
     protected boolean gameGoing;
 
@@ -64,17 +66,30 @@ public class MVCSnakeController {
         this.dataWrite = false;
     }
 
+    public int getNumOfPlayers()
+    {
+        return this.MODEL.playerCount;
+    }
+
     public void setHost(String port, String players, String width, String height)
     {
         try
         {
             this.MODEL.createNetwork(port, players, width, height);
             long time = System.currentTimeMillis();
-            while (System.currentTimeMillis() - time < 5000)
+
+            while (System.currentTimeMillis() - time < 3000)
             {
-                //give this a moment to start up the network, or it'll will just fly into the connection that isn't there
+                /*
+                    give this a moment to start up the network, or it'll will just fly into the connection
+                     isn't there
+
+                     much rather use the network as a model itself for the host, but little low on time, so
+                     maybe later
+                 */
             }
 
+            //after the network is set up, locally join it
             this.setJoin("localhost", port);
         }
         catch (NumberFormatException e)
@@ -108,7 +123,7 @@ public class MVCSnakeController {
 
     public void updateView()
     {
-        Platform.runLater(()->this.VIEW.updateView());
+        Platform.runLater(this.VIEW::updateView);
     }
 
     public void leftTurn(boolean b)

@@ -134,7 +134,7 @@ public class SnakeNetwork implements Protocol
             if (player == this.numOfPlayer - 1)
             {
                 this.gameIsOn = true;
-                pushNetwork(START_GAME);
+                pushNetwork(START_GAME, String.valueOf(this.numOfPlayer));
             }
         }
         catch (IOException e)
