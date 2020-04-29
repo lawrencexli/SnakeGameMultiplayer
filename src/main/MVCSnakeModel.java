@@ -130,7 +130,7 @@ public class MVCSnakeModel implements Protocol
         System.out.println("Model closed down");
     }
 
-    private synchronized void updateSnake(String snakeInfo)
+    private void updateSnake(String snakeInfo)
     {
         if (!this.CONTROLLER.dataWrite)
         {

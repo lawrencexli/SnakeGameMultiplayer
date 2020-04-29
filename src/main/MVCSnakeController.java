@@ -82,7 +82,7 @@ public class MVCSnakeController {
             {
                 /*
                     give this a moment to start up the network, or it'll will just fly into the connection
-                     isn't there
+                     which didnt have the chance to start isn't there
 
                      much rather use the network as a model itself for the host, but little low on time, so
                      maybe later
@@ -109,15 +109,15 @@ public class MVCSnakeController {
         this.MODEL.modelInit(host, port);
     }
 
-    public synchronized ArrayList<Circle> getITEM_POSITIONING() {
+    public ArrayList<Circle> getITEM_POSITIONING() {
         return ITEM_POSITIONING;
     }
 
-    public synchronized ArrayList<ArrayList<Circle>> getSNAKE_PARTS_POSITIONING() {
+    public ArrayList<ArrayList<Circle>> getSNAKE_PARTS_POSITIONING() {
         return SNAKE_PARTS_POSITIONING;
     }
 
-    public synchronized ArrayList<Node> getTrash() {
+    public ArrayList<Node> getTrash() {
         return SCRAP_NODES;
     }
 
