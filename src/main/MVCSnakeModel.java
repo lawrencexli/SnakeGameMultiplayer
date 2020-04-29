@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MVCSnakeModel
+public class MVCSnakeModel implements Protocol
 {
     private MVCSnakeController controller;
     private Socket socket;
@@ -75,7 +75,7 @@ public class MVCSnakeModel
         {
             this.gameRunning = true;
 
-            this.controller.displayError("Waiting For More Players...");
+            this.controller.displayMessage("Waiting For More Players...");
             this.socket = new Socket(host, Integer.parseInt(port));
             System.out.println("Connected");
 
@@ -86,11 +86,11 @@ public class MVCSnakeModel
         }
         catch (IOException e)
         {
-            this.controller.displayError(e.getMessage());
+            this.controller.displayMessage(e.getMessage());
         }
         catch (NumberFormatException e)
         {
-            this.controller.displayError(e.getMessage());
+            this.controller.displayMessage(e.getMessage());
         }
     }
 
@@ -106,8 +106,12 @@ public class MVCSnakeModel
                 System.out.println(input);
                 switch (protocol)
                 {
-                    case "DATA":
+                    case DATA:
                         this.updateSnake(input.substring(protocol.length() + 1));
+                        break;
+                    case START_GAME:
+                        this.controller.gameGoing = true;
+                        break;
                     default:
                         System.out.println("problem");
                 }
@@ -240,7 +244,7 @@ public class MVCSnakeModel
     {
         try
         {
-            this.controller.displayError("Starting NetWork...");
+            this.controller.displayMessage("Starting NetWork...");
             int thisPort = Integer.parseInt(port);
             this.playerCount = Integer.parseInt(players);
             this.width = Integer.parseInt(width);
@@ -250,15 +254,16 @@ public class MVCSnakeModel
         }
         catch (NumberFormatException e)
         {
-            this.controller.displayError("Port, Player, Width, and Height Must Be An Integers");
+            this.controller.displayMessage("Port, Player, Width, and Height Must Be An Integers");
         }
     }
 
     public void startModel()
     {
-        this.controller.displayError("Waiting For Other Players");
-        this.controller.getVIEW().startMenu.getChildren().forEach((node)->node.setDisable(true));
-        this.controller.gameGoing = true;
+        this.controller.displayMessage("Waiting For Other Players");
+        this.controller.getVIEW().startMenu.deactivateMenu();
+
+        //game is about to start we can get rid of the menu now
         this.scrapNodes.addAll(this.controller.getVIEW().startMenu.getChildren());
         this.scrapNodes.add(this.controller.getVIEW().startMenu);
         new Thread(this::listener).start();

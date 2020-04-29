@@ -20,7 +20,7 @@ import java.util.Scanner;
  *
  * @author Christopher Asbrock
  */
-public class SnakeNetwork
+public class SnakeNetwork implements Protocol
 {
     private Socket[] socket;
     private ServerSocket server;
@@ -132,7 +132,10 @@ public class SnakeNetwork
 
             new Thread(() -> networkListener(player)).start();
             if (player == this.numOfPlayer - 1)
+            {
                 this.gameIsOn = true;
+                pushNetwork(START_GAME);
+            }
         }
         catch (IOException e)
         {
@@ -151,10 +154,10 @@ public class SnakeNetwork
 
             switch (protocol)
             {
-                case "TURN_LEFT":
+                case TURN_LEFT:
                     this.turnLeft[player] = message.equalsIgnoreCase("true");
                     break;
-                case "TURN_RIGHT":
+                case TURN_RIGHT:
                     this.turnRight[player] = message.equalsIgnoreCase("true");
                     break;
             }
@@ -215,13 +218,19 @@ public class SnakeNetwork
         //System.out.println(allInfo);
        // this.networkOut.println("DATA " + allInfo);
        // System.out.println(allInfo);
-        pushNetwork(allInfo.toString());
+        pushNetwork(DATA, allInfo.toString());
     }
 
-    private void pushNetwork(String info)
+    private void pushNetwork(String protocol)
     {
         for (int i = 0; i < this.player.length; i++)
-            this.networkOut[i].println("DATA " + info);
+            this.networkOut[i].println(protocol);
+    }
+
+    private void pushNetwork(String protocol, String info)
+    {
+        for (int i = 0; i < this.player.length; i++)
+            this.networkOut[i].println(protocol + " " + info);
     }
 
     /**

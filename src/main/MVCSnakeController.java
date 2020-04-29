@@ -23,11 +23,11 @@ import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.shape.Circle;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MVCSnakeController {
 
+    public String menuMessage;
     protected boolean dataWrite;
     protected boolean gameGoing;
 
@@ -70,7 +70,6 @@ public class MVCSnakeController {
         {
             this.MODEL.createNetwork(port, players, width, height);
             long time = System.currentTimeMillis();
-
             while (System.currentTimeMillis() - time < 5000)
             {
                 //give this a moment to start up the network, or it'll will just fly into the connection that isn't there
@@ -80,13 +79,14 @@ public class MVCSnakeController {
         }
         catch (NumberFormatException e)
         {
-            this.displayError(e.getMessage());
+            this.displayMessage(e.getMessage());
         }
     }
 
-    public void displayError(String message)
+    public void displayMessage(String message)
     {
-        this.VIEW.getDisplayMessage().setText(message);
+        this.menuMessage = message;
+        this.updateView();
     }
 
     public void setJoin(String host, String port)
@@ -106,18 +106,18 @@ public class MVCSnakeController {
         return SCRAP_NODES;
     }
 
-    public void run()
-    {
-        this.MODEL.runListener();
-    }
-
     public void updateView()
     {
         Platform.runLater(()->this.VIEW.updateView());
     }
 
-    public void sendDirection(String turn_left, boolean b)
+    public void leftTurn(boolean b)
     {
-        this.MODEL.sendDirection(turn_left,b);
+        this.MODEL.sendDirection(this.MODEL.TURN_LEFT, b);
+    }
+
+    public void rightTurn(boolean b)
+    {
+        this.MODEL.sendDirection(this.MODEL.TURN_RIGHT, b);
     }
 }
