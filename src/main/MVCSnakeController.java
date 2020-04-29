@@ -30,37 +30,45 @@ public class MVCSnakeController {
     protected boolean dataWrite;
     protected boolean gameGoing;
 
-    private ArrayList<Circle> itemListPositions;
-    private ArrayList<ArrayList<Circle>> snakeListPositions;
-    private ArrayList<Node> scrapNodes;
+    /**a reference to the models item list*/
+    private final ArrayList<Circle> ITEM_POSITIONING;
+
+    /**a reference to the models list of snakes and its list of parts*/
+    private final ArrayList<ArrayList<Circle>> SNAKE_PARTS_POSITIONING;
+
+    /**a reference to the scrap array that gets cleared after each update*/
+    private final ArrayList<Node> SCRAP_NODES;
 
     /** MVC Snake View */
-    private MVCSnakeView theView;
+    private final MVCSnakeView VIEW;
+
     /** MVC Snake Model */
-    private MVCSnakeModel theModel;
+    private final MVCSnakeModel MODEL;
 
     public MVCSnakeController(MVCSnakeView view)
     {
-        this.theView = view;
-        this.theModel = new MVCSnakeModel();
+        this.VIEW = view;
+        this.MODEL = new MVCSnakeModel();
         this.gameGoing = false;
 
-        this.itemListPositions = this.theModel.getItemListPositions();
-        this.snakeListPositions = this.theModel.getSnakeListPositions();
-        this.scrapNodes = this.theModel.getScrapNodes();
+        this.ITEM_POSITIONING = this.MODEL.getItemListPositions();
+        this.SNAKE_PARTS_POSITIONING = this.MODEL.getSnakeListPositions();
+        this.SCRAP_NODES = this.MODEL.getScrapNodes();
 
         this.dataWrite = false;
     }
 
-    public void setHost(String port)
+    public void setHost(String port, String players, String width, String height)
     {
-        System.out.println("start host");
-        this.theModel.createNetwork(Integer.parseInt(port));
+        this.MODEL.width = Integer.parseInt(width);
+        this.MODEL.height = Integer.parseInt(height);
+        this.MODEL.playerCount = Integer.parseInt(players);
+        this.MODEL.createNetwork(Integer.parseInt(port), this.MODEL.playerCount, this.MODEL.width, this.MODEL.height);
         long time = System.currentTimeMillis();
 
         while (System.currentTimeMillis() - time < 5000)
         {
-
+            //give this a moment to start up the network, or it'll will just fly into the connection that isn't there
         }
 
         this.setJoin("localhost", port);
@@ -68,31 +76,30 @@ public class MVCSnakeController {
 
     public void setJoin(String host, String port)
     {
-        System.out.println("start join");
-        this.theModel.modelInit(this,host, port);
+        this.MODEL.modelInit(this,host, port);
         this.gameGoing = true;
-        this.getTrash().addAll(this.theView.startMenu.getChildren());
-        this.getTrash().add(this.theView.startMenu);
-        new Thread(()-> this.run()).start();
+        this.getTrash().addAll(this.VIEW.startMenu.getChildren());
+        this.getTrash().add(this.VIEW.startMenu);
+        new Thread(this::run).start();
     }
 
-    public synchronized ArrayList<Circle> getItemListPositions() {
-        return itemListPositions;
+    public synchronized ArrayList<Circle> getITEM_POSITIONING() {
+        return ITEM_POSITIONING;
     }
 
-    public synchronized ArrayList<ArrayList<Circle>> getSnakeListPositions() {
-        return snakeListPositions;
+    public synchronized ArrayList<ArrayList<Circle>> getSNAKE_PARTS_POSITIONING() {
+        return SNAKE_PARTS_POSITIONING;
     }
 
     public synchronized ArrayList<Node> getTrash() {
-        return scrapNodes;
+        return SCRAP_NODES;
     }
 
     public void run()
     {
-        this.theModel.runListener();
+        this.MODEL.runListener();
 
-        while (this.theModel.gameRunning)
+        while (this.MODEL.gameRunning)
         {
         }
 
@@ -101,11 +108,11 @@ public class MVCSnakeController {
 
     public void updateView()
     {
-        Platform.runLater(()->this.theView.updateView());
+        Platform.runLater(()->this.VIEW.updateView());
     }
 
     public void sendDirection(String turn_left, boolean b)
     {
-        this.theModel.sendDirection(turn_left,b);
+        this.MODEL.sendDirection(turn_left,b);
     }
 }

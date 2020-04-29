@@ -1,6 +1,7 @@
 package main;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,16 +19,20 @@ public class MVCSnakeView extends Application
 {
     private Pane root;
 
+    public Pane getRoot()
+    {
+        return root;
+    }
+
     protected GridPane startMenu;
     private Button clientButton;
     private Button hostButton;
     private TextField hostText;
     private TextField portText;
     private TextField hostPortField;
-    private Label hostPrompt;
-    private Label portPrompt;
-    private Label hostPortLabel;
-
+    private TextField numOfPlayerField;
+    private TextField setHeightField;
+    private TextField setWidthField;
     private MVCSnakeController controller;
 
     public void init()
@@ -38,33 +43,51 @@ public class MVCSnakeView extends Application
 
         this.startMenu = new GridPane();
         this.startMenu.setPrefSize(400,300);
-        this.hostPrompt = new Label();
-        this.hostPrompt.setText("HOST:");
-        this.portPrompt = new Label();
-        this.portPrompt.setText("PORT:");
+        //this.startMenu.setGridLinesVisible(true);
+        this.startMenu.setAlignment(Pos.CENTER);
+        this.startMenu.setHgap(10);
+        this.startMenu.setVgap(10);
         this.hostText = new TextField();
         this.portText = new TextField();
         this.hostPortField = new TextField();
-        this.hostPortLabel = new Label();
-        this.hostPortLabel.setText("PORT:");
+
+        this.numOfPlayerField = new TextField();
+        this.numOfPlayerField.setText("1");
+        this.setHeightField = new TextField();
+        this.setHeightField.setText("800");
+        this.setWidthField = new TextField();
+        this.setWidthField.setText("600");
 
         this.clientButton = new Button();
         this.clientButton.setText("JOIN");
         this.hostButton = new Button();
         this.hostButton.setText("HOST");
 
-        this.startMenu.add(this.hostPrompt, 1,1);
-        this.startMenu.add(this.hostText, 2,1);
-        this.startMenu.add(this.portPrompt, 1,2);
-        this.startMenu.add(this.portText,2,2);
-        this.startMenu.add(this.clientButton,2,3);
-        this.startMenu.add(this.hostPortLabel, 1,4);
-        this.startMenu.add(this.hostPortField, 2,4);
-        this.startMenu.add(this.hostButton,2,5);
+        this.startMenu.add(new Label("JOIN GAME"), 2, 1,3,1);
+        this.startMenu.add(new Label("HOST:"), 1,2);
+        this.startMenu.add(this.hostText, 2,2);
+
+        this.startMenu.add(new Label("PORT:"), 1,3);
+        this.startMenu.add(this.portText,2,3);
+
+
+        this.startMenu.add(this.clientButton,3,2,1,2);
+
+        this.startMenu.add(new Label("HOST GAME"), 2, 6,3,1);
+        this.startMenu.add(new Label("PORT:"), 1,7);
+        this.startMenu.add(this.hostPortField, 2,7);
+        this.startMenu.add(this.hostButton,3,7,1,4);
+        this.startMenu.add(new Label("PLAYERS:"), 1,8);
+        this.startMenu.add(this.numOfPlayerField,2,8);
+        this.startMenu.add(new Label("PANE HEIGHT:"), 1,9);
+        this.startMenu.add(this.setHeightField,2,9);
+        this.startMenu.add(new Label("PANE WIDTH:"), 1,10);
+        this.startMenu.add(this.setWidthField,2,10);
+
 
         this.root.getChildren().add(this.startMenu);
-        this.startMenu.setTranslateX(800/2);
-        this.startMenu.setTranslateY(600/2);
+        this.startMenu.setTranslateX(800/4);
+        this.startMenu.setTranslateY(600/4);
     }
 
     @Override
@@ -76,14 +99,13 @@ public class MVCSnakeView extends Application
         else
         {
             this.hostButton.setOnAction((event) ->
-            {
-                this.controller.setHost(this.hostPortField.getText());
-            });
+                    this.controller.setHost(this.hostPortField.getText(),
+                            this.numOfPlayerField.getText(),
+                            this.setWidthField.getText(),
+                            this.setHeightField.getText()));
 
             this.clientButton.setOnAction((event) ->
-            {
-                this.controller.setJoin(this.hostText.getText(), this.portText.getText());
-            });
+                    this.controller.setJoin(this.hostText.getText(), this.portText.getText()));
         }
         primaryStage.show();
     }
@@ -93,11 +115,11 @@ public class MVCSnakeView extends Application
         this.controller.dataWrite = true;
 
         int i = 0;
-        ArrayList<Circle> tempOne = this.controller.getSnakeListPositions().get(i++);
-        ArrayList<Circle> tempTwos = this.controller.getSnakeListPositions().get(i++);
-        ArrayList<Circle> tempThrees = this.controller.getSnakeListPositions().get(i++);
-        ArrayList<Circle> tempFours = this.controller.getSnakeListPositions().get(i);
-        ArrayList<Circle> tempTwo = this.controller.getItemListPositions();
+        ArrayList<Circle> tempOne = this.controller.getSNAKE_PARTS_POSITIONING().get(i++);
+        ArrayList<Circle> tempTwos = this.controller.getSNAKE_PARTS_POSITIONING().get(i++);
+        ArrayList<Circle> tempThrees = this.controller.getSNAKE_PARTS_POSITIONING().get(i++);
+        ArrayList<Circle> tempFours = this.controller.getSNAKE_PARTS_POSITIONING().get(i);
+        ArrayList<Circle> tempTwo = this.controller.getITEM_POSITIONING();
         ArrayList<Node> tempThree = this.controller.getTrash();
 
         while (!tempThree.isEmpty())

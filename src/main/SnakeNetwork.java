@@ -1,13 +1,13 @@
 package main;
 
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -31,9 +31,9 @@ public class SnakeNetwork
     private boolean gameIsOn = false;
 
     /**fixed width of the window*/
-    private final int WIDTH = 800;
+    private int WIDTH;
     /**fixed height of the window*/
-    private final int HEIGHT = 600;
+    private int HEIGHT;
 
     /**random number generator*/
     private Random randomizer;
@@ -72,8 +72,12 @@ public class SnakeNetwork
      *
      * @author Christopher Asbrock
      */
-    public void init(int port)
+    public void init(int port, int players, int width, int height)
     {
+        this.numOfPlayer = players;
+        this.WIDTH = width;
+        this.HEIGHT = height;
+
         this.randomizer = new Random();
 
         this.listOfItems = new ArrayList<>();
@@ -88,17 +92,16 @@ public class SnakeNetwork
         {
             this.player[i] = new Snake();
             this.player[i].setVelocity(0, 0);
-            this.player[i].setRotate(90 * i);
+            this.player[i].setRotate(90 * i + 45);
             ((Snake) this.player[i]).addTail();
 
             SnakeUtil.addToGame(this.player[i],
-                    WIDTH / 2 + 50 * Math.cos(Math.toRadians(90 * i)),
-                    HEIGHT / 2 + 50 * Math.sin(Math.toRadians(90 * i)));
+                    WIDTH / 2.0 + 50 * Math.cos(Math.toRadians(90 * i + 45)),
+                    HEIGHT / 2.0 + 50 * Math.sin(Math.toRadians(90 * i + 45)));
         }
 
         this.turnLeft = new boolean[this.numOfPlayer];
-        for (int i = 0; i < this.turnLeft.length; i++)
-            this.turnLeft[i] = true;
+        Arrays.fill(this.turnLeft, true);
         this.turnRight = new boolean[this.numOfPlayer];
 
         try
@@ -112,8 +115,6 @@ public class SnakeNetwork
         for (int i = 0; i < this.player.length; i++)
             if (this.player[i] != null)
                 this.setUpNetworkConnection(i);
-
-        System.out.println("init");
 
         this.start();
     }
@@ -186,41 +187,35 @@ public class SnakeNetwork
 
     private void sendNetworkInfo()
     {
-        String allInfo = "";
+        StringBuilder allInfo = new StringBuilder();
 
         for (int i = 0; i < this.listOfItems.size(); i++)
         {
-            allInfo += this.listOfItems.get(i).getTranslateX() + "," + this.listOfItems.get(i).getTranslateY() + ",";
+            allInfo.append(this.listOfItems.get(i).getTranslateX()).append(",").append(this.listOfItems.get(i).getTranslateY()).append(",");
             if (this.listOfItems.get(i) instanceof Poison)
-                allInfo += "2";
+                allInfo.append("2");
             else if (this.listOfItems.get(i) instanceof Potion)
-                allInfo += "1";
+                allInfo.append("1");
             else
-                allInfo += "0";
+                allInfo.append("0");
 
-            allInfo += (i != this.listOfItems.size() - 1) ? ";" : "";
+            allInfo.append((i != this.listOfItems.size() - 1) ? ";" : "");
         }
 
-        for (int i = 0; i < this.player.length; i ++)
+        for (GameAsset gameAsset : this.player)
         {
-            allInfo += "%";
+            allInfo.append("%");
 
-            if (this.player[i] != null)
-                for (int j = 0; j < ((Snake) this.player[i]).getSnakeTails().size(); j++)
-                    allInfo +=
-                            ((Snake) this.player[i]).getSnakeTails().get(j).getTranslateX() +
-                                    "," +
-                                    ((Snake) this.player[i]).getSnakeTails().get(j).getTranslateY() +
-                                    "," +
-                                    ((Snake) this.player[i]).getSnakeTails().get(j).getRotate() +
-                                    ((((Snake) this.player[i]).getSnakeTails().size() - 1 != j) ? ";" : "");
+            if (gameAsset != null)
+                for (int j = 0; j < ((Snake) gameAsset).getSnakeTails().size(); j++)
+                    allInfo.append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateX()).append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateY()).append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getRotate()).append((((Snake) gameAsset).getSnakeTails().size() - 1 != j) ? ";" : "");
             else
-                allInfo += null;
+                allInfo.append("null");
         }
         //System.out.println(allInfo);
        // this.networkOut.println("DATA " + allInfo);
        // System.out.println(allInfo);
-        pushNetwork(allInfo);
+        pushNetwork(allInfo.toString());
     }
 
     private void pushNetwork(String info)
@@ -250,6 +245,7 @@ public class SnakeNetwork
                     }
 
 
+                assert this.player[i] != null;
                 if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
                 {
                     System.out.println("PLayer" +
@@ -375,7 +371,6 @@ public class SnakeNetwork
         timer.start();
         while (true)
         {
-            System.out.println("start");
         }
     }
 
@@ -399,7 +394,7 @@ public class SnakeNetwork
     public static void main(String[] args)
     {
         SnakeNetwork test = new SnakeNetwork(4);
-        test.init(1111);
+        test.init(1111,4,600,800);
         test.start();
     }
 }

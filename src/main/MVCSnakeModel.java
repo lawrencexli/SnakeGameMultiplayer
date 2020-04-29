@@ -16,8 +16,7 @@
  *
  * ****************************************
  */
-package
-        main;
+package main;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -36,7 +35,10 @@ public class MVCSnakeModel
     private Socket socket;
     private Scanner networkIn;
     private PrintStream networkOut;
-    private SnakeNetwork hostedNetwork;
+
+    protected int height;
+    protected int width;
+    protected int playerCount;
 
     public ArrayList<Circle> getItemListPositions() {
         return itemListPositions;
@@ -50,18 +52,18 @@ public class MVCSnakeModel
         return scrapNodes;
     }
 
-    private ArrayList<Circle> itemListPositions;
-    private ArrayList<ArrayList<Circle>> snakeListPositions;
-    private ArrayList<Node> scrapNodes;
+    private final ArrayList<Circle> itemListPositions;
+    private final ArrayList<ArrayList<Circle>> snakeListPositions;
+    private final ArrayList<Node> scrapNodes;
 
-    protected boolean gameRunning;
+    protected volatile boolean gameRunning;
 
     public MVCSnakeModel()
     {
         this.itemListPositions = new ArrayList<>();
         this.snakeListPositions = new ArrayList<>();
         for (int i = 0; i < 4;i++)
-            this.snakeListPositions.add(new ArrayList<Circle>());
+            this.snakeListPositions.add(new ArrayList<>());
 
         this.scrapNodes = new ArrayList<>();
     }
@@ -145,7 +147,7 @@ public class MVCSnakeModel
             }
 
 
-            for (int i = 0; i < this.snakeListPositions.size(); i++)
+            for (int i = 0; i < this.playerCount; i++)
             {
                 if (positions.length > 1 + i)
                 {
@@ -200,7 +202,7 @@ public class MVCSnakeModel
 
         while (gameRunning)
         {
-            //run forever for now...
+            Thread.onSpinWait();
         }
 
         try
@@ -227,8 +229,8 @@ public class MVCSnakeModel
                 this.scrapNodes.add(list.remove(0));
     }
 
-    public void createNetwork(int port)
+    public void createNetwork(int port,int players,int width,int height)
     {
-        new Thread(()->new SnakeNetwork(4).init(port)).start();
+        new Thread(()->new SnakeNetwork(4).init(port,players, width,height)).start();
     }
 }
