@@ -260,12 +260,26 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
         this.width = Integer.parseInt(width);
         this.height = Integer.parseInt(height);
 
+        checkPlayerCount();
+        checkPort(thisPort);
+
+        this.startHostServer(thisPort);
+    }
+
+    private void checkPlayerCount() throws SnakeException
+    {
         if (this.playerCount < 1)
             throw new SnakeException("Must Be At Least One Player");
         else if (this.playerCount > 4)
             throw new SnakeException("4 Players Max");
+    }
 
-        this.startHostServer(thisPort);
+    private void checkPort(int thisPort) throws SnakeException
+    {
+        if (thisPort < 1000)
+            throw new SnakeException("Port Must Be Greater Then 1000");
+        else if (thisPort > 65535)
+            throw new SnakeException("Port Max 65535");
     }
 
     private void startHostServer(int thisPort)
