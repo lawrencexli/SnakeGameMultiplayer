@@ -31,28 +31,42 @@ import java.util.Scanner;
 
 public class MVCSnakeModel implements Protocol
 {
+    /***/
+    private final int MAX_PLAYERS = 4;
+    /***/
     private final MVCSnakeController CONTROLLER;
+
+    /***/
     private Socket socket;
+    /***/
     private Scanner networkIn;
+    /***/
     private PrintStream networkOut;
 
+    /***/
     protected int height;
+    /***/
     protected int width;
+    /***/
     protected int playerCount;
 
+    /**an arraylist holding the positions of all active items*/
     private final ArrayList<Circle> itemListPositions;
-    private final ArrayList<ArrayList<Circle>> snakeListPositions;
+    /**An array of the max players, that holds a reference to each of there ArrayList kept positions*/
+    private final ArrayList[] snakeListPositions;
+    /**An array list for reference in the view that notes and nodes taken out of game for removal*/
     private final ArrayList<Node> scrapNodes;
 
+    /***/
     protected volatile boolean gameRunning;
 
     public MVCSnakeModel(MVCSnakeController controller)
     {
         this.CONTROLLER = controller;
         this.itemListPositions = new ArrayList<>();
-        this.snakeListPositions = new ArrayList<>();
-        for (int i = 0; i < 4;i++)
-            this.snakeListPositions.add(new ArrayList<>());
+        this.snakeListPositions = new ArrayList[MAX_PLAYERS];
+        for (int i = 0; i < MAX_PLAYERS;i++)
+            this.snakeListPositions[i] = new ArrayList<>();
 
         this.scrapNodes = new ArrayList<>();
     }
@@ -63,7 +77,7 @@ public class MVCSnakeModel implements Protocol
         {
             this.gameRunning = true;
 
-            this.CONTROLLER.displayMessage("Waiting For More Players...");
+            this.CONTROLLER.displayMenuMessage("Waiting For More Players...");
             this.socket = new Socket(host, Integer.parseInt(port));
             System.out.println("Connected");
 
@@ -74,24 +88,27 @@ public class MVCSnakeModel implements Protocol
         }
         catch (IOException e)
         {
-            this.CONTROLLER.displayMessage(e.getMessage());
+            this.CONTROLLER.displayMenuMessage(e.getMessage());
         }
         catch (NumberFormatException e)
         {
-            this.CONTROLLER.displayMessage("Port, Players, Width, And Height Can Only Be Integers");
+            this.CONTROLLER.displayMenuMessage("Port, Players, Width, And Height Can Only Be Integers");
         }
     }
 
     private void listener()
     {
-        while (gameRunning)
+        try
         {
-            try
+            while (true)
             {
+                if (!this.networkIn.hasNextLine())
+                    throw new SnakeException("Disconnected");
+
                 String input = this.networkIn.nextLine();
                 String protocol = input.split(" ")[0];
 
-                System.out.println(input);
+                //System.out.println(input);
                 switch (protocol)
                 {
                     case DATA:
@@ -101,17 +118,25 @@ public class MVCSnakeModel implements Protocol
                         this.CONTROLLER.gameGoing = true;
                         this.playerCount = Integer.parseInt(input.substring(protocol.length() + 1));
                         break;
+                    case MESSAGE:
+                        this.CONTROLLER.displayGameMessage(input.substring(protocol.length() + 1));
+                        break;
+                    case END_GAME:
+                        throw new SnakeException("Game Is Over");
                     default:
                         System.out.println("problem");
                 }
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+        }
+        catch (SnakeException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        finally
+        {
+            this.close();
         }
 
-        this.close();
     }
 
     private void close()
@@ -137,24 +162,19 @@ public class MVCSnakeModel implements Protocol
             String[] positions = snakeInfo.split("%");
 
             if (positions.length > 0 && !positions[0].equals(""))
-            {
                 setItemPositioning(positions[0].split(";"));
-            }
 
             for (int i = 0; i < this.playerCount; i++)
-            {
                 if (!(positions[1 + i].equalsIgnoreCase("null")
                         || positions[1 + i].equalsIgnoreCase("")))
-                {
                     setSnakePositioning(i, positions[1 + i].split(";"));
-                }
-            }
 
             this.CONTROLLER.updateView();
         }
     }
 
-    private void setItemPositioning(String[] itemPos) {
+    private void setItemPositioning(String[] itemPos)
+    {
         this.resizeArrayList(itemPos.length, this.itemListPositions);
 
         for (int i = 0; i < itemPos.length; i++)
@@ -169,14 +189,15 @@ public class MVCSnakeModel implements Protocol
         }
     }
 
-    private void setItemType(int i, String[] xAndy) {
+    private void setItemType(int i, String[] xAndy)
+    {
         switch(Integer.parseInt(xAndy[2]))
         {
             case 0:
                 this.itemListPositions.get(i).setFill(Color.RED);
                 break;
             case 1:
-                this.itemListPositions.get(i).setFill(Color.YELLOWGREEN);
+                this.itemListPositions.get(i).setFill(Color.LIGHTGOLDENRODYELLOW);
                 break;
             case 2:
                 this.itemListPositions.get(i).setFill(Color.GREEN);
@@ -186,17 +207,17 @@ public class MVCSnakeModel implements Protocol
 
     private void setSnakePositioning(int i, String[] snakePos)
     {
-        this.resizeArrayList(snakePos.length, this.snakeListPositions.get(i));
+        this.resizeArrayList(snakePos.length, this.snakeListPositions[i]);
 
         for (int j = 0; j < snakePos.length; j++)
         {
             String[] xYAndRot = snakePos[j].split(",");
-            if (this.snakeListPositions.get(i).get(j) == null)
-                this.snakeListPositions.get(i).set(j, new Circle(15, 15, 15, getColor(i)));
+            if (this.snakeListPositions[i].get(j) == null)
+                this.snakeListPositions[i].set(j, new Circle(15, 15, 15, getColor(i)));
 
-            this.snakeListPositions.get(i).get(j).setTranslateX(Double.parseDouble(xYAndRot[0]));
-            this.snakeListPositions.get(i).get(j).setTranslateY(Double.parseDouble(xYAndRot[1]));
-            this.snakeListPositions.get(i).get(j).setRotate(Double.parseDouble(xYAndRot[2]));
+            ((ArrayList<Circle>) this.snakeListPositions[i]).get(j).setTranslateX(Double.parseDouble(xYAndRot[0]));
+            ((ArrayList<Circle>) this.snakeListPositions[i]).get(j).setTranslateY(Double.parseDouble(xYAndRot[1]));
+            ((ArrayList<Circle>) this.snakeListPositions[i]).get(j).setRotate(Double.parseDouble(xYAndRot[2]));
         }
     }
 
@@ -205,7 +226,7 @@ public class MVCSnakeModel implements Protocol
         switch (player)
         {
             case 0: return Color.FIREBRICK;
-            case 1: return Color.OLDLACE;
+            case 1: return Color.FORESTGREEN;
             case 2: return Color.GOLD;
             case 3: return Color.PURPLE;
             default:
@@ -213,9 +234,9 @@ public class MVCSnakeModel implements Protocol
         }
     }
 
-    public void sendDirection(String turn_left, boolean b)
+    public void sendDirection(String protocol, boolean onOff)
     {
-        networkOut.println(turn_left + " " + b);
+        networkOut.println(protocol + " " + onOff);
     }
 
     public synchronized void resizeArrayList(int size, List<Circle> list)
@@ -232,23 +253,33 @@ public class MVCSnakeModel implements Protocol
     {
         try
         {
-            this.CONTROLLER.displayMessage("Starting NetWork...");
+            this.CONTROLLER.displayMenuMessage("Starting NetWork...");
             int thisPort = Integer.parseInt(port);
             this.playerCount = Integer.parseInt(players);
             this.width = Integer.parseInt(width);
             this.height = Integer.parseInt(height);
 
-            new Thread(() -> new SnakeNetwork(4).init(thisPort, this.playerCount, this.width, this.height)).start();
+            new Thread(() -> {
+                try
+                {
+                    new SnakeNetwork(4).init(thisPort, this.playerCount, this.width, this.height);
+                }
+                catch (IOException e)
+                {
+                    this.CONTROLLER.displayMenuMessage("Server Failed To Start");
+                    System.exit(-1);
+                }
+            }).start();
         }
         catch (NumberFormatException e)
         {
-            this.CONTROLLER.displayMessage("Port, Player, Width, and Height Must Be An Integers");
+            this.CONTROLLER.displayMenuMessage("Port, Player, Width, and Height Must Be An Integers");
         }
     }
 
     public void startModel()
     {
-        this.CONTROLLER.displayMessage("Waiting For Other Players");
+        this.CONTROLLER.displayMenuMessage("Waiting For Other Players");
         this.CONTROLLER.getVIEW().getStartMenu().deactivateMenu();
 
         //game is about to start we can get rid of the menu now
@@ -258,15 +289,18 @@ public class MVCSnakeModel implements Protocol
         new Thread(this::listener).start();
     }
 
-    public ArrayList<Circle> getItemListPositions() {
+    public ArrayList<Circle> getItemListPositions()
+    {
         return itemListPositions;
     }
 
-    public ArrayList<ArrayList<Circle>> getSnakeListPositions() {
+    public ArrayList[] getSnakeListPositions()
+    {
         return snakeListPositions;
     }
 
-    public ArrayList<Node> getScrapNodes() {
+    public ArrayList<Node> getScrapNodes()
+    {
         return scrapNodes;
     }
 

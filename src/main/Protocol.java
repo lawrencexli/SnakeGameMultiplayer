@@ -11,4 +11,6 @@ public interface Protocol
     String TURN_LEFT = "turnLeft";
     String TURN_RIGHT = "turnRight";
     String ERROR = "error";
+    String END_GAME = "endGame";
+    String MESSAGE = "message";
 }
