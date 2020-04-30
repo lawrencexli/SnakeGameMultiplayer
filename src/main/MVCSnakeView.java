@@ -141,4 +141,3 @@ public class MVCSnakeView extends Application
         launch(args);
     }
 }
-
