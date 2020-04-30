@@ -5,5 +5,5 @@ module csci205_final_project_sp2020 {
     requires javafx.base;
     requires java.desktop;
 
-    opens main;
+    opens main.MainSnakeGame;
 }
