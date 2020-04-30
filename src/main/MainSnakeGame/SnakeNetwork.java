@@ -151,7 +151,6 @@ public class SnakeNetwork implements Protocol
     {
         while (true)
         {
-            System.out.println("looking for input");
             if (!this.networkIn[player].hasNextLine())
                 break;
 

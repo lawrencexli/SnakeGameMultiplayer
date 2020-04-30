@@ -82,7 +82,7 @@ public class MVCSnakeController {
         {
             this.MODEL.createNetwork(port, players, width, height);
 
-            waitFor(1);
+            this.waitFor(1);
 
             //after the network is set up, locally join it
             this.setJoin("localhost", port);
