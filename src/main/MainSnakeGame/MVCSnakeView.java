@@ -14,8 +14,14 @@ import main.SnakeGameAssets.SnakeMenu;
 
 public class MVCSnakeView extends Application
 {
+
+    private final int MAX_SNAKES = 4;
+    private final int MAX_PIECES = 2000;
+    private final int MAX_ITEMS = 30;
+
+
     /**game main root*/
-    protected Pane root;
+    private Pane root;
 
     /**games start menu*/
     private SnakeMenu startMenu;
@@ -56,7 +62,7 @@ public class MVCSnakeView extends Application
 
     private void initSnakes()
     {
-        this.snakeParts = new Circle[4][500];
+        this.snakeParts = new Circle[MAX_SNAKES][MAX_PIECES];
 
         for (int i = 0; i <this.snakeParts.length; i++)
         {
@@ -73,7 +79,7 @@ public class MVCSnakeView extends Application
 
     private void initItems()
     {
-        this.items = new Circle[30];
+        this.items = new Circle[MAX_ITEMS];
 
         for (int i = 0; i < this.items.length; i++)
         {
