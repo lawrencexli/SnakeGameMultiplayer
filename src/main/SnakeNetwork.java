@@ -56,6 +56,7 @@ public class SnakeNetwork implements Protocol
     private final int POISON_LENGTH = 100;
 
     private int numOfPlayer;
+    private int winner;
 
     /**
      * a trash collector that collects all assets removed from the scene to be removed
@@ -65,14 +66,13 @@ public class SnakeNetwork implements Protocol
 
     public SnakeNetwork(int numberOfPlayers)
     {
+        this.winner = -1;
         this.numOfPlayer = numberOfPlayers;
     }
     /**
      * initializes lists of items and the pane to a certain size
-     *
-     * @author Christopher Asbrock
      */
-    public void init(int port, int players, int width, int height)
+    public void init(int port, int players, int width, int height) throws IOException
     {
         this.numOfPlayer = players;
         this.WIDTH = width;
@@ -101,20 +101,14 @@ public class SnakeNetwork implements Protocol
         }
 
         this.turnLeft = new boolean[this.numOfPlayer];
-        Arrays.fill(this.turnLeft, true);
+        //Arrays.fill(this.turnLeft, true);
         this.turnRight = new boolean[this.numOfPlayer];
 
-        try
-        {
-            server = new ServerSocket(port);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < this.player.length; i++)
-            if (this.player[i] != null)
-                this.setUpNetworkConnection(i);
+
+        server = new ServerSocket(port);
+
+        for (int i = 0; i < this.numOfPlayer; i++)
+            this.setUpNetworkConnection(i);
 
         this.start();
     }
@@ -127,10 +121,11 @@ public class SnakeNetwork implements Protocol
             socket[player] = server.accept();
             System.out.println("Player " + (player + 1) + " connected");
 
-            networkIn[player] = new Scanner(socket[player].getInputStream());
             networkOut[player] = new PrintStream(socket[player].getOutputStream());
+            networkIn[player] = new Scanner(socket[player].getInputStream());
 
             new Thread(() -> networkListener(player)).start();
+
             if (player == this.numOfPlayer - 1)
             {
                 this.gameIsOn = true;
@@ -145,8 +140,12 @@ public class SnakeNetwork implements Protocol
 
     private void networkListener(int player)
     {
-        while (this.gameIsOn)
+        while (true)
         {
+            System.out.println("looking for input");
+            if (!this.networkIn[player].hasNextLine())
+                break;
+
             String input = this.networkIn[player].nextLine();
             System.out.println(player + " " + input);
             String protocol = input.split(" ")[0];
@@ -161,16 +160,28 @@ public class SnakeNetwork implements Protocol
                     this.turnRight[player] = message.equalsIgnoreCase("true");
                     break;
             }
-            //System.out.println(protocol);
-            //System.out.println(message);
         }
+
+        //if the player array is not null then they dced
+        if (this.player != null)
+            this.player[player] = null;
+        try
+        {
+            this.networkIn[player].close();
+            this.networkOut[player].close();
+            this.socket[player].close();
+        }
+        catch (IOException e)
+        {
+            //required by socket.close();
+        }
+
+        System.out.println("NetWork Done, Player " + (player + 1));
     }
 
     /**
      * the main driver that updates the screen 60 times a second.
      * food actions will only happen when player is alive
-     *
-     * @author Christopher Asbrock
      */
     private void updateDriver()
     {
@@ -191,20 +202,13 @@ public class SnakeNetwork implements Protocol
     private void sendNetworkInfo()
     {
         StringBuilder allInfo = new StringBuilder();
+        buildItemStringForNetwork(allInfo);
+        buildSnakeStringForNetwork(allInfo);
+        pushNetwork(DATA, allInfo.toString());
+    }
 
-        for (int i = 0; i < this.listOfItems.size(); i++)
-        {
-            allInfo.append(this.listOfItems.get(i).getTranslateX()).append(",").append(this.listOfItems.get(i).getTranslateY()).append(",");
-            if (this.listOfItems.get(i) instanceof Poison)
-                allInfo.append("2");
-            else if (this.listOfItems.get(i) instanceof Potion)
-                allInfo.append("1");
-            else
-                allInfo.append("0");
-
-            allInfo.append((i != this.listOfItems.size() - 1) ? ";" : "");
-        }
-
+    private void buildSnakeStringForNetwork(StringBuilder allInfo)
+    {
         for (GameAsset gameAsset : this.player)
         {
             allInfo.append("%");
@@ -215,21 +219,31 @@ public class SnakeNetwork implements Protocol
             else
                 allInfo.append("null");
         }
-        //System.out.println(allInfo);
-       // this.networkOut.println("DATA " + allInfo);
-       // System.out.println(allInfo);
-        pushNetwork(DATA, allInfo.toString());
     }
 
-    private void pushNetwork(String protocol)
+    private void buildItemStringForNetwork(StringBuilder allInfo)
     {
-        for (int i = 0; i < this.player.length; i++)
-            this.networkOut[i].println(protocol);
+        for (int i = 0; i < this.listOfItems.size(); i++)
+        {
+            allInfo.append(this.listOfItems.get(i).getTranslateX()).append(",").append(this.listOfItems.get(i).getTranslateY()).append(",");
+            allInfo.append(getItemType(i));
+            allInfo.append((i != this.listOfItems.size() - 1) ? ";" : "");
+        }
+    }
+
+    private String getItemType(int i)
+    {
+        if (this.listOfItems.get(i) instanceof Poison)
+            return "2";
+        else if (this.listOfItems.get(i) instanceof Potion)
+            return "1";
+        else
+            return "0";
     }
 
     private void pushNetwork(String protocol, String info)
     {
-        for (int i = 0; i < this.player.length; i++)
+        for (int i = 0; i < this.numOfPlayer; i++)
             this.networkOut[i].println(protocol + " " + info);
     }
 
@@ -242,49 +256,80 @@ public class SnakeNetwork implements Protocol
         {
             if (this.player[i] != null)
             {
-                if (this.turnRight[i])
-                    this.player[i].rotate(1);
-                else if (this.turnLeft[i])
-                    this.player[i].rotate(-1);
-
-                for (GameAsset item : this.listOfItems)
-                    if (this.player[i] != null && this.player[i].checkForCollision(item)) {
-                        handleItemCollision(item, (Snake) this.player[i]);
-                        this.inactiveFoodNodes.add(item);
-                    }
-
-
-                assert this.player[i] != null;
-                if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
-                {
-                    System.out.println("PLayer" +
-                            (i + 1) +
-                            "Hit X Wall");
-                    player[i].deactivate();
-                }
-
-                if (this.player[i].getTranslateY() < 30 || this.player[i].getTranslateY() > this.HEIGHT - 60)
-                {
-                    System.out.println("Player" +
-                            (i+1) +
-                            "Hit Y Wall");
-                    player[i].deactivate();
-                }
-
-                int j = 0;
-                for (SnakeTail tail : ((Snake) this.player[i]).getSnakeTails()) {
-                    if (j++ < 100)
-                        continue;       // First several SnakeTails always collide with the head
-
-                    if (this.player[i].checkForCollision(tail)) {
-                        System.out.printf("Collided with tail number %d\n", tail.id);
-                        player[i].deactivate();
-                    }
-                }
+                handlePlayerTurning(i);
+                handlePlayerItemCollision(i);
+                handlePlayerOtherPlayerCollision(i);
+                handlePlayerWallCollision(i);
+                handlePlayerSelfCollision(i);
             }
         }
 
         updatePlayer();
+    }
+
+    private void handlePlayerOtherPlayerCollision(int thisPlayer)
+    {
+        for (int i = 0 ; i < this.player.length; i++)
+            if (this.player[i] != null && this.player[thisPlayer] != null)
+                for (GameAsset tail : ((Snake) this.player[i]).getSnakeTails())
+                    if (i != thisPlayer && this.player[thisPlayer].checkForCollision(tail))
+                    {
+                        this.pushNetwork(MESSAGE,"Player " + (thisPlayer +1) + " Collided With Player " + (i + 1));
+                        //System.out.println("Hit Player " + (i + 1));
+                        this.player[thisPlayer].deactivate();
+                    }
+    }
+
+    private void handlePlayerSelfCollision(int i)
+    {
+        int j = 0;
+        for (SnakeTail tail : ((Snake) this.player[i]).getSnakeTails()) {
+            if (j++ < 100)
+                continue;       // First several SnakeTails always collide with the head
+
+            if (this.player[i].checkForCollision(tail))
+            {
+                this.pushNetwork(MESSAGE,"Player " + (i+1) + " Collided With Their Own Tail");
+                //System.out.printf("Collided with tail number %d\n", tail.id);
+                player[i].deactivate();
+            }
+        }
+    }
+
+    private void handlePlayerWallCollision(int i)
+    {
+        assert this.player[i] != null;
+        if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
+        {
+            this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
+            //System.out.println("PLayer" + (i + 1) + "Hit X Wall");
+            player[i].deactivate();
+        }
+
+        if (this.player[i].getTranslateY() < 30 || this.player[i].getTranslateY() > this.HEIGHT - 60)
+        {
+            this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
+            //System.out.println("Player" + (i+1) + "Hit Y Wall");
+            player[i].deactivate();
+        }
+    }
+
+    private void handlePlayerItemCollision(int i)
+    {
+        for (GameAsset item : this.listOfItems)
+            if (this.player[i] != null && this.player[i].checkForCollision(item))
+            {
+                handleItemCollision(item, (Snake) this.player[i]);
+                this.inactiveFoodNodes.add(item);
+            }
+    }
+
+    private void handlePlayerTurning(int i)
+    {
+        if (this.turnRight[i])
+            this.player[i].rotate(1);
+        else if (this.turnLeft[i])
+            this.player[i].rotate(-1);
     }
 
     /**
@@ -310,9 +355,7 @@ public class SnakeNetwork implements Protocol
     /**
      * when colliding with an Item this determines the instance type and adds or removes pieces of the snake
      * accordingly
-     *
-     * @author Christopher Asbrock
-     *
+     * 
      * @param item - the idem being collided with
      */
     private void handleItemCollision(GameAsset item, Snake currPlayer)
@@ -331,8 +374,6 @@ public class SnakeNetwork implements Protocol
 
     /**
      * Will remove any inactive items from the list
-     *
-     * @author Christopher Asbrock
      */
     private void itemCleanUp()
     {
@@ -343,8 +384,6 @@ public class SnakeNetwork implements Protocol
     /**
      * called per tick, creates a randomized number, if the value is under a specific amount it will
      * create a food item randomly on the field
-     *
-     * @author Christopher Asbrock
      */
     private void foodPlacer()
     {
@@ -374,13 +413,51 @@ public class SnakeNetwork implements Protocol
         }
     }
 
+    /**
+     * start method
+     * just started the tick timer for now, but there might be something else
+     * that needs to be started later.
+     */
     public void start()
     {
-        Thread timer = new Thread(this::tickTimer);
-        timer.start();
-        while (true)
+        this.tickTimer();
+    }
+
+    /**
+     * the final check for players, if everyone is null the game is over, it will null the whole array
+     */
+    public boolean checkPlayersEndGame()
+    {
+        int count = 0;
+        this.winner = -1;
+
+        for (int i = 0; i < this.numOfPlayer; i++)
         {
+            if (this.player[i] == null)
+                count++;
+            else
+                this.winner = i;
         }
+
+        System.out.println(count + " " + this.numOfPlayer);
+        if (this.numOfPlayer > 1)
+        {
+            if (count == this.numOfPlayer - 1)
+            {
+                this.player = null;
+                return true;
+            }
+        }
+        else
+        {
+            if (count == this.numOfPlayer)
+            {
+                this.player = null;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void tickTimer()
@@ -388,6 +465,7 @@ public class SnakeNetwork implements Protocol
         long now = System.currentTimeMillis();
 
         System.out.println("start");
+
         while (player != null)
         {
             if ((System.currentTimeMillis() - now) > 30) {
@@ -395,12 +473,20 @@ public class SnakeNetwork implements Protocol
 
                 updateDriver();
             }
+
+            this.checkPlayersEndGame();
         }
 
+        if (this.winner == -1)
+            this.pushNetwork(MESSAGE, "Game Over");
+        else
+            this.pushNetwork(MESSAGE, "Winner is Player " + (this.winner + 1) + "!!!");
+
+        this.pushNetwork(END_GAME, "");
         System.out.println("GameOver");
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
         SnakeNetwork test = new SnakeNetwork(4);
         test.init(1111,4,600,800);

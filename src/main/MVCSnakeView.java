@@ -1,11 +1,18 @@
 package main;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 
 public class MVCSnakeView extends Application
 {
@@ -14,6 +21,8 @@ public class MVCSnakeView extends Application
 
     /**games start menu*/
     private SnakeMenu startMenu;
+
+    private Label snakeAlert;
 
     /**A reference to the game controller*/
     private MVCSnakeController controller;
@@ -29,11 +38,43 @@ public class MVCSnakeView extends Application
         controller = new MVCSnakeController(this);
         root.setPrefSize(this.controller.WIDTH, this.controller.HEIGHT);
 
+        this.addWalls();
+        this.addSnakeAlertTextBox();
+
         this.startMenu = new SnakeMenu();
 
         this.root.getChildren().add(this.startMenu);
         this.startMenu.setTranslateX(this.controller.WIDTH/4.0);
         this.startMenu.setTranslateY(this.controller.HEIGHT/4.0);
+    }
+
+    private void addSnakeAlertTextBox()
+    {
+        this.snakeAlert = new Label("WELCOME");
+        this.snakeAlert.setStyle("-fx-background-color: #f2f2f2");
+        this.snakeAlert.setAlignment(Pos.CENTER);
+        this.snakeAlert.setPrefWidth(this.controller.WIDTH/2);
+        this.snakeAlert.setMouseTransparent(true);
+        this.snakeAlert.setTranslateX(this.controller.WIDTH/2 - this.snakeAlert.getPrefWidth()/2);
+        this.snakeAlert.setTranslateY(this.controller.HEIGHT - 24);
+        this.root.getChildren().add(snakeAlert);
+    }
+
+    private void addWalls()
+    {
+        this.root.getChildren().add(this.setWall(0,0, 30, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(this.controller.WIDTH - 30, 0,30, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0,0, this.controller.WIDTH, 30, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0, this.controller.HEIGHT - 30,this.controller.WIDTH, 30, Color.DARKGRAY));
+    }
+
+    private Rectangle setWall(int posX, int posY, int width, int height, Color color)
+    {
+        Rectangle tempTangle = new Rectangle(width, height, color);
+        tempTangle.setTranslateX(posX);
+        tempTangle.setTranslateY(posY);
+
+        return tempTangle;
     }
 
     /**
@@ -46,16 +87,15 @@ public class MVCSnakeView extends Application
     public void start(Stage primaryStage)
     {
         primaryStage.setScene(new Scene(this.root));
-        if (this.controller.gameGoing)
-            this.userInputButtonPress(primaryStage);
-        else
-        {
-            this.startMenu.onHostButtonClick((event) ->
-                    this.startMenu.hostStartAction(this.controller));
 
-            this.startMenu.onClientButtonClick((event) ->
-                    this.startMenu.joinStartAction(this.controller));
-        }
+        this.userInputButtonPress(primaryStage);
+
+        this.startMenu.onHostButtonClick((event) ->
+                this.startMenu.hostStartAction(this.controller));
+
+        this.startMenu.onClientButtonClick((event) ->
+                this.startMenu.joinStartAction(this.controller));
+
         primaryStage.show();
     }
 
@@ -67,8 +107,7 @@ public class MVCSnakeView extends Application
     {
         if (this.controller.gameGoing)
         {
-            //set the write flag (so no changes are made while this is being used)
-            this.controller.dataWrite = true;
+            this.snakeAlert.setText(this.controller.gameMessage);
 
             //remove the no longer needed nodes, and clear the list
             while (!this.controller.getTrash().isEmpty())
@@ -81,9 +120,10 @@ public class MVCSnakeView extends Application
 
             //uses the controller positioning reference to update the snakes on scene
             for (int i = 0; i < this.controller.getNumOfPlayers(); i++)
-                for (Circle part : this.controller.getSNAKE_PARTS_POSITIONING().get(i))
+                for (Circle part : (ArrayList<Circle>)this.controller.getSNAKE_PARTS_POSITIONING()[i])
                     if (part != null && !this.root.getChildren().contains(part))
                         this.root.getChildren().add(part);
+
 
             //view update is done, the data can be changed again
             this.controller.dataWrite = false;
@@ -107,15 +147,17 @@ public class MVCSnakeView extends Application
         stage.getScene().setOnKeyPressed(event ->
         {
             if (event.getCode() == KeyCode.LEFT)
-                this.controller.leftTurn(true);
+            {
+                System.out.println("press");
+                this.controller.leftTurn(true);}
             if (event.getCode() == KeyCode.RIGHT)
-                this.controller.leftTurn(true);
+                this.controller.rightTurn(true);
         });
 
         stage.getScene().setOnKeyReleased(event ->
         {
             if (event.getCode() == KeyCode.LEFT)
-                this.controller.rightTurn(false);
+                this.controller.leftTurn(false);
             if (event.getCode() == KeyCode.RIGHT)
                 this.controller.rightTurn(false);
         });

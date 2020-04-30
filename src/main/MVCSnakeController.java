@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class MVCSnakeController {
 
     protected String menuMessage;
+    protected String gameMessage;
     protected final int WIDTH = 800;
     protected final int HEIGHT = 600;
     protected boolean dataWrite;
@@ -37,7 +38,7 @@ public class MVCSnakeController {
     private final ArrayList<Circle> ITEM_POSITIONING;
 
     /**a reference to the models list of snakes and its list of parts*/
-    private final ArrayList<ArrayList<Circle>> SNAKE_PARTS_POSITIONING;
+    private final ArrayList[] SNAKE_PARTS_POSITIONING;
 
     /**a reference to the scrap array that gets cleared after each update*/
     private final ArrayList<Node> SCRAP_NODES;
@@ -58,6 +59,9 @@ public class MVCSnakeController {
         this.VIEW = view;
         this.MODEL = new MVCSnakeModel(this);
         this.gameGoing = false;
+
+        this.menuMessage = "";
+        this.gameMessage = "";
 
         this.ITEM_POSITIONING = this.MODEL.getItemListPositions();
         this.SNAKE_PARTS_POSITIONING = this.MODEL.getSnakeListPositions();
@@ -82,10 +86,10 @@ public class MVCSnakeController {
             {
                 /*
                     give this a moment to start up the network, or it'll will just fly into the connection
-                     which didnt have the chance to start isn't there
+                    which didnt have the chance to start isn't there
 
-                     much rather use the network as a model itself for the host, but little low on time, so
-                     maybe later
+                    much rather use the network as a model itself for the host, but little low on time, so
+                    maybe later
                  */
             }
 
@@ -94,13 +98,19 @@ public class MVCSnakeController {
         }
         catch (NumberFormatException e)
         {
-            this.displayMessage(e.getMessage());
+            this.displayMenuMessage(e.getMessage());
         }
     }
 
-    public void displayMessage(String message)
+    public void displayMenuMessage(String message)
     {
         this.menuMessage = message;
+        this.updateView();
+    }
+
+    public void displayGameMessage(String message)
+    {
+        this.gameMessage = message;
         this.updateView();
     }
 
@@ -109,30 +119,37 @@ public class MVCSnakeController {
         this.MODEL.modelInit(host, port);
     }
 
-    public ArrayList<Circle> getITEM_POSITIONING() {
+    public ArrayList<Circle> getITEM_POSITIONING()
+    {
         return ITEM_POSITIONING;
     }
 
-    public ArrayList<ArrayList<Circle>> getSNAKE_PARTS_POSITIONING() {
+    public ArrayList[] getSNAKE_PARTS_POSITIONING()
+    {
         return SNAKE_PARTS_POSITIONING;
     }
 
-    public ArrayList<Node> getTrash() {
+    public ArrayList<Node> getTrash()
+    {
         return SCRAP_NODES;
     }
 
     public void updateView()
     {
+        if (gameGoing)
+            this.dataWrite = true;
         Platform.runLater(this.VIEW::updateView);
     }
 
     public void leftTurn(boolean b)
     {
-        this.MODEL.sendDirection(this.MODEL.TURN_LEFT, b);
+        if (this.gameGoing)
+            this.MODEL.sendDirection(this.MODEL.TURN_LEFT, b);
     }
 
     public void rightTurn(boolean b)
     {
-        this.MODEL.sendDirection(this.MODEL.TURN_RIGHT, b);
+        if (this.gameGoing)
+            this.MODEL.sendDirection(this.MODEL.TURN_RIGHT, b);
     }
 }
