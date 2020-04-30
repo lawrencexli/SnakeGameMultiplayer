@@ -5,24 +5,26 @@
  *
  * Name: Christopher Asbrock
  * Section: 11am
- * Date: 4/29/20
- * Time: 4:23 PM
+ * Date: 4/30/20
+ * Time: 7:36 AM
  *
  * Project: csci205_final_project_sp2020
- * Package: main
- * Class: SnakeException
+ * Package: main.SnakeGameAssets.Items
+ * Class: Food
  *
  * Description:
  *
  * ****************************************
  */
 package
-        main;
+        main.SnakeGameAssets.Items;
 
-public class SnakeException extends Exception
-{
-    SnakeException(String message)
-    {
-        super(message);
+import javafx.scene.paint.Color;
+
+/** Food inherited from Item */
+public class Food extends Item {
+
+    public Food(int x, Color color) {
+        super(x,color,"Food");
     }
 }

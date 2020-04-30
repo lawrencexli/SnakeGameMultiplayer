@@ -1,22 +1,22 @@
 package main;
 
-import javafx.scene.paint.Color;
+import main.SnakeGameAssets.Snake;
+import main.SnakeGameAssets.SnakeTail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static main.GameAsset.MyRotate.LEFT;
 import static org.junit.jupiter.api.Assertions.*;
-import static main.GameAsset.MyRotate.RIGHT;
+
 
 class GameAssetTest
 {
     private static final double EPSILON = 1.0E-12;
-    private Item testAsset;
+    private Snake testAsset;
 
     @BeforeEach
     void setUp()
     {
-        this.testAsset = new Item(15, Color.RED, "Test");
+        this.testAsset = new Snake();
     }
 
     @Test
@@ -39,7 +39,7 @@ class GameAssetTest
         this.testAsset.setVelocity(1,0);
         for (int i = 0; i < 15; i++)
         {
-            this.testAsset.rotate(LEFT);
+            this.testAsset.rotate(1);
         }
         this.testAsset.updateAsset();
         assertTrue(this.testAsset.getTranslateX() > 0);
@@ -54,7 +54,7 @@ class GameAssetTest
         this.testAsset.setVelocity(1,0);
         for (int i = 0; i < 15; i++)
         {
-            this.testAsset.rotate(RIGHT);
+            this.testAsset.rotate(-1);
         }
         this.testAsset.updateAsset();
         assertTrue(this.testAsset.getTranslateX() > 0);

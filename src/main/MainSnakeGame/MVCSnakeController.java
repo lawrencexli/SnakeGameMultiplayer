@@ -17,11 +17,12 @@
  * ****************************************
  */
 package
-        main;
+        main.MainSnakeGame;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.shape.Circle;
+import main.Exception.SnakeException;
 
 import java.util.ArrayList;
 
@@ -38,7 +39,7 @@ public class MVCSnakeController {
     private final ArrayList<Circle> ITEM_POSITIONING;
 
     /**a reference to the models list of snakes and its list of parts*/
-    private final ArrayList[] SNAKE_PARTS_POSITIONING;
+    private final ArrayList<Circle>[] SNAKE_PARTS_POSITIONING;
 
     /**a reference to the scrap array that gets cleared after each update*/
     private final ArrayList<Node> SCRAP_NODES;
@@ -80,25 +81,30 @@ public class MVCSnakeController {
         try
         {
             this.MODEL.createNetwork(port, players, width, height);
-            long time = System.currentTimeMillis();
 
-            while (System.currentTimeMillis() - time < 3000)
-            {
-                /*
-                    give this a moment to start up the network, or it'll will just fly into the connection
-                    which didnt have the chance to start isn't there
-
-                    much rather use the network as a model itself for the host, but little low on time, so
-                    maybe later
-                 */
-            }
+            waitFor(1);
 
             //after the network is set up, locally join it
             this.setJoin("localhost", port);
         }
-        catch (NumberFormatException e)
+        catch (NumberFormatException | SnakeException e)
         {
             this.displayMenuMessage(e.getMessage());
+        }
+    }
+
+    private void waitFor(int seconds)
+    {
+        long time = System.currentTimeMillis();
+        while (System.currentTimeMillis() - time < (seconds * 1000))
+        {
+            /*
+                give this a moment to start up the network, or it'll will just fly into the connection
+                which didnt have the chance to start isn't there
+
+                much rather use the network as a model itself for the host, but little low on time, so
+                maybe later
+             */
         }
     }
 
@@ -124,7 +130,7 @@ public class MVCSnakeController {
         return ITEM_POSITIONING;
     }
 
-    public ArrayList[] getSNAKE_PARTS_POSITIONING()
+    public ArrayList<Circle>[] getSNAKE_PARTS_POSITIONING()
     {
         return SNAKE_PARTS_POSITIONING;
     }

@@ -1,18 +1,16 @@
-package main;
+package main.MainSnakeGame;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.scene.paint.Color;
-
-import java.util.ArrayList;
+import main.SnakeGameAssets.SnakeMenu;
 
 public class MVCSnakeView extends Application
 {
@@ -26,6 +24,8 @@ public class MVCSnakeView extends Application
 
     /**A reference to the game controller*/
     private MVCSnakeController controller;
+
+    private final int WALL_SIZE = 30;
 
     /**
      * the scene init,
@@ -53,19 +53,19 @@ public class MVCSnakeView extends Application
         this.snakeAlert = new Label("WELCOME");
         this.snakeAlert.setStyle("-fx-background-color: #f2f2f2");
         this.snakeAlert.setAlignment(Pos.CENTER);
-        this.snakeAlert.setPrefWidth(this.controller.WIDTH/2);
+        this.snakeAlert.setPrefWidth(this.controller.WIDTH/2.0);
         this.snakeAlert.setMouseTransparent(true);
-        this.snakeAlert.setTranslateX(this.controller.WIDTH/2 - this.snakeAlert.getPrefWidth()/2);
+        this.snakeAlert.setTranslateX(this.controller.WIDTH/2.0 - this.snakeAlert.getPrefWidth()/2);
         this.snakeAlert.setTranslateY(this.controller.HEIGHT - 24);
         this.root.getChildren().add(snakeAlert);
     }
 
     private void addWalls()
     {
-        this.root.getChildren().add(this.setWall(0,0, 30, this.controller.HEIGHT, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(this.controller.WIDTH - 30, 0,30, this.controller.HEIGHT, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(0,0, this.controller.WIDTH, 30, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(0, this.controller.HEIGHT - 30,this.controller.WIDTH, 30, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0,0, this.WALL_SIZE, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(this.controller.WIDTH - this.WALL_SIZE, 0,this.WALL_SIZE, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0,0, this.controller.WIDTH, this.WALL_SIZE, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0, this.controller.HEIGHT - this.WALL_SIZE,this.controller.WIDTH, 30, Color.DARKGRAY));
     }
 
     private Rectangle setWall(int posX, int posY, int width, int height, Color color)
@@ -88,15 +88,18 @@ public class MVCSnakeView extends Application
     {
         primaryStage.setScene(new Scene(this.root));
 
-        this.userInputButtonPress(primaryStage);
+        this.userInputGameGoing(primaryStage);
+        this.userInputMainMenu();
 
+        primaryStage.show();
+    }
+
+    private void userInputMainMenu() {
         this.startMenu.onHostButtonClick((event) ->
                 this.startMenu.hostStartAction(this.controller));
 
         this.startMenu.onClientButtonClick((event) ->
                 this.startMenu.joinStartAction(this.controller));
-
-        primaryStage.show();
     }
 
     /**
@@ -120,7 +123,7 @@ public class MVCSnakeView extends Application
 
             //uses the controller positioning reference to update the snakes on scene
             for (int i = 0; i < this.controller.getNumOfPlayers(); i++)
-                for (Circle part : (ArrayList<Circle>)this.controller.getSNAKE_PARTS_POSITIONING()[i])
+                for (Circle part : this.controller.getSNAKE_PARTS_POSITIONING()[i])
                     if (part != null && !this.root.getChildren().contains(part))
                         this.root.getChildren().add(part);
 
@@ -142,14 +145,12 @@ public class MVCSnakeView extends Application
      *
      * @param stage - the primary stage
      */
-    private void userInputButtonPress(Stage stage)
+    private void userInputGameGoing(Stage stage)
     {
         stage.getScene().setOnKeyPressed(event ->
         {
             if (event.getCode() == KeyCode.LEFT)
-            {
-                System.out.println("press");
-                this.controller.leftTurn(true);}
+                this.controller.leftTurn(true);
             if (event.getCode() == KeyCode.RIGHT)
                 this.controller.rightTurn(true);
         });

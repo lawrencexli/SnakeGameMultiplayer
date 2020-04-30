@@ -1,13 +1,15 @@
-package main;
+package main.MainSnakeGame;
 
 import javafx.scene.paint.Color;
+import main.CommonInterfaces.Protocol;
+import main.SnakeGameAssets.*;
+import main.SnakeGameAssets.Items.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -64,10 +66,9 @@ public class SnakeNetwork implements Protocol
      * */
     private ArrayList<GameAsset> inactiveFoodNodes;
 
-    public SnakeNetwork(int numberOfPlayers)
+    public SnakeNetwork()
     {
         this.winner = -1;
-        this.numOfPlayer = numberOfPlayers;
     }
     /**
      * initializes lists of items and the pane to a certain size
@@ -78,16 +79,23 @@ public class SnakeNetwork implements Protocol
         this.WIDTH = width;
         this.HEIGHT = height;
 
-        this.randomizer = new Random();
+        initGameVariables();
+        initAndPlaceSnakes();
+        initAndConnectNetwork(port);
 
-        this.listOfItems = new ArrayList<>();
-        this.inactiveFoodNodes = new ArrayList<>();
+        this.start();
+    }
 
-        this.player = new GameAsset[this.numOfPlayer];
-        this.socket = new Socket[this.numOfPlayer];
-        this.networkIn = new Scanner[this.numOfPlayer];
-        this.networkOut = new PrintStream[this.numOfPlayer];
+    private void initAndConnectNetwork(int port) throws IOException
+    {
+        server = new ServerSocket(port);
 
+        for (int i = 0; i < this.numOfPlayer; i++)
+            this.setUpNetworkConnection(i);
+    }
+
+    private void initAndPlaceSnakes()
+    {
         for (int i = 0; i < this.numOfPlayer; i++)
         {
             this.player[i] = new Snake();
@@ -99,18 +107,19 @@ public class SnakeNetwork implements Protocol
                     WIDTH / 2.0 + 50 * Math.cos(Math.toRadians(90 * i + 45)),
                     HEIGHT / 2.0 + 50 * Math.sin(Math.toRadians(90 * i + 45)));
         }
+    }
 
+    private void initGameVariables()
+    {
+        this.randomizer = new Random();
+        this.listOfItems = new ArrayList<>();
+        this.inactiveFoodNodes = new ArrayList<>();
+        this.player = new GameAsset[this.numOfPlayer];
+        this.socket = new Socket[this.numOfPlayer];
+        this.networkIn = new Scanner[this.numOfPlayer];
+        this.networkOut = new PrintStream[this.numOfPlayer];
         this.turnLeft = new boolean[this.numOfPlayer];
-        //Arrays.fill(this.turnLeft, true);
         this.turnRight = new boolean[this.numOfPlayer];
-
-
-        server = new ServerSocket(port);
-
-        for (int i = 0; i < this.numOfPlayer; i++)
-            this.setUpNetworkConnection(i);
-
-        this.start();
     }
 
     private void setUpNetworkConnection(int player)
@@ -147,7 +156,6 @@ public class SnakeNetwork implements Protocol
                 break;
 
             String input = this.networkIn[player].nextLine();
-            System.out.println(player + " " + input);
             String protocol = input.split(" ")[0];
             String message = input.substring(protocol.length() + 1);
 
@@ -275,7 +283,7 @@ public class SnakeNetwork implements Protocol
                     if (i != thisPlayer && this.player[thisPlayer].checkForCollision(tail))
                     {
                         this.pushNetwork(MESSAGE,"Player " + (thisPlayer +1) + " Collided With Player " + (i + 1));
-                        //System.out.println("Hit Player " + (i + 1));
+                        System.out.println("Hit Player " + (i + 1));
                         this.player[thisPlayer].deactivate();
                     }
     }
@@ -290,7 +298,7 @@ public class SnakeNetwork implements Protocol
             if (this.player[i].checkForCollision(tail))
             {
                 this.pushNetwork(MESSAGE,"Player " + (i+1) + " Collided With Their Own Tail");
-                //System.out.printf("Collided with tail number %d\n", tail.id);
+                System.out.printf("Collided with tail number %d\n", tail.id);
                 player[i].deactivate();
             }
         }
@@ -302,14 +310,14 @@ public class SnakeNetwork implements Protocol
         if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
         {
             this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
-            //System.out.println("PLayer" + (i + 1) + "Hit X Wall");
+            System.out.println("PLayer" + (i + 1) + "Hit X Wall");
             player[i].deactivate();
         }
 
         if (this.player[i].getTranslateY() < 30 || this.player[i].getTranslateY() > this.HEIGHT - 60)
         {
             this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
-            //System.out.println("Player" + (i+1) + "Hit Y Wall");
+            System.out.println("Player" + (i+1) + "Hit Y Wall");
             player[i].deactivate();
         }
     }
@@ -387,7 +395,7 @@ public class SnakeNetwork implements Protocol
      */
     private void foodPlacer()
     {
-        if (this.listOfItems.size() < 130)
+        if (this.listOfItems.size() < 30)
         {
             int randomInt = randomizer.nextInt(2000);
             if (randomInt < 25)
@@ -439,7 +447,6 @@ public class SnakeNetwork implements Protocol
                 this.winner = i;
         }
 
-        System.out.println(count + " " + this.numOfPlayer);
         if (this.numOfPlayer > 1)
         {
             if (count == this.numOfPlayer - 1)
@@ -448,13 +455,10 @@ public class SnakeNetwork implements Protocol
                 return true;
             }
         }
-        else
+        else if (count == this.numOfPlayer)
         {
-            if (count == this.numOfPlayer)
-            {
-                this.player = null;
-                return true;
-            }
+            this.player = null;
+            return true;
         }
 
         return false;
@@ -478,19 +482,11 @@ public class SnakeNetwork implements Protocol
         }
 
         if (this.winner == -1)
-            this.pushNetwork(MESSAGE, "Game Over");
+            this.pushNetwork(END_GAME, "Game Over");
         else
-            this.pushNetwork(MESSAGE, "Winner is Player " + (this.winner + 1) + "!!!");
+            this.pushNetwork(END_GAME, "Winner is Player " + (this.winner + 1) + "!!!");
 
-        this.pushNetwork(END_GAME, "");
         System.out.println("GameOver");
-    }
-
-    public static void main(String[] args) throws IOException
-    {
-        SnakeNetwork test = new SnakeNetwork(4);
-        test.init(1111,4,600,800);
-        test.start();
     }
 }
 

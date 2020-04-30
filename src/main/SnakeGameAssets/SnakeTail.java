@@ -16,11 +16,10 @@
  *
  * ****************************************
  */
-package main;
+package main.SnakeGameAssets;
 
 
 import javafx.scene.paint.Color;
-import main.GameAsset;
 
 public class SnakeTail extends GameAsset {
 

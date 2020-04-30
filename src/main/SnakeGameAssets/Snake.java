@@ -17,7 +17,7 @@
  * ****************************************
  */
 package
-        main;
+        main.SnakeGameAssets;
 
 import javafx.scene.paint.Color;
 

@@ -1,6 +1,6 @@
 package network;
 
-import main.Snake;
+import main.SnakeGameAssets.Snake;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
