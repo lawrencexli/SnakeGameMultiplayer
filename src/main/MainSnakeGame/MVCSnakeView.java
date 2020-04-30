@@ -168,11 +168,12 @@ public class MVCSnakeView extends Application
         while (!this.controller.getTrash().isEmpty())
             this.root.getChildren().remove(this.controller.getTrash().remove(0));
 
-        //goes through and updates any new items that just game in
-        //for (Circle part : this.controller.getITEM_POSITIONING())
-            //if (part != null && !this.root.getChildren().contains(part))
-                //this.root.getChildren().add(part);
+        updateItems();
+        updateSnake();
+    }
 
+    private void updateItems()
+    {
         for (int i = 0; i < this.items.length ; i++)
         {
             if (i < this.controller.getITEM_POSITIONING().size())
@@ -185,7 +186,10 @@ public class MVCSnakeView extends Application
             else
                 this.items[i].setVisible(false);
         }
+    }
 
+    private void updateSnake()
+    {
         for (int i = 0; i < this.controller.getSNAKE_PARTS_POSITIONING().length ; i++)
         {
             for (int j = 0; j < this.snakeParts[i].length ; j++)
@@ -195,36 +199,13 @@ public class MVCSnakeView extends Application
                     this.snakeParts[i][j].setVisible(true);
                     this.snakeParts[i][j].setTranslateX(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateX());
                     this.snakeParts[i][j].setTranslateY(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateY());
+                    this.snakeParts[i][j].setRotate(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getRotate());
                     this.snakeParts[i][j].setFill(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getFill());
                 }
                 else
                     this.snakeParts[i][j].setVisible(false);
             }
         }
-
-        //uses the controller positioning reference to update the snakes on scene
-        //for (int i = 0; i < this.controller.getNumOfPlayers(); i++)
-            //for (Circle part : this.controller.getSNAKE_PARTS_POSITIONING()[i])
-                //if (part != null && !this.root.getChildren().contains(part))
-                    //this.root.getChildren().add(part);
-    }
-
-    private void updateAllNodes()
-    {
-        //remove the no longer needed nodes, and clear the list
-        while (!this.controller.getTrash().isEmpty())
-            this.root.getChildren().remove(this.controller.getTrash().remove(0));
-
-        //goes through and updates any new items that just game in
-        for (Circle part : this.controller.getITEM_POSITIONING())
-            if (part != null && !this.root.getChildren().contains(part))
-                this.root.getChildren().add(part);
-
-        //uses the controller positioning reference to update the snakes on scene
-        for (int i = 0; i < this.controller.getNumOfPlayers(); i++)
-            for (Circle part : this.controller.getSNAKE_PARTS_POSITIONING()[i])
-                if (part != null && !this.root.getChildren().contains(part))
-                    this.root.getChildren().add(part);
     }
 
     /**
