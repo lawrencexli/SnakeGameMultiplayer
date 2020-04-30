@@ -16,7 +16,7 @@
  *
  * ****************************************
  */
-package main;
+package main.SnakeGameAssets;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -35,7 +35,7 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    public class MyRotate
+    public static class MyRotate
     {
         final static int RIGHT = -1;
         final static int LEFT = 1;
@@ -55,9 +55,9 @@ public abstract class GameAsset extends Circle
      *
      * @author Christopher Asbrock
      */
-    public GameAsset(int xCenter, Color color)
+    public GameAsset(int size, Color color)
     {
-        super(xCenter, xCenter, xCenter, color);
+        super(size, size, size, color);
         this.speed = 3;
         this.noLongerActive = false;
     }

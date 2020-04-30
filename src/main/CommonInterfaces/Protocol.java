@@ -1,4 +1,4 @@
-package main;
+package main.CommonInterfaces;
 
 /**
  * protocol shared between the client and the server

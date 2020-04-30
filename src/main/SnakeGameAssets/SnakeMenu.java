@@ -16,7 +16,7 @@
  *
  * ****************************************
  */
-package main;
+package main.SnakeGameAssets;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import main.MainSnakeGame.MVCSnakeController;
 
 public class SnakeMenu extends GridPane
 {
@@ -105,13 +106,16 @@ public class SnakeMenu extends GridPane
         this.add(new Label("HOST GAME"), 2, 6,3,1);
         this.add(new Label("PORT:"), 1,7);
         this.add(this.hostPortField, 2,7);
-        this.add(this.hostButton,3,7,1,4);
+        this.add(this.hostButton,3,7,1,2);
         this.add(new Label("PLAYERS:"), 1,8);
         this.add(this.numOfPlayerField,2,8);
-        this.add(new Label("PANE HEIGHT:"), 1,9);
-        this.add(this.setHeightField,2,9);
-        this.add(new Label("PANE WIDTH:"), 1,10);
-        this.add(this.setWidthField,2,10);
+
+        //no time to set this one up, but it is set up so just taking the options out will not effect the game
+
+        //this.add(new Label("PANE HEIGHT:"), 1,9);
+        //this.add(this.setHeightField,2,9);
+        //this.add(new Label("PANE WIDTH:"), 1,10);
+        //this.add(this.setWidthField,2,10);
     }
 
     private void setUpJoinSection()
