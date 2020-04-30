@@ -42,8 +42,10 @@ public class SnakeTail extends GameAsset {
         this.parent = parent;
         if (parent != null)
         {
-            this.setTranslateX(parent.getTranslateX());
-            this.setTranslateY(parent.getTranslateY());
+            prevX = parent.getTranslateX();
+            prevY = parent.getTranslateY();
+            this.setTranslateX(prevX);
+            this.setTranslateY(prevY);
         }
     }
 
