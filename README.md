@@ -26,9 +26,12 @@ the Model, View, Controller design and Object-oriented principles.
 
 # Third Party libraries 
 
-+ JavaFX
++ JavaFX-sdk-13
++ Junit-Jupiter:5.6.2
 
 # Build and run instructions
+
+
 
 
 
