@@ -71,7 +71,7 @@ public class MVCSnakeView extends Application
                 Circle part = new Circle(15,15,15, Color.DARKGRAY);
                 part.setTranslateX(-30);
                 part.setTranslateY(-30);
-                this.snakeParts[i][j] = part;
+                this.snakeParts[i][this.snakeParts[i].length - 1 -j] = part;
                 this.root.getChildren().add(part);
             }
         }

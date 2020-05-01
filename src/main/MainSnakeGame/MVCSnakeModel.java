@@ -212,26 +212,30 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     {
         this.resizeArrayList(snakePos.length, this.snakeListPositions[i]);
 
+        boolean colorSwap = true;
+
         for (int j = 0; j < snakePos.length; j++)
         {
             String[] xYAndRot = snakePos[j].split(",");
             if (this.snakeListPositions[i].get(j) == null)
-                this.snakeListPositions[i].set(j, new Circle(15, 15, 15, getColor(i)));
+                this.snakeListPositions[i].set(j, new Circle(15, 15, 15, getColor(i, colorSwap)));
 
             this.snakeListPositions[i].get(j).setTranslateX(Double.parseDouble(xYAndRot[X_POSITION]));
             this.snakeListPositions[i].get(j).setTranslateY(Double.parseDouble(xYAndRot[Y_POSITION]));
             this.snakeListPositions[i].get(j).setRotate(Double.parseDouble(xYAndRot[ROTATION]));
+
+            colorSwap = !colorSwap;
         }
     }
 
-    private Color getColor(int player)
+    private Color getColor(int player, boolean swap)
     {
         switch (player)
         {
-            case 0: return Color.FIREBRICK;
-            case 1: return Color.FORESTGREEN;
-            case 2: return Color.GOLD;
-            case 3: return Color.PURPLE;
+            case 0: return (swap) ? Color.FIREBRICK : Color.ALICEBLUE;
+            case 1: return (swap) ?  Color.FORESTGREEN : Color.GOLD;
+            case 2: return (swap) ?  Color.BLUEVIOLET : Color.ORANGERED;
+            case 3: return (swap) ?  Color.PURPLE : Color.ORCHID;
             default:
                 return Color.BLACK;
         }
