@@ -25,6 +25,8 @@ import java.util.Scanner;
  */
 public class SnakeNetwork implements Protocol, GameCommonIndexes
 {
+    private final int INIT_SNAKE_SIZE = 15;
+
     private Socket[] socket;
     private ServerSocket server;
 
@@ -102,7 +104,7 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
             this.player[i] = new Snake();
             this.player[i].setVelocity(0, 0);
             this.player[i].setRotate(90 * i + 45);
-            for (int j = 0; j < 15; j++)
+            for (int j = 0; j < INIT_SNAKE_SIZE; j++)
                 ((Snake) this.player[i]).addTail();
 
             SnakeUtil.addToGame(this.player[i],
