@@ -1,6 +1,7 @@
 package main.MainSnakeGame;
 
 import javafx.scene.paint.Color;
+import main.CommonInterfaces.GameCommonIndexes;
 import main.CommonInterfaces.Protocol;
 import main.SnakeGameAssets.*;
 import main.SnakeGameAssets.Items.*;
@@ -22,7 +23,7 @@ import java.util.Scanner;
  *
  * @author Christopher Asbrock
  */
-public class SnakeNetwork implements Protocol
+public class SnakeNetwork implements Protocol, GameCommonIndexes
 {
     private Socket[] socket;
     private ServerSocket server;
@@ -156,8 +157,8 @@ public class SnakeNetwork implements Protocol
                 break;
 
             String input = this.networkIn[player].nextLine();
-            String protocol = input.split(" ")[0];
-            String message = input.substring(protocol.length() + 1);
+            String protocol = getProtocol(input);
+            String message = getMessage(protocol, input);
 
             switch (protocol)
             {
@@ -223,7 +224,10 @@ public class SnakeNetwork implements Protocol
 
             if (gameAsset != null)
                 for (int j = 0; j < ((Snake) gameAsset).getSnakeTails().size(); j++)
-                    allInfo.append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateX()).append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateY()).append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getRotate()).append((((Snake) gameAsset).getSnakeTails().size() - 1 != j) ? ";" : "");
+                    allInfo.append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateX())
+                            .append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getTranslateY())
+                            .append(",").append(((Snake) gameAsset).getSnakeTails().get(j).getRotate())
+                            .append((((Snake) gameAsset).getSnakeTails().size() - 1 != j) ? ";" : "");
             else
                 allInfo.append("null");
         }
@@ -233,20 +237,21 @@ public class SnakeNetwork implements Protocol
     {
         for (int i = 0; i < this.listOfItems.size(); i++)
         {
-            allInfo.append(this.listOfItems.get(i).getTranslateX()).append(",").append(this.listOfItems.get(i).getTranslateY()).append(",");
+            allInfo.append(this.listOfItems.get(i).getTranslateX()).append(",")
+                    .append(this.listOfItems.get(i).getTranslateY()).append(",");
             allInfo.append(getItemType(i));
             allInfo.append((i != this.listOfItems.size() - 1) ? ";" : "");
         }
     }
 
-    private String getItemType(int i)
+    private int getItemType(int i)
     {
         if (this.listOfItems.get(i) instanceof Poison)
-            return "2";
+            return POISON;
         else if (this.listOfItems.get(i) instanceof Potion)
-            return "1";
+            return POTION;
         else
-            return "0";
+            return FOOD;
     }
 
     private void pushNetwork(String protocol, String info)
@@ -307,14 +312,14 @@ public class SnakeNetwork implements Protocol
     private void handlePlayerWallCollision(int i)
     {
         assert this.player[i] != null;
-        if (this.player[i].getTranslateX() < 30 || this.player[i].getTranslateX() > this.WIDTH - 60)
+        if (this.player[i].getTranslateX() < WALL_THICKNESS || this.player[i].getTranslateX() > this.WIDTH - WALL_THICKNESS * 2)
         {
             this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
             System.out.println("PLayer" + (i + 1) + "Hit X Wall");
             player[i].deactivate();
         }
 
-        if (this.player[i].getTranslateY() < 30 || this.player[i].getTranslateY() > this.HEIGHT - 60)
+        if (this.player[i].getTranslateY() < WALL_THICKNESS || this.player[i].getTranslateY() > this.HEIGHT - WALL_THICKNESS * 2)
         {
             this.pushNetwork(MESSAGE,"Player " + (i+1) + " Hit A Wall");
             System.out.println("Player" + (i+1) + "Hit Y Wall");
@@ -335,9 +340,9 @@ public class SnakeNetwork implements Protocol
     private void handlePlayerTurning(int i)
     {
         if (this.turnRight[i])
-            this.player[i].rotate(1);
+            this.player[i].rotate(RIGHT);
         else if (this.turnLeft[i])
-            this.player[i].rotate(-1);
+            this.player[i].rotate(LEFT);
     }
 
     /**
@@ -395,7 +400,7 @@ public class SnakeNetwork implements Protocol
      */
     private void foodPlacer()
     {
-        if (this.listOfItems.size() < 30)
+        if (this.listOfItems.size() < MAX_ITEMS)
         {
             int randomInt = randomizer.nextInt(2000);
             if (randomInt < 25)
@@ -403,10 +408,10 @@ public class SnakeNetwork implements Protocol
                 Item newItem;
                 switch (randomInt)
                 {
-                    case 1:
+                    case POTION:
                         newItem = new Potion(12, Color.GOLD);
                         break;
-                    case 2:
+                    case POISON:
                         newItem = new Poison(11, Color.GREEN);
                         break;
                     default:
@@ -415,8 +420,8 @@ public class SnakeNetwork implements Protocol
 
                 this.listOfItems.add(newItem);
                 SnakeUtil.addToGame(newItem,
-                        60 + (this.randomizer.nextInt(WIDTH- 150)),
-                        60 + (this.randomizer.nextInt(HEIGHT- 150)));
+                        WALL_THICKNESS * 2 + (this.randomizer.nextInt(WIDTH- 150)),
+                        WALL_THICKNESS * 2 + (this.randomizer.nextInt(HEIGHT- 150)));
             }
         }
     }

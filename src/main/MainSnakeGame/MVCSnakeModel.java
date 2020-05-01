@@ -21,7 +21,7 @@ package main.MainSnakeGame;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import main.CommonInterfaces.GameIndexPositioning;
+import main.CommonInterfaces.GameCommonIndexes;
 import main.CommonInterfaces.Protocol;
 import main.Exception.SnakeException;
 
@@ -32,10 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MVCSnakeModel implements Protocol, GameIndexPositioning
+public class MVCSnakeModel implements Protocol, GameCommonIndexes
 {
-    /***/
-    private final int MAX_PLAYERS = 4;
     /***/
     private final MVCSnakeController CONTROLLER;
 
@@ -53,7 +51,7 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     /***/
     protected int playerCount;
 
-    private Circle defualtSize = new Circle(15,15,15);
+    private Circle snakeDefaultCircle = new Circle(SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE);
 
     /**an arraylist holding the positions of all active items*/
     private final ArrayList<Circle> itemListPositions;
@@ -111,22 +109,23 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
                     throw new SnakeException("Disconnected From Server");
 
                 String input = this.networkIn.nextLine();
-                String protocol = input.split(" ")[0];
+                String protocol = getProtocol(input);
+                String message = getMessage(protocol, input);
 
                 switch (protocol)
                 {
                     case DATA:
-                        this.updateSnake(input.substring(protocol.length() + 1));
+                        this.updateSnake(message);
                         break;
                     case START_GAME:
                         this.CONTROLLER.gameGoing = true;
-                        this.playerCount = Integer.parseInt(input.substring(protocol.length() + 1));
+                        this.playerCount = Integer.parseInt(message);
                         break;
                     case MESSAGE:
-                        this.CONTROLLER.displayGameMessage(input.substring(protocol.length() + 1));
+                        this.CONTROLLER.displayGameMessage(message);
                         break;
                     case END_GAME:
-                        throw new SnakeException(input.substring(protocol.length() + 1));
+                        throw new SnakeException(message);
                     default:
                         System.out.println("problem");
                 }
@@ -166,13 +165,13 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
         {
             String[] positions = snakeInfo.split("%");
 
-            if (positions.length > 0 && !positions[0].equals(""))
-                setItemPositioning(positions[0].split(";"));
+            if (positions.length > 0 && !positions[ITEM].equals(""))
+                setItemPositioning(positions[ITEM].split(";"));
 
             for (int i = 0; i < this.playerCount; i++)
-                if (!(positions[1 + i].equalsIgnoreCase("null")
-                        || positions[1 + i].equalsIgnoreCase("")))
-                    setSnakePositioning(i, positions[1 + i].split(";"));
+                if (!(positions[SNAKE + i].equalsIgnoreCase("null")
+                        || positions[SNAKE + i].equalsIgnoreCase("")))
+                    setSnakePositioning(i, positions[SNAKE + i].split(";"));
 
             for (int i = 0; i < this.playerCount; i++)
                 if (this.snakeListPositions[i].size() < 100)
@@ -191,7 +190,7 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
         for (int i = 0; i < itemPos.length; i++)
         {
             if (this.itemListPositions.get(i) == null)
-                this.itemListPositions.set(i, new Circle(10, 10, 10, Color.RED));
+                this.itemListPositions.set(i, new Circle(ITEM_SIZE, ITEM_SIZE, ITEM_SIZE, Color.RED));
 
             String[] xAndY = itemPos[i].split(",");
             this.itemListPositions.get(i).setTranslateX(Double.parseDouble(xAndY[X_POSITION]));
@@ -204,13 +203,13 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     {
         switch(type)
         {
-            case 0:
+            case FOOD:
                 this.itemListPositions.get(index).setFill(Color.RED);
                 break;
-            case 1:
+            case POTION:
                 this.itemListPositions.get(index).setFill(Color.LIGHTGOLDENRODYELLOW);
                 break;
-            case 2:
+            case POISON:
                 this.itemListPositions.get(index).setFill(Color.GREEN);
                 break;
         }
@@ -240,10 +239,10 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     {
         switch (player)
         {
-            case 0: return (swap) ? Color.DARKRED : Color.RED;
-            case 1: return (swap) ?  Color.DARKGREEN : Color.GREEN;
-            case 2: return (swap) ?  Color.DARKBLUE : Color.BLUE;
-            case 3: return (swap) ?  Color.DARKGOLDENROD : Color.GOLDENROD;
+            case PLAYER_ONE: return (swap) ? Color.DARKRED : Color.RED;
+            case PLAYER_TWO: return (swap) ?  Color.DARKGREEN : Color.GREEN;
+            case PLAYER_THREE: return (swap) ?  Color.DARKBLUE : Color.BLUE;
+            case PLAYER_FOUR: return (swap) ?  Color.DARKGOLDENROD : Color.GOLDENROD;
             default:
                 return Color.BLACK;
         }
@@ -251,7 +250,7 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
 
     private void snakeShaperSmall(int snake)
     {
-        double normalSize = this.defualtSize.getScaleX();
+        double normalSize = this.snakeDefaultCircle.getScaleX();
 
         int partitionSize = (this.snakeListPositions[snake].size() / 2);
         int partitionIndex = 0;
@@ -297,7 +296,7 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
 
     private void snakeShaper(int snake)
     {
-        double normalSize = this.defualtSize.getScaleX();
+        double normalSize = this.snakeDefaultCircle.getScaleX();
 
         int partitionSize = (this.snakeListPositions[snake].size() / 9);
         int partitionIndex = 0;

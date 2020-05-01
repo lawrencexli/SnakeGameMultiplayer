@@ -10,16 +10,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import main.CommonInterfaces.GameCommonIndexes;
 import main.SnakeGameAssets.SnakeMenu;
 
-public class MVCSnakeView extends Application
+public class MVCSnakeView extends Application implements GameCommonIndexes
 {
-
-    private final int MAX_SNAKES = 4;
-    private final int MAX_PIECES = 2000;
-    private final int MAX_ITEMS = 30;
-
-
     /**game main root*/
     private Pane root;
 
@@ -30,8 +25,6 @@ public class MVCSnakeView extends Application
 
     /**A reference to the game controller*/
     private MVCSnakeController controller;
-
-    private final int WALL_SIZE = 30;
 
     private Circle[][] snakeParts;
     private Circle[] items;
@@ -62,13 +55,13 @@ public class MVCSnakeView extends Application
 
     private void initSnakes()
     {
-        this.snakeParts = new Circle[MAX_SNAKES][MAX_PIECES];
+        this.snakeParts = new Circle[MAX_PLAYERS][MAX_SNAKE_PIECES];
 
         for (int i = 0; i <this.snakeParts.length; i++)
         {
             for (int j = 0; j < this.snakeParts[i].length; j++)
             {
-                Circle part = new Circle(15,15,15, Color.DARKGRAY);
+                Circle part = new Circle(SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE, Color.DARKGRAY);
                 part.setTranslateX(-30);
                 part.setTranslateY(-30);
                 this.snakeParts[i][this.snakeParts[i].length - 1 -j] = part;
@@ -83,7 +76,7 @@ public class MVCSnakeView extends Application
 
         for (int i = 0; i < this.items.length; i++)
         {
-            Circle part = new Circle(10,10,10, Color.DARKGRAY);
+            Circle part = new Circle(ITEM_SIZE,ITEM_SIZE,ITEM_SIZE, Color.DARKGRAY);
             part.setTranslateX(-30);
             part.setTranslateY(-30);
             this.items[i] = part;
@@ -105,10 +98,10 @@ public class MVCSnakeView extends Application
 
     private void addWalls()
     {
-        this.root.getChildren().add(this.setWall(0,0, this.WALL_SIZE, this.controller.HEIGHT, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(this.controller.WIDTH - this.WALL_SIZE, 0,this.WALL_SIZE, this.controller.HEIGHT, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(0,0, this.controller.WIDTH, this.WALL_SIZE, Color.DARKGRAY));
-        this.root.getChildren().add(this.setWall(0, this.controller.HEIGHT - this.WALL_SIZE,this.controller.WIDTH, 30, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0,0, WALL_THICKNESS, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(this.controller.WIDTH - WALL_THICKNESS, 0,WALL_THICKNESS, this.controller.HEIGHT, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0,0, this.controller.WIDTH, WALL_THICKNESS, Color.DARKGRAY));
+        this.root.getChildren().add(this.setWall(0, this.controller.HEIGHT - WALL_THICKNESS,this.controller.WIDTH, WALL_THICKNESS, Color.DARKGRAY));
     }
 
     private Rectangle setWall(int posX, int posY, int width, int height, Color color)

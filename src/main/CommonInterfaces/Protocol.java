@@ -13,4 +13,14 @@ public interface Protocol
     String ERROR = "error";
     String END_GAME = "endGame";
     String MESSAGE = "message";
+
+    default String getProtocol(String input)
+    {
+        return input.split(" ")[0];
+    }
+
+    default String getMessage(String protocol, String input)
+    {
+        return input.substring(protocol.length() + 1);
+    }
 }

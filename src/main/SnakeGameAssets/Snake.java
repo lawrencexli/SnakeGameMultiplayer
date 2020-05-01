@@ -54,7 +54,7 @@ public class Snake extends GameAsset {
 
     /** Remove a tail */
     public GameAsset removeTail() {
-        if (!(snakeTails.size() == 0 || snakeTails.size() == 1)) {
+        if (snakeTails.size() > 15) {
             return snakeTails.removeLast();
         }
 
