@@ -53,6 +53,8 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     /***/
     protected int playerCount;
 
+    private Circle defualtSize = new Circle(15,15,15);
+
     /**an arraylist holding the positions of all active items*/
     private final ArrayList<Circle> itemListPositions;
     /**An array of the max players, that holds a reference to each of there ArrayList kept positions*/
@@ -172,6 +174,12 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
                         || positions[1 + i].equalsIgnoreCase("")))
                     setSnakePositioning(i, positions[1 + i].split(";"));
 
+            for (int i = 0; i < this.playerCount; i++)
+                if (this.snakeListPositions[i].size() < 100)
+                    this.snakeShaperSmall(i);
+                else
+                    this.snakeShaper(i);
+
             this.CONTROLLER.updateView();
         }
     }
@@ -232,13 +240,122 @@ public class MVCSnakeModel implements Protocol, GameIndexPositioning
     {
         switch (player)
         {
-            case 0: return (swap) ? Color.FIREBRICK : Color.ALICEBLUE;
-            case 1: return (swap) ?  Color.FORESTGREEN : Color.GOLD;
-            case 2: return (swap) ?  Color.BLUEVIOLET : Color.ORANGERED;
-            case 3: return (swap) ?  Color.PURPLE : Color.ORCHID;
+            case 0: return (swap) ? Color.DARKRED : Color.RED;
+            case 1: return (swap) ?  Color.DARKGREEN : Color.GREEN;
+            case 2: return (swap) ?  Color.DARKBLUE : Color.BLUE;
+            case 3: return (swap) ?  Color.DARKGOLDENROD : Color.GOLDENROD;
             default:
                 return Color.BLACK;
         }
+    }
+
+    private void snakeShaperSmall(int snake)
+    {
+        double normalSize = this.defualtSize.getScaleX();
+
+        int partitionSize = (this.snakeListPositions[snake].size() / 2);
+        int partitionIndex = 0;
+
+        double count = 0;
+        double middleIndexSize = 0;
+
+        for (int i = 0; i < this.snakeListPositions[snake].size(); i++)
+        {
+            switch (partitionIndex)
+            {
+                case 0:
+                    if (count < partitionSize * .2)
+                        middleIndexSize = this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                (normalSize - (normalSize * (count/ partitionSize))));
+                    else
+                        this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                middleIndexSize);
+                    break;
+                case 2:
+                    if (count < partitionSize * .4)
+                        this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                middleIndexSize);
+                    else
+                        this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                Math.max((normalSize - (normalSize * (1 - (count / partitionSize)))), middleIndexSize));
+                    break;
+                case 1:
+                    this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                            Math.min((normalSize - normalSize * (count / (partitionSize))), middleIndexSize));
+                    break;
+                default:
+                    this.snakeListPositions[snake].get(i).setFill(Color.BLACK);
+            }
+
+            if (count++ == partitionSize)
+            {
+                count = 0;
+                partitionIndex++;
+            }
+        }
+    }
+
+    private void snakeShaper(int snake)
+    {
+        double normalSize = this.defualtSize.getScaleX();
+
+        int partitionSize = (this.snakeListPositions[snake].size() / 9);
+        int partitionIndex = 0;
+        double count = 0;
+
+        double middleIndexSize = 0;
+        double middleSectionIndex = 0;
+        double lastSectionIndex = 0;
+
+        for (int i = 0; i < this.snakeListPositions[snake].size(); i++)
+        {
+            switch (partitionIndex)
+            {
+                case 0:
+                    if (count < (partitionSize * .1))
+                        middleIndexSize = this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                (normalSize - (normalSize * (count/ partitionSize))));
+                    else
+                        this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                middleIndexSize);
+                    break;
+                case 1:
+                        this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                                Math.max((normalSize - (normalSize * (1 - (count / partitionSize)))), middleIndexSize));
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                            normalSize + (normalSize * (.1 * (middleSectionIndex++ / partitionSize))));
+                    break;
+                case 5:
+                    this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                            normalSize + (normalSize * (.3 * (1 - count / partitionSize))));
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                    this.setSnakePartScale(this.snakeListPositions[snake].get(i),
+                            normalSize - normalSize * (lastSectionIndex++ / (partitionSize * 3)));
+                    break;
+                default:
+                    this.snakeListPositions[snake].get(i).setFill(Color.BLACK);
+            }
+
+            if (count++ == partitionSize)
+            {
+                count = 0;
+                partitionIndex++;
+            }
+        }
+    }
+
+    private double setSnakePartScale(Circle part, double scale)
+    {
+        part.setScaleX(scale);
+        part.setScaleY(scale);
+        return scale;
     }
 
     public void sendDirection(String protocol, boolean onOff)

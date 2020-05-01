@@ -200,9 +200,11 @@ public class MVCSnakeView extends Application
         {
             for (int j = 0; j < this.snakeParts[i].length ; j++)
             {
-                if (j < this.controller.getSNAKE_PARTS_POSITIONING()[i].size())
+                if (j < this.controller.getSNAKE_PARTS_POSITIONING()[i].size() && this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j) != null)
                 {
                     this.snakeParts[i][j].setVisible(true);
+                    this.snakeParts[i][j].setScaleX(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getScaleX());
+                    this.snakeParts[i][j].setScaleY(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getScaleY());
                     this.snakeParts[i][j].setTranslateX(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateX());
                     this.snakeParts[i][j].setTranslateY(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateY());
                     this.snakeParts[i][j].setRotate(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getRotate());
