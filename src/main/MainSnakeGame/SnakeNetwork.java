@@ -101,7 +101,7 @@ public class SnakeNetwork implements Protocol
             this.player[i] = new Snake();
             this.player[i].setVelocity(0, 0);
             this.player[i].setRotate(90 * i + 45);
-            for (int j = 0; j < 50; j++)
+            for (int j = 0; j < 15; j++)
                 ((Snake) this.player[i]).addTail();
 
             SnakeUtil.addToGame(this.player[i],
