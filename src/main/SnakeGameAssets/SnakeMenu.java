@@ -25,7 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import main.MainSnakeGame.SnakeGameController;
+import main.SnakeGame.SnakeGameController;
 
 /** The main menu of the snake called from the snake view */
 public class SnakeMenu extends GridPane

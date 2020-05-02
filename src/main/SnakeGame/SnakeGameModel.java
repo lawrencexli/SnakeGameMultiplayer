@@ -16,7 +16,7 @@
  *
  * ****************************************
  */
-package main.MainSnakeGame;
+package main.SnakeGame;
 
 import javafx.scene.Node;
 import javafx.scene.image.Image;

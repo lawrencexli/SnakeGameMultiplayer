@@ -1,4 +1,4 @@
-package main.MainSnakeGame;
+package main.SnakeGame;
 
 import javafx.scene.paint.Color;
 import main.CommonInterfaces.GameGlobalValues;

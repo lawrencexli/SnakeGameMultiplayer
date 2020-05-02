@@ -17,7 +17,7 @@
  * ****************************************
  */
 package
-        main.MainSnakeGame;
+        main.SnakeGame;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
