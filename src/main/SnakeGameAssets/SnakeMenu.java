@@ -27,16 +27,26 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import main.MainSnakeGame.MVCSnakeController;
 
+/** The main menu of the snake called from the snake view */
 public class SnakeMenu extends GridPane
 {
+    /** The join button */
     private Button clientButton;
+    /** The host button */
     private Button hostButton;
+    /** The host text */
     private TextField hostText;
+    /** The port text */
     private TextField portText;
+    /** The host port field */
     private TextField hostPortField;
+    /** The number of player field */
     private TextField numOfPlayerField;
+    /** The setting height of the window field */
     private TextField setHeightField;
+    /** The setting width of the window field */
     private TextField setWidthField;
+    /** Message display field */
     private TextField displayMessage;
 
     /**
@@ -58,6 +68,9 @@ public class SnakeMenu extends GridPane
         this.add(this.displayMessage, 1, 13,4,1);
     }
 
+    /**
+     * Initialization of the menu fields
+     */
     private void initMenusFields()
     {
         this.hostText = new TextField();
@@ -74,6 +87,9 @@ public class SnakeMenu extends GridPane
         this.setDefaultValues("1", "800", "600");
     }
 
+    /**
+     * Setting up the default attributes for the menu
+     */
     private void setUpDefaultAttributes()
     {
         this.clientButton.setText("JOIN");
@@ -85,6 +101,12 @@ public class SnakeMenu extends GridPane
         this.displayMessage.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Setting up the default values for the field
+     * @param players the number of players
+     * @param width the width of game window
+     * @param height the height of game window
+     */
     private void setDefaultValues(String players, String width, String height)
     {
         this.numOfPlayerField.setText(players);
@@ -92,6 +114,9 @@ public class SnakeMenu extends GridPane
         this.setHeightField.setText(height);
     }
 
+    /**
+     * Set the display properties for every fields and buttons and message boxes
+     */
     private void setDisplayProperties()
     {
         this.setPrefSize(400,300);
@@ -101,6 +126,9 @@ public class SnakeMenu extends GridPane
         this.setVgap(10);
     }
 
+    /**
+     * Setting up the host section of the menu
+     */
     private void setUpHostSection()
     {
         this.add(new Label("HOST GAME"), 2, 6,3,1);
@@ -118,6 +146,9 @@ public class SnakeMenu extends GridPane
         //this.add(this.setWidthField,2,10);
     }
 
+    /**
+     * Setting up the join section of the menu
+     */
     private void setUpJoinSection()
     {
         this.add(new Label("JOIN GAME"), 2, 1,3,1);
@@ -128,27 +159,45 @@ public class SnakeMenu extends GridPane
         this.add(this.clientButton,3,2,1,2);
     }
 
+    /**
+     * Deactivate the menu if the game starts
+     */
     public void deactivateMenu()
     {
         this.getChildren().forEach((node)->node.setDisable(true));
         this.displayMessage.setDisable(false);
     }
 
+    /**
+     * Activate the menu
+     */
     public void activateMenu()
     {
         this.getChildren().forEach((node)->node.setDisable(false));
     }
 
+    /**
+     * Handling mouse click events on the join button
+     * @param event the event handler
+     */
     public void onClientButtonClick(EventHandler<ActionEvent> event)
     {
         this.clientButton.setOnAction(event);
     }
 
+    /**
+     * Handling mouse click events on the host button
+     * @param event the event handler
+     */
     public void onHostButtonClick(EventHandler<ActionEvent> event)
     {
         this.hostButton.setOnAction(event);
     }
 
+    /**
+     * Handling the start action of host via the controller
+     * @param controller the snake game controller
+     */
     public void hostStartAction(MVCSnakeController controller)
     {
         controller.setHost(this.hostPortField.getText(),
@@ -157,6 +206,10 @@ public class SnakeMenu extends GridPane
                 this.setHeightField.getText());
     }
 
+    /**
+     * Handling the join action of players via the controller
+     * @param controller the snake game controller
+     */
     public void joinStartAction(MVCSnakeController controller)
     {
         controller.setJoin(this.hostText.getText(), this.portText.getText());

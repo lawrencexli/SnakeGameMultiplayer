@@ -34,17 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/** A MVC snake model that is responsible for the snake and item in the game */
 public class MVCSnakeModel implements Protocol, GameGlobalValues
 {
-    /***/
+    /** The snake controller */
     private final MVCSnakeController CONTROLLER;
-    /***/
+    /** The snake shape change variable */
     private final int SNAKE_SHAPE_CHANGE = 100;
-    /***/
+    /** The max port value */
     private final int MAX_PORT = 65535;
-    /***/
+    /** The min port value */
     private final int MIN_PORT = 1000;
-    /***/
+    /** The default snake piece reference, which is the initial head of the snake */
     private final Circle DEFAULT_SNAKE_PIECE_REFERENCE = new Circle(SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE,SNAKE_PIECE_SIZE);
     /**an arraylist holding the positions of all active items*/
     private final ArrayList<Circle> ALL_ITEM_POSITIONS;
@@ -53,23 +54,24 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
     /**An array list for reference in the view that notes and nodes taken out of game for removal*/
     private final ArrayList<Node> SCRAP_NODES;
 
-    /***/
+    /** The socket */
     private Socket socket;
-    /***/
+    /** The network scanner in for input messages from server*/
     private Scanner networkIn;
-    /***/
+    /** The network PrintStream out for output messages from client*/
     private PrintStream networkOut;
 
-    /***/
+    /** The height */
     protected int height;
-    /***/
+    /** The width */
     protected int width;
-    /***/
+    /** The count of how many players in a game */
     protected int playerCount;
 
-    /***/
+    /** A boolean to check if the game is running */
     protected boolean gameRunning;
 
+    /** Constructor of the snake model */
     public MVCSnakeModel(MVCSnakeController controller)
     {
         this.CONTROLLER = controller;
@@ -81,6 +83,11 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         this.SCRAP_NODES = new ArrayList<>();
     }
 
+    /**
+     * The initialization of the model
+     * @param host the host ip
+     * @param port the host port
+     */
     protected void modelInit(String host, String port)
     {
         try
@@ -106,6 +113,9 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * A listener for the networking
+     */
     private void listener()
     {
         try
@@ -131,7 +141,7 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
                     case PLAYER_INFO:
                         this.CONTROLLER.setPlayerInfo(
                                 "PLAYER " + Integer.valueOf(message) + "  ",
-                                this.getColor(Integer.valueOf(message) - 1, false
+                                this.getColor(Integer.parseInt(message) - 1, false
                                 ));
                         break;
                     case MESSAGE:
@@ -156,6 +166,9 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
 
     }
 
+    /**
+     * Close the model. (snake or item) and will remove them from the game
+     */
     private void close()
     {
         try
@@ -172,6 +185,10 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         System.out.println("Model closed down");
     }
 
+    /**
+     * Update the snake with the snake info (position of the snake) from server
+     * @param snakeInfo the position of the snake, with length information.
+     */
     private void updateSnake(String snakeInfo)
     {
         if (!this.CONTROLLER.dataWrite)
@@ -198,6 +215,10 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Setting the item positioning in the server
+     * @param itemPos the position of items as a list of strings
+     */
     private void setItemPositioning(String[] itemPos)
     {
         this.resizeArrayList(itemPos.length, this.ALL_ITEM_POSITIONS);
@@ -214,6 +235,11 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Set the image based on the image from the sprites package
+     * @param index the index of that item
+     * @param type the item type. [Food, Potion, Poison]
+     */
     private void setItemType(int index, int type)
     {
         switch(type)
@@ -230,6 +256,11 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Set the snake positioning
+     * @param i the index of the snake
+     * @param snakePos the snake position as a list of strings
+     */
     private void setSnakePositioning(int i, String[] snakePos)
     {
         this.resizeArrayList(snakePos.length, this.ALL_PLAYERS_SNAKE_POSITIONS[i]);
@@ -250,6 +281,12 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Get the color of the snake. Different players have different snake colors
+     * @param player the player as snake
+     * @param swap the swap between colors
+     * @return return the color of that snake player
+     */
     private Color getColor(int player, boolean swap)
     {
         switch (player)
@@ -269,7 +306,7 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
      *
      * Breaks the snake down int 2 partitions and resizes the pieces to make it more snake looking
      *
-     * @param snake
+     * @param snake the snake to be applied
      */
     private void snakeShaperSmall(int snake)
     {
@@ -325,7 +362,7 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
      *
      * breaks the snake down into 9 partitions and sizes each one out to make the snake seem more... snake like
      *
-     * @param snake
+     * @param snake the snake model to apply
      */
     private void snakeShaper(int snake)
     {
@@ -400,6 +437,12 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Snake the snake part scale. This will make the snake more like a snake. Visual appealing.
+     * @param part the parts of a snake
+     * @param scale the scale to make
+     * @return the scale of a snake parts
+     */
     private double setSnakePartScale(Circle part, double scale)
     {
         part.setScaleX(scale);
@@ -407,11 +450,21 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         return scale;
     }
 
+    /**
+     * Print the message about the server protocols
+     * @param protocol the protocol interface string
+     * @param onOff the protocol is set to on or off
+     */
     public void sendDirection(String protocol, boolean onOff)
     {
         networkOut.println(protocol + " " + onOff);
     }
 
+    /**
+     * Resize the array list of circles (snake parts for the snake)
+     * @param size the size
+     * @param list the list of circles
+     */
     public synchronized void resizeArrayList(int size, List<Circle> list)
     {
         if (list.size() < size)
@@ -422,6 +475,15 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
                 this.SCRAP_NODES.add(list.remove(0));
     }
 
+    /**
+     * Create a network host
+     * @param port the port
+     * @param players max number of players
+     * @param width width of the game window
+     * @param height height of the game window
+     * @throws NumberFormatException exception for incorrect number format
+     * @throws SnakeException the snake exceptions handling the errors
+     */
     public void createNetwork(String port,String players,String width,String height) throws NumberFormatException, SnakeException
     {
         this.CONTROLLER.displayMenuMessage("Starting NetWork...");
@@ -436,6 +498,10 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         this.startHostServer(thisPort);
     }
 
+    /**
+     * Check number of players
+     * @throws SnakeException if the number of players is invalid (0 snake or more than 4 players)
+     */
     private void checkPlayerCount() throws SnakeException
     {
         if (this.playerCount < 1)
@@ -444,14 +510,23 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
             throw new SnakeException("4 Players Max");
     }
 
+    /**
+     * Checking if the port is valid
+     * @param thisPort the port number
+     * @throws SnakeException if the port is invalid
+     */
     private void checkPort(int thisPort) throws SnakeException
     {
         if (thisPort < this.MIN_PORT)
-            throw new SnakeException("Port Must Be Greater Then 1000");
+            throw new SnakeException("Port Must Be Greater Than 1000");
         else if (thisPort > this.MAX_PORT)
             throw new SnakeException("Port Max 65535");
     }
 
+    /**
+     * Begin to host the server
+     * @param thisPort the port number
+     */
     private void startHostServer(int thisPort)
     {
         new Thread(() ->
@@ -468,6 +543,9 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
         }).start();
     }
 
+    /**
+     * Setting up the model, call the controller as the server is hosted
+     */
     public void startModel()
     {
         this.CONTROLLER.displayMenuMessage("Waiting For Other Players");

@@ -19,10 +19,9 @@
 package
         main.Exception;
 
+/** The snake exception handling class */
 public class SnakeException extends Exception
 {
-    public SnakeException(String message)
-    {
-        super(message);
-    }
+    /** Construction of the exception handling */
+    public SnakeException(String message) { super(message); }
 }

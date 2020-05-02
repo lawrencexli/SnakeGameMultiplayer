@@ -34,12 +34,17 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
     /**Length of snake deleted for poison*/
     private final int POISON_LENGTH = 100;
 
+    /** The socket list */
     private Socket[] socket;
+    /** The server */
     private ServerSocket server;
 
+    /** Scanner in for the network information */
     private Scanner [] networkIn;
+    /** PrintStream out for the network information */
     private PrintStream [] networkOut;
 
+    /** Boolean to check if a game is on */
     private boolean gameIsOn = false;
 
     /**fixed width of the window*/
@@ -48,7 +53,7 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
     private int HEIGHT;
 
     /**random number generator*/
-    private Random randomizer;
+    private Random randomNumGen;
 
     /**a list containing all items currently in the pane*/
     private ArrayList<GameAsset> listOfItems;
@@ -60,7 +65,9 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
     /**trigger for a left turn*/
     private boolean[] turnLeft;
 
+    /**Number of player*/
     private int numOfPlayer;
+    /**The number representing the winner*/
     private int winner;
 
     /**
@@ -69,10 +76,12 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
      * */
     private ArrayList<GameAsset> inactiveFoodNodes;
 
+    /** Construction of the network */
     public SnakeNetwork()
     {
         this.winner = -1;
     }
+
     /**
      * initializes lists of items and the pane to a certain size
      */
@@ -89,6 +98,11 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         this.start();
     }
 
+    /**
+     * The initialization and connection to the network
+     * @param port the port
+     * @throws IOException if the read/write run into problems
+     */
     private void initAndConnectNetwork(int port) throws IOException
     {
         server = new ServerSocket(port);
@@ -97,6 +111,9 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             this.setUpNetworkConnection(i);
     }
 
+    /**
+     * Initialization and placement of all snakes
+     */
     private void initAndPlaceSnakes()
     {
         for (int i = 0; i < this.numOfPlayer; i++)
@@ -113,9 +130,12 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Initialization of game instance variables that will be used in the running of the game
+     */
     private void initGameVariables()
     {
-        this.randomizer = new Random();
+        this.randomNumGen = new Random();
         this.listOfItems = new ArrayList<>();
         this.inactiveFoodNodes = new ArrayList<>();
         this.player = new GameAsset[this.numOfPlayer];
@@ -126,6 +146,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         this.turnRight = new boolean[this.numOfPlayer];
     }
 
+    /**
+     * Set up the network connection for the client (player)
+     * @param player the player representation
+     */
     private void setUpNetworkConnection(int player)
     {
         try
@@ -152,6 +176,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * The network listener for the player
+     * @param player the player representation
+     */
     private void networkListener(int player)
     {
         while (this.networkIn[player].hasNextLine())
@@ -207,6 +235,9 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Send the network info
+     */
     private void sendNetworkInfo()
     {
         StringBuilder allInfo = new StringBuilder();
@@ -215,6 +246,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         pushNetwork(DATA, allInfo.toString());
     }
 
+    /**
+     * Build the snake string information for the network
+     * @param allInfo the information as string builder. Populate the information to be ready to send
+     */
     private void buildSnakeStringForNetwork(StringBuilder allInfo)
     {
         for (GameAsset gameAsset : this.player)
@@ -232,6 +267,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Build the item string information for the network
+     * @param allInfo the information as string builder. Populate the information to be ready to send
+     */
     private void buildItemStringForNetwork(StringBuilder allInfo)
     {
         for (int i = 0; i < this.listOfItems.size(); i++)
@@ -243,6 +282,11 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * Get the type of an item
+     * @param i the index of the list
+     * @return the type as class name
+     */
     private int getItemType(int i)
     {
         if (this.listOfItems.get(i) instanceof Poison)
@@ -253,6 +297,11 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             return FOOD;
     }
 
+    /**
+     * Push all information to the network
+     * @param protocol the protocol interface for messages
+     * @param info the information to push to network
+     */
     private void pushNetwork(String protocol, String info)
     {
         for (int i = 0; i < this.numOfPlayer; i++)
@@ -279,6 +328,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         updatePlayer();
     }
 
+    /**
+     * handle if a snake collided with another snake's body
+     * @param thisPlayer the player representation
+     */
     private void handlePlayerOtherPlayerCollision(int thisPlayer)
     {
         for (int i = 0 ; i < this.player.length; i++)
@@ -292,6 +345,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
                     }
     }
 
+    /**
+     * handle if a snake is collided with itself
+     * @param i the index of the player representation
+     */
     private void handlePlayerSelfCollision(int i)
     {
         int j = 0;
@@ -308,6 +365,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * handle if a snake is collided with the wall
+     * @param i the index of the player representation
+     */
     private void handlePlayerWallCollision(int i)
     {
         assert this.player[i] != null;
@@ -326,6 +387,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
         }
     }
 
+    /**
+     * handle if a snake is collided with an item (the snake eats something)
+     * @param i the index of the player representation
+     */
     private void handlePlayerItemCollision(int i)
     {
         for (GameAsset item : this.listOfItems)
@@ -336,6 +401,10 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             }
     }
 
+    /**
+     * handle if a snake is turning direction
+     * @param i the index of the player representation
+     */
     private void handlePlayerTurning(int i)
     {
         if (this.turnRight[i])
@@ -401,7 +470,7 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
     {
         if (this.listOfItems.size() < MAX_ITEMS)
         {
-            int randomInt = randomizer.nextInt(2000);
+            int randomInt = randomNumGen.nextInt(2000);
             if (randomInt < 25)
             {
                 Item newItem;
@@ -419,8 +488,8 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
 
                 this.listOfItems.add(newItem);
                 SnakeUtil.addToGame(newItem,
-                        WALL_THICKNESS * 2 + (this.randomizer.nextInt(WIDTH- 150)),
-                        WALL_THICKNESS * 2 + (this.randomizer.nextInt(HEIGHT- 150)));
+                        WALL_THICKNESS * 2 + (this.randomNumGen.nextInt(WIDTH- 150)),
+                        WALL_THICKNESS * 2 + (this.randomNumGen.nextInt(HEIGHT- 150)));
             }
         }
     }
@@ -458,6 +527,9 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             this.player = null;
     }
 
+    /**
+     * The in-game ticking timer of the snake game
+     */
     private void tickTimer()
     {
         long now = System.currentTimeMillis();
