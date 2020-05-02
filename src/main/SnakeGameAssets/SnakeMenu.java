@@ -56,6 +56,8 @@ public class SnakeMenu extends GridPane
      *  TOP: join game menu, with host and port field
      *  MIDDLE: host game menu, with port, number of players, width and height fields
      *  BOTTOM: a message display, for errors or updates
+     *
+     * @author: Christopher Asbrock
      */
     public SnakeMenu()
     {

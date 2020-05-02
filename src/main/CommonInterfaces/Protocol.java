@@ -3,6 +3,8 @@ package main.CommonInterfaces;
 /**
  * protocol shared between the client and the server
  * each will implement this so the protocol is standardized
+ *
+ * @author: Christopher Asbrock
  */
 public interface Protocol
 {

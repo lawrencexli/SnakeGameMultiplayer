@@ -21,6 +21,13 @@ package main.SnakeGameAssets;
 
 import javafx.scene.paint.Color;
 
+/**
+ * A snake tail class inherited from GameAsset
+ *
+ * @author: Christopher Asbrock
+ * @author: Tung Tran
+ * @author: Lawrence Li
+ */
 public class SnakeTail extends GameAsset {
 
     /** For debugging */

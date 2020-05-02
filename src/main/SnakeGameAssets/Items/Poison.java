@@ -21,7 +21,13 @@ package
 
 import javafx.scene.paint.Color;
 
-/** Poison inherited from Item */
+/**
+ * Poison inherited from Item
+ *
+ * @author: Lawrence Li
+ * @author: Christopher Asbrock
+ * @author: Franco Perinotti
+ */
 public class Poison extends Item {
 
     public Poison(int x, Color color) {

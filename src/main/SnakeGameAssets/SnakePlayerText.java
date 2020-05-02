@@ -24,7 +24,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-/** The snake player text for displaying in the game window */
+/**
+ * The snake player text for displaying in the game window
+ *
+ * @author: Christopher Asbrock
+ */
 public class SnakePlayerText extends GridPane
 {
     /** The player number label */

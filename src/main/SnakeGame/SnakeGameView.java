@@ -31,7 +31,12 @@ import main.CommonInterfaces.GameGlobalValues;
 import main.SnakeGameAssets.SnakeMenu;
 import main.SnakeGameAssets.SnakePlayerText;
 
-/** A snake game view of the MVC design. Make the view of the game window and root pane */
+/**
+ * A snake game view of the MVC design. Make the view of the game window and root pane
+ *
+ * @author: Christopher Asbrock
+ * @author: Tung Tran
+ */
 public class SnakeGameView implements GameGlobalValues {
 
     /**game main root*/

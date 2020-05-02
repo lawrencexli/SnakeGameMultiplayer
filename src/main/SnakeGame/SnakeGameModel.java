@@ -34,7 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/** A MVC snake model that is responsible for the snake and item in the game */
+/**
+ * A MVC snake model that is responsible for the snake and item in the game
+ *
+ * @author: Christopher Asbrock
+ * @author: Tung Tran
+ */
 public class SnakeGameModel implements Protocol, GameGlobalValues
 {
     /** The snake controller */

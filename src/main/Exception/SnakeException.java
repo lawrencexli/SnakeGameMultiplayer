@@ -19,7 +19,11 @@
 package
         main.Exception;
 
-/** The snake exception handling class */
+/**
+ * The snake exception handling class
+ *
+ * @author: Christopher Asbrock
+ */
 public class SnakeException extends Exception
 {
     /** Construction of the exception handling */

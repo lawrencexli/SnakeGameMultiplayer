@@ -27,7 +27,11 @@ import main.Exception.SnakeException;
 
 import java.util.ArrayList;
 
-/** A snake controller that update the view and display messages */
+/**
+ * A snake controller that update the view and display messages
+ *
+ * @author: Christopher Asbrock
+ */
 public class SnakeGameController {
 
     /** Menu message */

@@ -21,7 +21,13 @@ package
 
 import javafx.scene.paint.Color;
 
-/** Potion inherited from Item */
+/**
+ * Potion inherited from Item
+ *
+ * @author: Lawrence Li
+ * @author: Christopher Asbrock
+ * @author: Franco Perinotti
+ */
 public class Potion extends Item {
 
     public Potion(int x,  Color color) {

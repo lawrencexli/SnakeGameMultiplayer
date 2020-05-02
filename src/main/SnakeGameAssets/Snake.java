@@ -23,8 +23,13 @@ import javafx.scene.paint.Color;
 
 import java.util.LinkedList;
 
+/**
+ * A snake class inherited from GameAsset contain a list of snake tail objects
+ *
+ * @author: Tung Tran
+ * @author: Lawrence Li
+ */
 public class Snake extends GameAsset {
-
 
     /** SnakeTails with references to its parents */
     private LinkedList<SnakeTail> snakeTails;

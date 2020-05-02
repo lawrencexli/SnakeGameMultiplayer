@@ -22,6 +22,7 @@ import java.util.Scanner;
  * player can change the angle of the snake by using their arrow keys
  *
  * @author Christopher Asbrock
+ * @author Franco Perinotti
  */
 public class SnakeNetwork implements Protocol, GameGlobalValues
 {

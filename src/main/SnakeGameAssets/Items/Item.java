@@ -25,6 +25,11 @@ import main.SnakeGameAssets.GameAsset;
 
 /**
  * A class that represent the items in the snake game
+ *
+ *
+ * @author: Lawrence Li
+ * @author: Christopher Asbrock
+ * @author: Franco Perinotti
  */
 public abstract class Item extends GameAsset {
 

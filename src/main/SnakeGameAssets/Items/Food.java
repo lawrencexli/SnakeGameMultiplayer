@@ -21,7 +21,13 @@ package
 
 import javafx.scene.paint.Color;
 
-/** Food inherited from Item */
+/**
+ * Food inherited from Item
+ *
+ * @author: Lawrence Li
+ * @author: Christopher Asbrock
+ * @author: Franco Perinotti
+ */
 public class Food extends Item {
 
     public Food(int x, Color color) {
