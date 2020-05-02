@@ -28,7 +28,7 @@ import main.Exception.SnakeException;
 import java.util.ArrayList;
 
 /** A snake controller that update the view and display messages */
-public class MVCSnakeController {
+public class SnakeGameController {
 
     /** Menu message */
     protected String menuMessage;
@@ -67,13 +67,13 @@ public class MVCSnakeController {
     private final SnakeGameView VIEW;
 
     /** MVC Snake Model */
-    private final MVCSnakeModel MODEL;
+    private final SnakeGameModel MODEL;
 
     /** Constructor of controller */
-    public MVCSnakeController(SnakeGameView view)
+    public SnakeGameController(SnakeGameView view)
     {
         this.VIEW = view;
-        this.MODEL = new MVCSnakeModel(this);
+        this.MODEL = new SnakeGameModel(this);
         this.gameGoing = false;
 
         this.menuMessage = "";

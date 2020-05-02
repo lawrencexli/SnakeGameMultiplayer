@@ -25,7 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import main.MainSnakeGame.MVCSnakeController;
+import main.MainSnakeGame.SnakeGameController;
 
 /** The main menu of the snake called from the snake view */
 public class SnakeMenu extends GridPane
@@ -198,7 +198,7 @@ public class SnakeMenu extends GridPane
      * Handling the start action of host via the controller
      * @param controller the snake game controller
      */
-    public void hostStartAction(MVCSnakeController controller)
+    public void hostStartAction(SnakeGameController controller)
     {
         controller.setHost(this.hostPortField.getText(),
                 this.numOfPlayerField.getText(),
@@ -210,7 +210,7 @@ public class SnakeMenu extends GridPane
      * Handling the join action of players via the controller
      * @param controller the snake game controller
      */
-    public void joinStartAction(MVCSnakeController controller)
+    public void joinStartAction(SnakeGameController controller)
     {
         controller.setJoin(this.hostText.getText(), this.portText.getText());
     }

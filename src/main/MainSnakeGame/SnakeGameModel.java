@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Scanner;
 
 /** A MVC snake model that is responsible for the snake and item in the game */
-public class MVCSnakeModel implements Protocol, GameGlobalValues
+public class SnakeGameModel implements Protocol, GameGlobalValues
 {
     /** The snake controller */
-    private final MVCSnakeController CONTROLLER;
+    private final SnakeGameController CONTROLLER;
     /** The snake shape change variable */
     private final int SNAKE_SHAPE_CHANGE = 100;
     /** The max port value */
@@ -72,7 +72,7 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
     protected boolean gameRunning;
 
     /** Constructor of the snake model */
-    public MVCSnakeModel(MVCSnakeController controller)
+    public SnakeGameModel(SnakeGameController controller)
     {
         this.CONTROLLER = controller;
         this.ALL_ITEM_POSITIONS = new ArrayList<>();

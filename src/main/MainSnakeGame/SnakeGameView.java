@@ -47,7 +47,7 @@ public class SnakeGameView implements GameGlobalValues {
     private SnakePlayerText playerInfo;
 
     /**A reference to the game controller*/
-    private MVCSnakeController controller;
+    private SnakeGameController controller;
 
     /**A list of snake parts (circles)*/
     private Circle[][] snakeParts;
@@ -61,7 +61,7 @@ public class SnakeGameView implements GameGlobalValues {
      */
     public SnakeGameView() {
         root = new Pane();
-        controller = new MVCSnakeController(this);
+        controller = new SnakeGameController(this);
         root.setPrefSize(this.controller.WIDTH, this.controller.HEIGHT);
 
         initSnakes();
