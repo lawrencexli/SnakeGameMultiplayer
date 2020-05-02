@@ -31,7 +31,36 @@ the Model, View, Controller design and Object-oriented principles.
 
 # Build and run instructions
 
+The following instructions is tested successfully on Mac. 
+The instruction will assume that you have this gitlab repository in your computer,
+and you have this repository folder in your HOME location. 
 
+Step 1 - Open terminal
+
+Step 2 - Enter the following command
+
+**java --module-path ~/csci205_final_project_sp2020/lib/javafx-sdk-13 --add-modules=javafx.controls -jar ~/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar**
+
+
+The above command will assume that you have this repository folder in your HOME location. 
+
+If you store it somewhere else, you need to replace the ~ above and enter your directory to this repository. 
+
+
+Example: If you store it under /Users/USERNAME/Desktop:
+
+
+/Users/USERNAME/Desktop/csci205_final_project_sp2020/lib/javafx-sdk-13
+
+/Users/USERNAME/Desktop/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar
+
+
+or for ~/Desktop as an example:
+
+
+~/Desktop/csci205_final_project_sp2020/lib/javafx-sdk-13
+
+~/Desktop/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar
 
 
 
