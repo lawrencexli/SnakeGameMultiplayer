@@ -13,6 +13,7 @@ public interface Protocol
     String ERROR = "error";
     String END_GAME = "endGame";
     String MESSAGE = "message";
+    String PLAYER_INFO = "playerInfo";
 
     default String getProtocol(String input)
     {

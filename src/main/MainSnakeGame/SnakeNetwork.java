@@ -137,12 +137,13 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             networkOut[player] = new PrintStream(socket[player].getOutputStream());
             networkIn[player] = new Scanner(socket[player].getInputStream());
 
+            this.networkOut[player].println(PLAYER_INFO + " " + (player + 1));
             new Thread(() -> networkListener(player)).start();
 
             if (player == this.numOfPlayer - 1)
             {
                 this.gameIsOn = true;
-                pushNetwork(START_GAME, (this.numOfPlayer) + " " + (player + 1));
+                this.pushNetwork(START_GAME, String.valueOf(this.numOfPlayer));
             }
         }
         catch (IOException e)

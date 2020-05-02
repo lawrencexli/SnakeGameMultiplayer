@@ -21,6 +21,7 @@ package
 
 import javafx.application.Platform;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import main.Exception.SnakeException;
 
@@ -30,6 +31,9 @@ public class MVCSnakeController {
 
     protected String menuMessage;
     protected String gameMessage;
+    protected String playerInfo;
+    protected Color playerColor;
+
     protected final int WIDTH = 800;
     protected final int HEIGHT = 600;
     protected boolean dataWrite;
@@ -157,5 +161,12 @@ public class MVCSnakeController {
     {
         if (this.gameGoing)
             this.MODEL.sendDirection(this.MODEL.TURN_RIGHT, b);
+    }
+
+    public void setPlayerInfo(String text, Color color)
+    {
+        this.playerInfo = text;
+        this.playerColor = color;
+        this.updateView();
     }
 }

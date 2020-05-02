@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.CommonInterfaces.GameGlobalValues;
 import main.SnakeGameAssets.SnakeMenu;
+import main.SnakeGameAssets.SnakePlayerText;
 
 public class MVCSnakeView extends Application implements GameGlobalValues
 {
@@ -22,6 +23,8 @@ public class MVCSnakeView extends Application implements GameGlobalValues
     private SnakeMenu startMenu;
 
     private Label snakeAlert;
+
+    private SnakePlayerText playerInfo;
 
     /**A reference to the game controller*/
     private MVCSnakeController controller;
@@ -51,6 +54,11 @@ public class MVCSnakeView extends Application implements GameGlobalValues
         this.root.getChildren().add(this.startMenu);
         this.startMenu.setTranslateX(this.controller.WIDTH/4.0);
         this.startMenu.setTranslateY(this.controller.HEIGHT/4.0);
+
+        this.playerInfo = new SnakePlayerText();
+        this.root.getChildren().add(this.playerInfo);
+        this.playerInfo.setTranslateX(WALL_THICKNESS);
+        this.playerInfo.setTranslateY(this.controller.HEIGHT - 26);
     }
 
     private void initSnakes()
@@ -147,6 +155,7 @@ public class MVCSnakeView extends Application implements GameGlobalValues
         if (this.controller.gameGoing)
         {
             this.snakeAlert.setText(this.controller.gameMessage);
+            this.playerInfo.setPlayerField(this.controller.playerInfo, this.controller.playerColor);
 
             updateAllNodesBeta();
 
@@ -242,6 +251,11 @@ public class MVCSnakeView extends Application implements GameGlobalValues
     public SnakeMenu getStartMenu()
     {
         return startMenu;
+    }
+
+    public SnakePlayerText getPlayerInfo()
+    {
+        return playerInfo;
     }
 
     /**

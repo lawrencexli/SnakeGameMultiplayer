@@ -126,8 +126,13 @@ public class MVCSnakeModel implements Protocol, GameGlobalValues
                         break;
                     case START_GAME:
                         this.CONTROLLER.gameGoing = true;
-                        this.playerCount = Integer.parseInt(message.split(" ")[0]);
-                        this.CONTROLLER.displayGameMessage("PLAYER " + message.split(" ")[0]);
+                        this.playerCount = Integer.parseInt(message);
+                        break;
+                    case PLAYER_INFO:
+                        this.CONTROLLER.setPlayerInfo(
+                                "PLAYER " + Integer.valueOf(message) + "  ",
+                                this.getColor(Integer.valueOf(message) - 1, false
+                                ));
                         break;
                     case MESSAGE:
                         this.CONTROLLER.displayGameMessage(message);
