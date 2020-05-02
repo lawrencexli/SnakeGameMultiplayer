@@ -125,12 +125,12 @@ public class MVCSnakeController {
         this.MODEL.modelInit(host, port);
     }
 
-    public ArrayList<Circle> getITEM_POSITIONING()
+    public ArrayList<Circle> getItemPositions()
     {
         return ITEM_POSITIONING;
     }
 
-    public ArrayList<Circle>[] getSNAKE_PARTS_POSITIONING()
+    public ArrayList<Circle>[] getSnakePostions()
     {
         return SNAKE_PARTS_POSITIONING;
     }

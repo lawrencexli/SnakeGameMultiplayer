@@ -1,7 +1,7 @@
 package main.MainSnakeGame;
 
 import javafx.scene.paint.Color;
-import main.CommonInterfaces.GameCommonIndexes;
+import main.CommonInterfaces.GameGlobalValues;
 import main.CommonInterfaces.Protocol;
 import main.SnakeGameAssets.*;
 import main.SnakeGameAssets.Items.*;
@@ -23,9 +23,16 @@ import java.util.Scanner;
  *
  * @author Christopher Asbrock
  */
-public class SnakeNetwork implements Protocol, GameCommonIndexes
+public class SnakeNetwork implements Protocol, GameGlobalValues
 {
+    /**base length for the snake, it will start this size and will not be able to go less then this*/
     private final int INIT_SNAKE_SIZE = 15;
+    /**Length of snake added for potion*/
+    private final int POTION_LENGTH = 50;
+    /**Length of snake added for food*/
+    private final int FOOD_LENGTH = 5;
+    /**Length of snake deleted for poison*/
+    private final int POISON_LENGTH = 100;
 
     private Socket[] socket;
     private ServerSocket server;
@@ -52,13 +59,6 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
     private boolean[] turnRight;
     /**trigger for a left turn*/
     private boolean[] turnLeft;
-
-    /**Length of snake added for potion*/
-    private final int POTION_LENGTH = 50;
-    /**Length of snake added for food*/
-    private final int FOOD_LENGTH = 5;
-    /**Length of snake deleted for poison*/
-    private final int POISON_LENGTH = 100;
 
     private int numOfPlayer;
     private int winner;
@@ -153,17 +153,13 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
 
     private void networkListener(int player)
     {
-        while (true)
+        while (this.networkIn[player].hasNextLine())
         {
-            if (!this.networkIn[player].hasNextLine())
-                break;
-
             String input = this.networkIn[player].nextLine();
             String protocol = getProtocol(input);
             String message = getMessage(protocol, input);
 
-            switch (protocol)
-            {
+            switch (protocol) {
                 case TURN_LEFT:
                     this.turnLeft[player] = message.equalsIgnoreCase("true");
                     break;
@@ -376,13 +372,13 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
     private void handleItemCollision(GameAsset item, Snake currPlayer)
     {
         if (item instanceof Potion)
-            for (int i = 0; i < POTION_LENGTH; i++)
+            for (int i = 0; i < this.POTION_LENGTH; i++)
                 currPlayer.addTail();
         else if (item instanceof Poison)
-            for (int i = 0; i < POISON_LENGTH; i++)
-                currPlayer.removeTail();
+            for (int i = 0; i < this.POISON_LENGTH; i++)
+                currPlayer.removeTail(this.INIT_SNAKE_SIZE);
         else
-            for (int i = 0; i < FOOD_LENGTH; i++)
+            for (int i = 0; i < this.FOOD_LENGTH; i++)
                 currPlayer.addTail();
 
     }
@@ -411,13 +407,13 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
                 switch (randomInt)
                 {
                     case POTION:
-                        newItem = new Potion(12, Color.GOLD);
+                        newItem = new Potion(ITEM_SIZE, Color.GOLD);
                         break;
                     case POISON:
-                        newItem = new Poison(11, Color.GREEN);
+                        newItem = new Poison(ITEM_SIZE, Color.GREEN);
                         break;
                     default:
-                        newItem = new Food(10, Color.BLUE);
+                        newItem = new Food(ITEM_SIZE, Color.BLUE);
                 }
 
                 this.listOfItems.add(newItem);
@@ -441,34 +437,24 @@ public class SnakeNetwork implements Protocol, GameCommonIndexes
     /**
      * the final check for players, if everyone is null the game is over, it will null the whole array
      */
-    public boolean checkPlayersEndGame()
+    public void checkPlayersEndGame()
     {
         int count = 0;
         this.winner = -1;
 
         for (int i = 0; i < this.numOfPlayer; i++)
-        {
             if (this.player[i] == null)
                 count++;
             else
                 this.winner = i;
-        }
 
         if (this.numOfPlayer > 1)
         {
             if (count == this.numOfPlayer - 1)
-            {
                 this.player = null;
-                return true;
-            }
         }
         else if (count == this.numOfPlayer)
-        {
             this.player = null;
-            return true;
-        }
-
-        return false;
     }
 
     private void tickTimer()

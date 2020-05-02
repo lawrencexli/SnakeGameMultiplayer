@@ -6,7 +6,7 @@ package main.CommonInterfaces;
  *
  * @author Christopher Asbrock
  */
-public interface GameCommonIndexes
+public interface GameGlobalValues
 {
     /**Common index position representing the x position*/
     int X_POSITION = 0;

@@ -4,18 +4,16 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import main.CommonInterfaces.GameCommonIndexes;
+import main.CommonInterfaces.GameGlobalValues;
 import main.SnakeGameAssets.SnakeMenu;
 
-public class MVCSnakeView extends Application implements GameCommonIndexes
+public class MVCSnakeView extends Application implements GameGlobalValues
 {
     /**game main root*/
     private Pane root;
@@ -177,12 +175,12 @@ public class MVCSnakeView extends Application implements GameCommonIndexes
     {
         for (int i = 0; i < this.items.length ; i++)
         {
-            if (i < this.controller.getITEM_POSITIONING().size())
+            if (i < this.controller.getItemPositions().size())
             {
                 this.items[i].setVisible(true);
-                this.items[i].setTranslateX(this.controller.getITEM_POSITIONING().get(i).getTranslateX());
-                this.items[i].setTranslateY(this.controller.getITEM_POSITIONING().get(i).getTranslateY());
-                this.items[i].setFill(this.controller.getITEM_POSITIONING().get(i).getFill());
+                this.items[i].setTranslateX(this.controller.getItemPositions().get(i).getTranslateX());
+                this.items[i].setTranslateY(this.controller.getItemPositions().get(i).getTranslateY());
+                this.items[i].setFill(this.controller.getItemPositions().get(i).getFill());
             }
             else
                 this.items[i].setVisible(false);
@@ -191,19 +189,19 @@ public class MVCSnakeView extends Application implements GameCommonIndexes
 
     private void updateSnake()
     {
-        for (int i = 0; i < this.controller.getSNAKE_PARTS_POSITIONING().length ; i++)
+        for (int i = 0; i < this.controller.getSnakePostions().length ; i++)
         {
             for (int j = 0; j < this.snakeParts[i].length ; j++)
             {
-                if (j < this.controller.getSNAKE_PARTS_POSITIONING()[i].size() && this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j) != null)
+                if (j < this.controller.getSnakePostions()[i].size() && this.controller.getSnakePostions()[i].get(j) != null)
                 {
                     this.snakeParts[i][j].setVisible(true);
-                    this.snakeParts[i][j].setScaleX(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getScaleX());
-                    this.snakeParts[i][j].setScaleY(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getScaleY());
-                    this.snakeParts[i][j].setTranslateX(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateX());
-                    this.snakeParts[i][j].setTranslateY(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getTranslateY());
-                    this.snakeParts[i][j].setRotate(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getRotate());
-                    this.snakeParts[i][j].setFill(this.controller.getSNAKE_PARTS_POSITIONING()[i].get(j).getFill());
+                    this.snakeParts[i][j].setScaleX(this.controller.getSnakePostions()[i].get(j).getScaleX());
+                    this.snakeParts[i][j].setScaleY(this.controller.getSnakePostions()[i].get(j).getScaleY());
+                    this.snakeParts[i][j].setTranslateX(this.controller.getSnakePostions()[i].get(j).getTranslateX());
+                    this.snakeParts[i][j].setTranslateY(this.controller.getSnakePostions()[i].get(j).getTranslateY());
+                    this.snakeParts[i][j].setRotate(this.controller.getSnakePostions()[i].get(j).getRotate());
+                    this.snakeParts[i][j].setFill(this.controller.getSnakePostions()[i].get(j).getFill());
                 }
                 else
                     this.snakeParts[i][j].setVisible(false);
