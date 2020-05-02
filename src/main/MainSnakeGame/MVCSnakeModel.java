@@ -19,7 +19,9 @@
 package main.MainSnakeGame;
 
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import main.CommonInterfaces.GameCommonIndexes;
 import main.CommonInterfaces.Protocol;
@@ -204,13 +206,13 @@ public class MVCSnakeModel implements Protocol, GameCommonIndexes
         switch(type)
         {
             case FOOD:
-                this.itemListPositions.get(index).setFill(Color.RED);
+                this.itemListPositions.get(index).setFill(new ImagePattern(new Image("file:src/main/sprites/foodSprite.png")));
                 break;
             case POTION:
-                this.itemListPositions.get(index).setFill(Color.LIGHTGOLDENRODYELLOW);
+                this.itemListPositions.get(index).setFill(new ImagePattern(new Image("file:src/main/sprites/potionSprite.png")));
                 break;
             case POISON:
-                this.itemListPositions.get(index).setFill(Color.GREEN);
+                this.itemListPositions.get(index).setFill(new ImagePattern(new Image("file:src/main/sprites/poisonSprite.png")));
                 break;
         }
     }
@@ -291,6 +293,8 @@ public class MVCSnakeModel implements Protocol, GameCommonIndexes
                 count = 0;
                 partitionIndex++;
             }
+
+            setHead(snake, i);
         }
     }
 
@@ -347,6 +351,18 @@ public class MVCSnakeModel implements Protocol, GameCommonIndexes
                 count = 0;
                 partitionIndex++;
             }
+
+            setHead(snake, i);
+        }
+    }
+
+    private void setHead(int snake, int i)
+    {
+        if (i == 0)
+        {
+            this.snakeListPositions[snake].get(i).setScaleX(1.3);
+            this.snakeListPositions[snake].get(i).setScaleY(1.3);
+            this.snakeListPositions[snake].get(i).setFill(new ImagePattern(new Image("file:src/main/sprites/player" + (i + 1) + "Head.png")));
         }
     }
 

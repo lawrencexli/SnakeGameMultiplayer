@@ -36,7 +36,7 @@ public interface GameCommonIndexes
     int POISON = 2;
 
     /**the size of an item*/
-    int ITEM_SIZE = 10;
+        int ITEM_SIZE = 15;
 
     /**the size of a snake piece*/
     int SNAKE_PIECE_SIZE = 15;
