@@ -36,6 +36,7 @@ import main.SnakeGameAssets.SnakePlayerText;
  *
  * @author: Christopher Asbrock
  * @author: Tung Tran
+ * @author: Lawrence Li
  */
 public class SnakeGameView implements GameGlobalValues {
 

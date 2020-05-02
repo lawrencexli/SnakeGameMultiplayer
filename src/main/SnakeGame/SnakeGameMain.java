@@ -8,6 +8,7 @@ import javafx.stage.Stage;
  * The main class that the snake game will run. Will call the view
  *
  * @author: Lawrence Li
+ * @author: Christopher Asbrock
  */
 public class SnakeGameMain extends Application
 {
