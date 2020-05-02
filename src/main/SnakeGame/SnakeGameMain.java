@@ -11,10 +11,7 @@ public class SnakeGameMain extends Application
 {
 
     /** The view of the snake */
-    SnakeGameView VIEW;
-
-    @Override
-    public void init() { this.VIEW = new SnakeGameView(); }
+    private final SnakeGameView VIEW = new SnakeGameView();
 
     /**
      * javafx start method, sets and shows the stage,
