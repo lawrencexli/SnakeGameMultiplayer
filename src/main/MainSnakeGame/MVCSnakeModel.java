@@ -362,7 +362,7 @@ public class MVCSnakeModel implements Protocol, GameCommonIndexes
         {
             this.snakeListPositions[snake].get(i).setScaleX(1.3);
             this.snakeListPositions[snake].get(i).setScaleY(1.3);
-            this.snakeListPositions[snake].get(i).setFill(new ImagePattern(new Image("file:src/main/sprites/player" + (i + 1) + "Head.png")));
+            this.snakeListPositions[snake].get(i).setFill(new ImagePattern(new Image("file:src/main/sprites/player" + (snake + 1) + "Head.png")));
         }
     }
 
