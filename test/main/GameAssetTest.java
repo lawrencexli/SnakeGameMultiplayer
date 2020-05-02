@@ -8,9 +8,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 
+/**
+ * A test in game asset
+ *
+ * @author: Christopher Asbrock
+ */
 class GameAssetTest
 {
+    /** The epsilon of comparison double */
     private static final double EPSILON = 1.0E-12;
+
+    /** The snake asset to be tested */
     private Snake testAsset;
 
     @BeforeEach
@@ -19,6 +27,7 @@ class GameAssetTest
         this.testAsset = new Snake();
     }
 
+    /** Test rotate left */
     @Test
     void rotateLEFT()
     {
@@ -48,6 +57,7 @@ class GameAssetTest
         this.cordPrintOut();
     }
 
+    /** Test rotate right */
     @Test
     void rotateRight()
     {
@@ -68,6 +78,7 @@ class GameAssetTest
         assertEquals(this.testAsset.getTranslateY(), 1, EPSILON);
     }
 
+    /** Print the coordinates out */
     private void cordPrintOut()
     {
         System.out.println(this.testAsset.getTranslateX() + " " + this.testAsset.getTranslateY() + " " + this.testAsset.getRotate());

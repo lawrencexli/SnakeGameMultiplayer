@@ -5,8 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * A snake tail test to test the snake can rotate and move properly
+ *
+ * @author: Christopher Asbrock
+ */
 class SnakeTailTest {
 
+    /** Update the snake tail test */
     @Test
     void updateAsset()
     {

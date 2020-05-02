@@ -6,8 +6,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * A test in game asset to check for collisions
+ *
+ * @author: Christopher Asbrock
+ */
 class GameAssetTest {
 
+    /** Check for collision */
     @Test
     void checkForCollision()
     {
