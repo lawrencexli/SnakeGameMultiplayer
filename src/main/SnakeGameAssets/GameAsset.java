@@ -30,17 +30,6 @@ import javafx.scene.shape.Circle;
  */
 public abstract class GameAsset extends Circle
 {
-    /**
-     * inner class that determines the direction of a rotation
-     *
-     * @author Christopher Asbrock
-     */
-    public static class MyRotate
-    {
-        final static int RIGHT = -1;
-        final static int LEFT = 1;
-    }
-
     /**the x velocity this object is moving in, 0 if stationary*/
     private double velocityX;
     /**the y velocity this object is moving in, 0 if stationary*/

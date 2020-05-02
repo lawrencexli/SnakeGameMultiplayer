@@ -142,7 +142,7 @@ public class SnakeNetwork implements Protocol, GameGlobalValues
             if (player == this.numOfPlayer - 1)
             {
                 this.gameIsOn = true;
-                pushNetwork(START_GAME, String.valueOf(this.numOfPlayer));
+                pushNetwork(START_GAME, (this.numOfPlayer) + " " + (player + 1));
             }
         }
         catch (IOException e)
