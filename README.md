@@ -35,16 +35,43 @@ The following instructions is tested successfully on Mac.
 The instruction will assume that you have this gitlab repository in your computer,
 and you have this repository folder in your HOME location. 
 
-Step 1 - Open terminal
+Step 1 - Download Javafx-sdk-13 from the following download link:
 
-Step 2 - Enter the following command
+Mac:
+https://gluonhq.com/download/javafx-13-0-2-sdk-mac/
 
-**java --module-path ~/csci205_final_project_sp2020/lib/javafx-sdk-13 --add-modules=javafx.controls -jar ~/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar**
+Linux:
+https://gluonhq.com/download/javafx-13-0-2-sdk-linux/
+
+Windows:
+https://gluonhq.com/download/javafx-13-0-2-sdk-windows/
+
+
+Step 2 - Once you downloaded it, unzip the file and store it somewhere in your computer.
+Remember to store the file in a good location so you can know its directory path. 
+
+Step 3 - Open terminal
+
+Step 4 - Enter the following command
+
+
+
+**java --module-path [INSERT YOUR JAVAFX LIBRARY DIRECTORY HERE] --add-modules=javafx.controls -jar ~/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar**
+
 
 
 The above command will assume that you have this repository folder in your HOME location. 
 
-If you store it somewhere else, you need to replace the ~ above and enter your directory to this repository. 
+Also, your javafx library directory will be something like the following:
+
+
+
+**your_directory_from_home/javafx-sdk-13.0.2/lib**
+
+
+
+If you store the repository somewhere else, you need to replace the ~ in the command and enter your directory to this repository. 
+
 
 
 Example: If you store it under /Users/USERNAME/Desktop:
