@@ -77,15 +77,11 @@ If you store the repository somewhere else, you need to replace the ~ in the com
 Example: If you store it under /Users/USERNAME/Desktop:
 
 
-/Users/USERNAME/Desktop/csci205_final_project_sp2020/lib/javafx-sdk-13
-
 /Users/USERNAME/Desktop/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar
 
 
 or for ~/Desktop as an example:
 
-
-~/Desktop/csci205_final_project_sp2020/lib/javafx-sdk-13
 
 ~/Desktop/csci205_final_project_sp2020/dist/csci205_final_project_sp2020.jar
 
