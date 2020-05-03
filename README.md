@@ -52,7 +52,13 @@ Remember to store the file in a good location so you can know its directory path
 
 Step 3 - Open terminal
 
-Step 4 - Enter the following command
+Step 4 - Go to the repository folder by enter the following command:
+
+**cd ~/csci205_final_project_sp2020** or **cd YOUR_DIRECTORY_HERE/csci205_final_project_sp2020** if you did not put
+this repository in your HOME location.
+
+
+Step 5 - Enter the following command
 
 
 
