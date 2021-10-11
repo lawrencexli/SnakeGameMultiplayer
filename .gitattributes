@@ -1,3 +1,4 @@
 Presentation[[:space:]]video.mov filter=lfs diff=lfs merge=lfs -text
 lib/ filter=lfs diff=lfs merge=lfs -text
 .gitattributes filter=lfs diff=lfs merge=lfs -text
+Presentation/[[:space:]]video.mov filter=lfs diff=lfs merge=lfs -text
