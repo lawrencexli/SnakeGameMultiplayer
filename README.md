@@ -1,6 +1,8 @@
 # CSCI 205 Final Project
   **Welcome to this amazing snake game developed by the Team 3 Python!**
   
+  **The project demonstration video is linked here: https://www.youtube.com/watch?v=vklWWPKC7XI**
+  
   **Team members:**
   
   Christopher Asbrock
